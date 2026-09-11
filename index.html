@@ -27,8 +27,8 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            padding: 20px;
+            align-items: stretch;
+            padding: 0;
         }
 
         body::before {
@@ -44,6 +44,7 @@
             background-size: 40px 40px;
             animation: gridPulse 4s ease-in-out infinite;
             z-index: 0;
+            pointer-events: none;
         }
 
         @keyframes gridPulse {
@@ -69,16 +70,36 @@
             100% { transform: translateY(100%); }
         }
 
-        .game-wrapper {
+        /* ============================================================
+           ЭКРАНЫ
+           ============================================================ */
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            min-height: 100vh;
+            padding: 20px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             position: relative;
             z-index: 1;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* === МЕНЮ === */
+        .menu-content {
             background: linear-gradient(145deg, #0d0d1a, #1a0a2e);
             border-radius: 30px;
-            padding: 25px;
+            padding: 40px 30px;
             border: 2px solid rgba(0, 255, 255, 0.3);
-            box-shadow: 0 0 60px rgba(0, 255, 255, 0.1), inset 0 0 60px rgba(0, 255, 255, 0.03);
-            max-width: 800px;
+            box-shadow: 0 0 60px rgba(0, 255, 255, 0.15), inset 0 0 60px rgba(0, 255, 255, 0.03);
+            text-align: center;
             width: 100%;
+            max-width: 500px;
             animation: borderGlow 3s ease-in-out infinite;
         }
 
@@ -87,23 +108,15 @@
             50% { border-color: rgba(255, 0, 255, 0.3); }
         }
 
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 0 10px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .game-header h1 {
-            font-size: 18px;
+        .menu-title {
+            font-size: 26px;
             background: linear-gradient(90deg, #00ffff, #ff00ff, #00ffff);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: rainbowText 3s linear infinite;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
         }
 
         @keyframes rainbowText {
@@ -111,17 +124,120 @@
             100% { background-position: 200% center; }
         }
 
+        .menu-subtitle {
+            color: rgba(0, 255, 255, 0.4);
+            font-size: 12px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .menu-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .menu-stats span {
+            color: #00ffff;
+            font-size: 13px;
+            padding: 8px 15px;
+            border-radius: 10px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .menu-stats strong {
+            color: #ffdd00;
+            text-shadow: 0 0 15px rgba(255, 221, 0, 0.5);
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .menu-btn {
+            padding: 16px 30px;
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            background: rgba(0, 255, 255, 0.05);
+            color: #00ffff;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .menu-btn:hover {
+            background: rgba(0, 255, 255, 0.15);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .menu-btn:active {
+            transform: translateY(0);
+        }
+
+        .menu-btn.primary {
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.15), rgba(255, 0, 255, 0.15));
+            border-color: rgba(0, 255, 255, 0.4);
+            font-size: 16px;
+            padding: 18px 30px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.15);
+        }
+
+        .menu-btn.primary:hover {
+            background: linear-gradient(90deg, rgba(0, 255, 255, 0.25), rgba(255, 0, 255, 0.25));
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+        }
+
+        .menu-hint {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        .menu-hint span {
+            color: #ffdd00;
+        }
+
+        /* === ИГРОВОЙ ЭКРАН === */
+        .screen-game {
+            justify-content: flex-start;
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+
+        .game-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 12px;
+            gap: 8px;
+        }
+
         .game-stats {
             display: flex;
-            gap: 20px;
-            font-size: 14px;
+            gap: 8px;
+            font-size: 12px;
             color: #00ffff;
             text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            flex-wrap: wrap;
+            justify-content: center;
+            flex: 1;
         }
 
         .game-stats span {
             background: rgba(0, 255, 255, 0.05);
-            padding: 5px 12px;
+            padding: 5px 10px;
             border-radius: 8px;
             border: 1px solid rgba(0, 255, 255, 0.1);
         }
@@ -136,15 +252,57 @@
             text-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
         }
 
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            background: rgba(0, 255, 255, 0.05);
+            color: #00ffff;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 255, 255, 0.15);
+        }
+
+        .back-btn.top-left {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .pause-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 0, 255, 0.2);
+            background: rgba(255, 0, 255, 0.05);
+            color: #ff00ff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .pause-btn:hover {
+            background: rgba(255, 0, 255, 0.15);
+        }
+
         .canvas-wrapper {
-            position: relative;
             width: 100%;
+            position: relative;
         }
 
         #gameCanvas {
             display: block;
             width: 100%;
             height: auto;
+            max-height: 55vh;
+            object-fit: contain;
             background: #05050f;
             border-radius: 15px;
             border: 1px solid rgba(0, 255, 255, 0.15);
@@ -152,55 +310,14 @@
             touch-action: none;
         }
 
-        .game-controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        .game-controls button {
-            padding: 10px 25px;
-            font-family: 'Orbitron', monospace;
-            font-size: 12px;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            background: rgba(0, 255, 255, 0.05);
-            color: #00ffff;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .game-controls button:hover {
-            background: rgba(0, 255, 255, 0.15);
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
-            transform: scale(1.05);
-        }
-
-        .game-controls button:active {
-            transform: scale(0.95);
-        }
-
-        .game-controls .btn-restart {
-            border-color: rgba(255, 0, 255, 0.2);
-            color: #ff00ff;
-        }
-
-        .game-controls .btn-restart:hover {
-            background: rgba(255, 0, 255, 0.15);
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.1);
-        }
-
-        /* === Мобильные кнопки — ПОД канвасом === */
+        /* === МОБИЛЬНЫЕ КНОПКИ — ПОД канвасом === */
         .mobile-controls {
             display: none;
             margin-top: 12px;
             padding: 0 10px;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
         }
 
         .mobile-controls .mobile-right {
@@ -255,84 +372,60 @@
             }
         }
 
-        @media (hover: hover) and (pointer: fine) {
-            .mobile-controls {
-                display: none !important;
-            }
-        }
-
-        /* Меню апгрейдов */
-        .upgrade-panel {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(255, 0, 255, 0.03);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 0, 255, 0.1);
+        .game-controls {
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
             justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
         }
 
-        .upgrade-panel .upgrade-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            padding: 8px 15px;
-            background: rgba(0, 255, 255, 0.03);
+        .game-controls button {
+            padding: 10px 22px;
+            font-family: 'Orbitron', monospace;
+            font-size: 12px;
             border-radius: 10px;
-            border: 1px solid rgba(0, 255, 255, 0.05);
-            min-width: 80px;
-        }
-
-        .upgrade-panel .upgrade-item .label {
-            font-size: 10px;
-            color: rgba(0, 255, 255, 0.4);
-            letter-spacing: 1px;
-        }
-
-        .upgrade-panel .upgrade-item .value {
-            font-size: 16px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            background: rgba(0, 255, 255, 0.05);
             color: #00ffff;
-            text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-
-        .upgrade-panel .upgrade-item button {
-            font-size: 10px;
-            padding: 4px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 221, 0, 0.2);
-            background: rgba(255, 221, 0, 0.05);
-            color: #ffdd00;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: 'Orbitron', monospace;
-            letter-spacing: 1px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .upgrade-panel .upgrade-item button:hover {
-            background: rgba(255, 221, 0, 0.15);
-            box-shadow: 0 0 20px rgba(255, 221, 0, 0.1);
+        .game-controls button:hover {
+            background: rgba(0, 255, 255, 0.15);
         }
 
-        /* === Таблица рекордов === */
-        .leaderboard {
-            margin-top: 15px;
-            padding: 15px 20px;
-            background: rgba(255, 221, 0, 0.03);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 221, 0, 0.15);
+        .game-controls .btn-restart {
+            border-color: rgba(255, 0, 255, 0.2);
+            color: #ff00ff;
         }
 
-        .leaderboard-title {
-            font-size: 13px;
+        .game-controls .btn-restart:hover {
+            background: rgba(255, 0, 255, 0.15);
+        }
+
+        /* === ЭКРАН РЕКОРДОВ === */
+        .records-content {
+            background: linear-gradient(145deg, #0d0d1a, #1a0a2e);
+            border-radius: 30px;
+            padding: 40px 30px;
+            border: 2px solid rgba(255, 221, 0, 0.3);
+            box-shadow: 0 0 60px rgba(255, 221, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-top: 40px;
+        }
+
+        .records-title {
+            font-size: 20px;
             color: #ffdd00;
             text-align: center;
             letter-spacing: 3px;
-            margin-bottom: 12px;
+            margin-bottom: 25px;
             text-shadow: 0 0 20px rgba(255, 221, 0, 0.4);
-            font-weight: 700;
         }
 
         .leaderboard-list {
@@ -341,21 +434,20 @@
             margin: 0;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
 
         .leaderboard-list li {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 14px;
+            padding: 12px 16px;
             background: rgba(0, 255, 255, 0.03);
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid rgba(0, 255, 255, 0.08);
-            font-size: 13px;
+            font-size: 14px;
             color: #00ffff;
             font-family: 'Orbitron', monospace;
-            transition: all 0.3s;
         }
 
         .leaderboard-list li:nth-child(1) {
@@ -401,41 +493,170 @@
             border-style: dashed;
         }
 
-        .game-hint {
+        .clear-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 8px 16px;
+            font-family: 'Orbitron', monospace;
+            font-size: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            background: rgba(255, 0, 85, 0.05);
+            color: #ff0055;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .clear-btn:hover {
+            background: rgba(255, 0, 85, 0.15);
+        }
+
+        /* === ЭКРАН АПГРЕЙДОВ === */
+        .upgrades-content {
+            background: linear-gradient(145deg, #0d0d1a, #1a0a2e);
+            border-radius: 30px;
+            padding: 40px 30px;
+            border: 2px solid rgba(255, 0, 255, 0.3);
+            box-shadow: 0 0 60px rgba(255, 0, 255, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-top: 40px;
+        }
+
+        .upgrades-title {
+            font-size: 20px;
+            color: #ff00ff;
             text-align: center;
-            margin-top: 10px;
-            color: rgba(255, 255, 255, 0.15);
-            font-size: 11px;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+        }
+
+        .upgrades-coins {
+            text-align: center;
+            color: rgba(0, 255, 255, 0.6);
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .upgrades-coins strong {
+            color: #ffdd00;
+        }
+
+        .upgrade-panel {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .upgrade-panel .upgrade-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(0, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 255, 0.08);
+            min-width: 100px;
+        }
+
+        .upgrade-panel .upgrade-item .label {
+            font-size: 10px;
+            color: rgba(0, 255, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .upgrade-panel .upgrade-item .value {
+            font-size: 20px;
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .upgrade-panel .upgrade-item button {
+            font-size: 10px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 221, 0, 0.2);
+            background: rgba(255, 221, 0, 0.05);
+            color: #ffdd00;
+            cursor: pointer;
+            transition: all 0.3s;
             font-family: 'Orbitron', monospace;
             letter-spacing: 1px;
         }
 
-        .game-hint span {
-            color: #ffdd00;
-            text-shadow: 0 0 10px rgba(255, 221, 0, 0.2);
+        .upgrade-panel .upgrade-item button:hover {
+            background: rgba(255, 221, 0, 0.15);
         }
 
+        /* === МОБИЛЬНАЯ АДАПТАЦИЯ === */
         @media (max-width: 600px) {
-            body { padding: 8px; }
-            .game-wrapper { padding: 15px; border-radius: 20px; }
-            .game-header h1 { font-size: 14px; }
-            .game-stats { font-size: 11px; gap: 10px; }
-            .game-stats span { padding: 3px 8px; }
-            .upgrade-panel .upgrade-item { min-width: 60px; padding: 5px 10px; }
-            .upgrade-panel .upgrade-item .value { font-size: 13px; }
+            .screen { padding: 10px; }
+            .menu-content { padding: 25px 18px; border-radius: 22px; }
+            .menu-title { font-size: 18px; }
+            .menu-subtitle { font-size: 10px; letter-spacing: 2px; margin-bottom: 20px; }
+            .menu-stats span { font-size: 11px; padding: 6px 10px; }
+            .menu-btn { padding: 13px 20px; font-size: 12px; }
+            .menu-btn.primary { padding: 15px 20px; font-size: 14px; }
+            .game-stats { font-size: 10px; gap: 5px; }
+            .game-stats span { padding: 3px 7px; }
+            .back-btn, .pause-btn { width: 34px; height: 34px; font-size: 14px; }
+            #gameCanvas { max-height: 60vh; }
+            .mobile-btn { width: 55px; height: 55px; font-size: 22px; }
+            .mobile-btn.shield-btn-m, .mobile-btn.boost-btn { width: 45px; height: 45px; font-size: 16px; }
+            .game-controls button { padding: 8px 16px; font-size: 10px; }
+            .records-content, .upgrades-content { padding: 25px 18px; border-radius: 22px; }
+            .records-title, .upgrades-title { font-size: 16px; }
+        }
+
+        @media (max-height: 700px) and (orientation: landscape) {
+            #gameCanvas { max-height: 70vh; }
         }
     </style>
 </head>
 <body>
-    <div class="game-wrapper">
-        <div class="game-header">
-            <h1>🏃 CYBER RUNNER 2077</h1>
+
+    <!-- ============================================================ -->
+    <!-- ЭКРАН 1: ГЛАВНОЕ МЕНЮ                                        -->
+    <!-- ============================================================ -->
+    <div class="screen screen-menu active" id="screenMenu">
+        <div class="menu-content">
+            <h1 class="menu-title">🏃 CYBER RUNNER 2077</h1>
+            <p class="menu-subtitle">киберпанк-раннер</p>
+
+            <div class="menu-stats">
+                <span>🏆 Лучший: <strong id="menuBest">0</strong></span>
+                <span>💰 Монеты: <strong id="menuCoins">0</strong></span>
+            </div>
+
+            <div class="menu-buttons">
+                <button class="menu-btn primary" onclick="startNewGame()">▶ НОВАЯ ИГРА</button>
+                <button class="menu-btn" onclick="showScreen('screenRecords')">🏆 РЕКОРДЫ</button>
+                <button class="menu-btn" onclick="showScreen('screenUpgrades')">⚙ АПГРЕЙДЫ</button>
+            </div>
+
+            <div class="menu-hint">
+                <span>ПРОБЕЛ</span> — прыжок &nbsp;|&nbsp; <span>SHIFT</span> — ускорение &nbsp;|&nbsp; <span>E</span> — щит
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ЭКРАН 2: ИГРА                                                -->
+    <!-- ============================================================ -->
+    <div class="screen screen-game" id="screenGame">
+        <div class="game-topbar">
+            <button class="back-btn" onclick="goHome()" title="В меню">←</button>
             <div class="game-stats">
                 <span>⚡ <span id="scoreDisplay">0</span></span>
                 <span class="coins">💰 <span id="coinsDisplay">0</span></span>
                 <span class="lives">❤️ <span id="livesDisplay">3</span></span>
                 <span>🏆 <span id="bestDisplay">0</span></span>
             </div>
+            <button class="pause-btn" onclick="togglePause()" id="pauseBtn" title="Пауза">⏸</button>
         </div>
 
         <div class="canvas-wrapper">
@@ -451,38 +672,51 @@
         </div>
 
         <div class="game-controls">
-            <button onclick="restartGame()" class="btn-restart">🔄 Рестарт</button>
-            <button onclick="togglePause()" id="pauseBtn">⏸ Пауза</button>
+            <button onclick="restartGame()" class="btn-restart">🔄 Заново</button>
             <button onclick="useShield()" id="shieldBtn">🛡️ Щит (1)</button>
         </div>
+    </div>
 
-        <div class="leaderboard" id="leaderboard">
-            <h2 class="leaderboard-title">🏆 ТОП-5 РЕКОРДОВ</h2>
+    <!-- ============================================================ -->
+    <!-- ЭКРАН 3: РЕКОРДЫ                                             -->
+    <!-- ============================================================ -->
+    <div class="screen screen-records" id="screenRecords">
+        <button class="back-btn top-left" onclick="goHome()">←</button>
+        <div class="records-content">
+            <h2 class="records-title">🏆 ТОП-5 РЕКОРДОВ</h2>
             <ol class="leaderboard-list" id="leaderboardList">
                 <li class="leaderboard-empty">Пока нет рекордов — сыграй!</li>
             </ol>
+            <button class="clear-btn" onclick="clearRecords()">🗑 Очистить рекорды</button>
         </div>
+    </div>
 
-        <div class="upgrade-panel">
-            <div class="upgrade-item">
-                <span class="label">СКОРОСТЬ</span>
-                <span class="value" id="speedLevel">1</span>
-                <button onclick="buyUpgrade('speed')">⬆ 50💰</button>
-            </div>
-            <div class="upgrade-item">
-                <span class="label">ПРЫЖОК</span>
-                <span class="value" id="jumpLevel">1</span>
-                <button onclick="buyUpgrade('jump')">⬆ 30💰</button>
-            </div>
-            <div class="upgrade-item">
-                <span class="label">ЩИТЫ</span>
-                <span class="value" id="shieldLevel">0</span>
-                <button onclick="buyUpgrade('shield')">⬆ 40💰</button>
-            </div>
-        </div>
+    <!-- ============================================================ -->
+    <!-- ЭКРАН 4: АПГРЕЙДЫ                                            -->
+    <!-- ============================================================ -->
+    <div class="screen screen-upgrades" id="screenUpgrades">
+        <button class="back-btn top-left" onclick="goHome()">←</button>
+        <div class="upgrades-content">
+            <h2 class="upgrades-title">⚙ АПГРЕЙДЫ</h2>
+            <p class="upgrades-coins">💰 Монет: <strong id="upgradeCoins">0</strong></p>
 
-        <div class="game-hint">
-            <span>ПРОБЕЛ</span> / <span>КЛИК</span> — прыжок &nbsp;|&nbsp; <span>SHIFT</span> — ускорение &nbsp;|&nbsp; <span>E</span> — щит
+            <div class="upgrade-panel">
+                <div class="upgrade-item">
+                    <span class="label">СКОРОСТЬ</span>
+                    <span class="value" id="speedLevel">1</span>
+                    <button onclick="buyUpgrade('speed')">⬆ 50💰</button>
+                </div>
+                <div class="upgrade-item">
+                    <span class="label">ПРЫЖОК</span>
+                    <span class="value" id="jumpLevel">1</span>
+                    <button onclick="buyUpgrade('jump')">⬆ 30💰</button>
+                </div>
+                <div class="upgrade-item">
+                    <span class="label">ЩИТЫ</span>
+                    <span class="value" id="shieldLevel">0</span>
+                    <button onclick="buyUpgrade('shield')">⬆ 40💰</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -496,10 +730,10 @@
         const H = canvas.height;
         const GROUND_Y = 340;
 
-        let gameRunning = true;
+        let gameRunning = false;
         let gamePaused = false;
         let score = 0;
-        let coins = 0;
+        let coins = parseInt(localStorage.getItem('cyberRunnerCoins')) || 0;
         let lives = 3;
         let best = parseInt(localStorage.getItem('cyberRunnerBest')) || 0;
         let leaderboard = JSON.parse(localStorage.getItem('cyberRunnerLeaderboard')) || [];
@@ -614,7 +848,6 @@
 
             frameCount++;
 
-            // Скорость с учётом буста
             const baseSpeed = 5 + (upgrades.speed - 1) * 1.5;
             const scoreBonus = Math.floor(score / 200) * 0.5;
 
@@ -624,7 +857,6 @@
                 speed = Math.min(18, baseSpeed + scoreBonus);
             }
 
-            // Физика
             player.vy += gravity;
             player.y += player.vy;
 
@@ -634,14 +866,12 @@
                 player.jumping = false;
             }
 
-            // Ноги
             legTimer++;
             if (legTimer > 5) {
                 legTimer = 0;
                 legFrame = (legFrame + 1) % 2;
             }
 
-            // Трейл
             if (frameCount % 3 === 0) {
                 trail.push({ x: player.x + player.w / 2, y: player.y + player.h / 2, life: 20 });
                 if (trail.length > 30) trail.shift();
@@ -651,7 +881,6 @@
                 if (trail[i].life <= 0) trail.splice(i, 1);
             }
 
-            // Щит и буст
             if (shieldActive) {
                 shieldTimer--;
                 if (shieldTimer <= 0) shieldActive = false;
@@ -659,7 +888,6 @@
             if (shieldCooldown > 0) shieldCooldown--;
             if (boostCooldown > 0) boostCooldown--;
 
-            // Спавн препятствий
             spawnTimer++;
             let interval = Math.max(40, 80 - Math.floor(score / 50));
             if (spawnTimer >= interval) {
@@ -668,14 +896,12 @@
                 if (score > 100 && Math.random() < 0.3) spawnObstacle();
             }
 
-            // Спавн монет
             coinSpawnTimer++;
             if (coinSpawnTimer >= 25 + Math.random() * 30) {
                 coinSpawnTimer = 0;
                 if (Math.random() < 0.5) spawnCoin();
             }
 
-            // Препятствия
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 const obs = obstacles[i];
                 obs.x -= speed;
@@ -724,6 +950,7 @@
                             localStorage.setItem('cyberRunnerBest', best);
                         }
                         saveLeaderboardEntry(score);
+                        saveCoins();
                         updateUI();
                         return;
                     }
@@ -737,7 +964,6 @@
                 }
             }
 
-            // Монеты
             for (let i = coinsList.length - 1; i >= 0; i--) {
                 const coin = coinsList[i];
                 coin.x -= speed;
@@ -766,7 +992,6 @@
                 }
             }
 
-            // Частицы
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
                 p.x += p.vx;
@@ -792,7 +1017,6 @@
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
-            // Звёзды
             ctx.fillStyle = 'rgba(255,255,255,0.15)';
             for (let i = 0; i < 40; i++) {
                 const sx = (i * 37 + 13 + frameCount * 0.02) % W;
@@ -803,7 +1027,6 @@
                 ctx.fill();
             }
 
-            // Земля
             ctx.shadowBlur = 0;
             ctx.fillStyle = '#1a1a3a';
             ctx.fillRect(0, GROUND_Y, W, 2);
@@ -818,7 +1041,6 @@
                 ctx.stroke();
             }
 
-            // Трейл
             for (const t of trail) {
                 const alpha = t.life / 20;
                 ctx.fillStyle = `rgba(0, 255, 255, ${alpha * 0.2})`;
@@ -827,7 +1049,6 @@
                 ctx.fill();
             }
 
-            // Монеты
             for (const coin of coinsList) {
                 if (coin.collected) continue;
                 const glow = Math.sin(frameCount * 0.1) * 0.5 + 0.5;
@@ -845,7 +1066,6 @@
                 ctx.fillText('$', coin.x, coin.y + 1);
             }
 
-            // Препятствия
             for (const obs of obstacles) {
                 ctx.shadowColor = obs.color;
                 ctx.shadowBlur = 25;
@@ -882,7 +1102,6 @@
                 ctx.shadowBlur = 0;
             }
 
-            // Игрок
             const dx = player.x;
             const dy = player.y;
 
@@ -968,7 +1187,6 @@
             }
             ctx.shadowBlur = 0;
 
-            // Частицы
             for (const p of particles) {
                 const alpha = p.life / 30;
                 ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
@@ -980,14 +1198,12 @@
                 ctx.shadowBlur = 0;
             }
 
-            // Счёт
             ctx.fillStyle = 'rgba(0, 255, 255, 0.1)';
             ctx.font = '12px Orbitron';
             ctx.textAlign = 'right';
             ctx.fillText('SCORE: ' + score, W - 15, 25);
 
-            // Game Over
-            if (!gameRunning) {
+            if (!gameRunning && document.getElementById('screenGame').classList.contains('active')) {
                 ctx.fillStyle = 'rgba(0,0,0,0.7)';
                 ctx.fillRect(0, 0, W, H);
                 ctx.textAlign = 'center';
@@ -997,9 +1213,12 @@
                 ctx.font = 'bold 36px Orbitron';
                 ctx.fillText('☠ GAME OVER', W / 2, H / 2 - 20);
                 ctx.shadowBlur = 0;
-                ctx.fillStyle = 'rgba(0, 255, 255, 0.4)';
+                ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
                 ctx.font = '16px Rajdhani';
-                ctx.fillText('Нажми "Рестарт" чтобы попробовать снова', W / 2, H / 2 + 35);
+                ctx.fillText('Очки: ' + score, W / 2, H / 2 + 15);
+                ctx.fillStyle = 'rgba(0, 255, 255, 0.3)';
+                ctx.font = '13px Rajdhani';
+                ctx.fillText('"Заново" или "←" в меню', W / 2, H / 2 + 40);
                 ctx.textAlign = 'left';
             }
 
@@ -1018,7 +1237,47 @@
         }
 
         // ============================================================
-        //  6. UI И РЕКОРДЫ
+        //  6. ЭКРАНЫ
+        // ============================================================
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function goHome() {
+            gameRunning = false;
+            gamePaused = false;
+            showScreen('screenMenu');
+            updateMenuStats();
+        }
+
+        function startNewGame() {
+            restartGame();
+            showScreen('screenGame');
+        }
+
+        function updateMenuStats() {
+            const menuBest = document.getElementById('menuBest');
+            const menuCoins = document.getElementById('menuCoins');
+            const upgradeCoins = document.getElementById('upgradeCoins');
+            if (menuBest) menuBest.textContent = best;
+            if (menuCoins) menuCoins.textContent = coins;
+            if (upgradeCoins) upgradeCoins.textContent = coins;
+        }
+
+        function clearRecords() {
+            if (!confirm('Удалить все рекорды?')) return;
+            leaderboard = [];
+            localStorage.removeItem('cyberRunnerLeaderboard');
+            renderLeaderboard();
+        }
+
+        function saveCoins() {
+            localStorage.setItem('cyberRunnerCoins', coins);
+        }
+
+        // ============================================================
+        //  7. UI И РЕКОРДЫ
         // ============================================================
         function updateUI() {
             document.getElementById('scoreDisplay').textContent = score;
@@ -1029,6 +1288,7 @@
             document.getElementById('jumpLevel').textContent = upgrades.jump;
             document.getElementById('shieldLevel').textContent = upgrades.shield;
             document.getElementById('shieldBtn').textContent = `🛡️ Щит (${upgrades.shield})`;
+            updateMenuStats();
         }
 
         function saveLeaderboardEntry(finalScore) {
@@ -1070,7 +1330,7 @@
         }
 
         // ============================================================
-        //  7. ДЕЙСТВИЯ
+        //  8. ДЕЙСТВИЯ
         // ============================================================
         function jump() {
             if (!gameRunning || gamePaused) return;
@@ -1119,13 +1379,15 @@
         function togglePause() {
             if (!gameRunning) return;
             gamePaused = !gamePaused;
-            document.getElementById('pauseBtn').textContent = gamePaused ? '▶ Играть' : '⏸ Пауза';
+            const btn = document.getElementById('pauseBtn');
+            if (btn) btn.textContent = gamePaused ? '▶' : '⏸';
         }
 
         function restartGame() {
             gameRunning = true;
             gamePaused = false;
-            document.getElementById('pauseBtn').textContent = '⏸ Пауза';
+            const pauseBtn = document.getElementById('pauseBtn');
+            if (pauseBtn) pauseBtn.textContent = '⏸';
             score = 0;
             lives = 3;
             obstacles = [];
@@ -1161,6 +1423,7 @@
             coins -= costs[type];
             upgrades[type]++;
             soundCoin();
+            saveCoins();
             updateUI();
 
             for (let i = 0; i < 20; i++) {
@@ -1176,9 +1439,12 @@
         }
 
         // ============================================================
-        //  8. УПРАВЛЕНИЕ
+        //  9. УПРАВЛЕНИЕ
         // ============================================================
         document.addEventListener('keydown', function(e) {
+            const gameActive = document.getElementById('screenGame').classList.contains('active');
+            if (!gameActive) return;
+
             if (e.key === ' ' || e.key === 'Space') {
                 e.preventDefault();
                 if (!gameRunning) { restartGame(); return; }
@@ -1198,19 +1464,19 @@
 
         canvas.addEventListener('click', function(e) {
             initAudio();
-            if (!gameRunning) { restartGame(); return; }
+            if (!gameRunning) return;
             jump();
         });
 
         canvas.addEventListener('touchstart', function(e) {
             e.preventDefault();
             initAudio();
-            if (!gameRunning) { restartGame(); return; }
+            if (!gameRunning) return;
             jump();
         });
 
         // ============================================================
-        //  9. ЦИКЛ И ЗАПУСК
+        //  10. ЦИКЛ И ЗАПУСК
         // ============================================================
         function gameLoop() {
             update();
@@ -1237,10 +1503,10 @@
 
         updateUI();
         renderLeaderboard();
+        updateMenuStats();
         gameLoop();
 
         console.log('🏃 CYBER RUNNER 2077 запущен!');
-        console.log('🕹️ ПРОБЕЛ — прыжок, SHIFT — ускорение, E — щит, P — пауза');
     </script>
 </body>
 </html>

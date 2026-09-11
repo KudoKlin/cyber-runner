@@ -633,7 +633,8 @@
             </div>
 
             <div class="menu-buttons">
-                <button class="menu-btn primary" onclick="startNewGame()">▶ НОВАЯ ИГРА</button>
+                <button class="menu-btn primary" id="continueBtn" onclick="continueGame()" style="display:none;">▶ ПРОДОЛЖИТЬ</button>
+                <button class="menu-btn" id="newGameBtn" onclick="startNewGame()">✨ НОВАЯ ИГРА</button>
                 <button class="menu-btn" onclick="showScreen('screenRecords')">🏆 РЕКОРДЫ</button>
                 <button class="menu-btn" onclick="showScreen('screenUpgrades')">⚙ АПГРЕЙДЫ</button>
             </div>
@@ -930,6 +931,7 @@
                     soundHit();
                     score = Math.max(0, score - 20);
                     updateUI();
+                    saveGameState();
 
                     for (let j = 0; j < 20; j++) {
                         particles.push({
@@ -951,6 +953,7 @@
                         }
                         saveLeaderboardEntry(score);
                         saveCoins();
+                        clearGameState();
                         updateUI();
                         return;
                     }
@@ -961,6 +964,7 @@
                     obstacles.splice(i, 1);
                     score += 5;
                     updateUI();
+                    saveGameState();
                 }
             }
 
@@ -977,6 +981,7 @@
                     coins += 10;
                     soundCoin();
                     updateUI();
+                    saveGameState();
                     for (let j = 0; j < 10; j++) {
                         particles.push({
                             x: coin.x, y: coin.y,
@@ -1245,14 +1250,62 @@
         }
 
         function goHome() {
+            if (gameRunning) saveGameState();
             gameRunning = false;
             gamePaused = false;
             showScreen('screenMenu');
             updateMenuStats();
+            updateContinueButton();
         }
 
         function startNewGame() {
+            // Полный сброс прогресса
+            coins = 0;
+            score = 0;
+            lives = 3;
+            upgrades = { speed: 1, jump: 1, shield: 0 };
+            clearGameState();
+            saveCoins();
             restartGame();
+            showScreen('screenGame');
+        }
+
+        function continueGame() {
+            const state = loadGameState();
+            if (!state) {
+                startNewGame();
+                return;
+            }
+
+            score = state.score || 0;
+            coins = state.coins || 0;
+            lives = state.lives || 3;
+            upgrades = state.upgrades || { speed: 1, jump: 1, shield: 0 };
+
+            obstacles = [];
+            coinsList = [];
+            particles = [];
+            trail = [];
+            spawnTimer = 0;
+            coinSpawnTimer = 0;
+            frameCount = 0;
+            shieldActive = false;
+            shieldTimer = 0;
+            shieldCooldown = 0;
+            boostCooldown = 0;
+
+            player.y = state.playerY !== undefined ? state.playerY : (GROUND_Y - player.h);
+            player.vy = state.playerVy || 0;
+            player.jumping = state.playerJumping || false;
+
+            gameRunning = true;
+            gamePaused = false;
+
+            const pauseBtn = document.getElementById('pauseBtn');
+            if (pauseBtn) pauseBtn.textContent = '⏸';
+
+            saveCoins();
+            updateUI();
             showScreen('screenGame');
         }
 
@@ -1272,12 +1325,64 @@
             renderLeaderboard();
         }
 
+        // ============================================================
+        //  7. СОХРАНЕНИЕ / ЗАГРУЗКА
+        // ============================================================
         function saveCoins() {
             localStorage.setItem('cyberRunnerCoins', coins);
         }
 
+        function saveGameState() {
+            if (!gameRunning) return;
+            const state = {
+                score: score,
+                coins: coins,
+                lives: lives,
+                upgrades: upgrades,
+                playerY: player.y,
+                playerVy: player.vy,
+                playerJumping: player.jumping,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('cyberRunnerSave', JSON.stringify(state));
+        }
+
+        function loadGameState() {
+            try {
+                const raw = localStorage.getItem('cyberRunnerSave');
+                if (!raw) return null;
+                const state = JSON.parse(raw);
+                if (!state || typeof state.score !== 'number') return null;
+                return state;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function clearGameState() {
+            localStorage.removeItem('cyberRunnerSave');
+        }
+
+        function hasSavedGame() {
+            return loadGameState() !== null;
+        }
+
+        function updateContinueButton() {
+            const btn = document.getElementById('continueBtn');
+            const newBtn = document.getElementById('newGameBtn');
+            if (!btn || !newBtn) return;
+
+            if (hasSavedGame()) {
+                btn.style.display = 'block';
+                newBtn.classList.remove('primary');
+            } else {
+                btn.style.display = 'none';
+                newBtn.classList.add('primary');
+            }
+        }
+
         // ============================================================
-        //  7. UI И РЕКОРДЫ
+        //  8. UI И РЕКОРДЫ
         // ============================================================
         function updateUI() {
             document.getElementById('scoreDisplay').textContent = score;
@@ -1289,6 +1394,7 @@
             document.getElementById('shieldLevel').textContent = upgrades.shield;
             document.getElementById('shieldBtn').textContent = `🛡️ Щит (${upgrades.shield})`;
             updateMenuStats();
+            updateContinueButton();
         }
 
         function saveLeaderboardEntry(finalScore) {
@@ -1330,7 +1436,7 @@
         }
 
         // ============================================================
-        //  8. ДЕЙСТВИЯ
+        //  9. ДЕЙСТВИЯ
         // ============================================================
         function jump() {
             if (!gameRunning || gamePaused) return;
@@ -1373,6 +1479,7 @@
                 upgrades.shield--;
                 soundShield();
                 updateUI();
+                saveGameState();
             }
         }
 
@@ -1405,6 +1512,7 @@
             player.vy = 0;
             player.jumping = false;
             updateUI();
+            saveGameState();
         }
 
         function buyUpgrade(type) {
@@ -1424,6 +1532,7 @@
             upgrades[type]++;
             soundCoin();
             saveCoins();
+            saveGameState();
             updateUI();
 
             for (let i = 0; i < 20; i++) {
@@ -1439,7 +1548,7 @@
         }
 
         // ============================================================
-        //  9. УПРАВЛЕНИЕ
+        //  10. УПРАВЛЕНИЕ
         // ============================================================
         document.addEventListener('keydown', function(e) {
             const gameActive = document.getElementById('screenGame').classList.contains('active');
@@ -1476,7 +1585,7 @@
         });
 
         // ============================================================
-        //  10. ЦИКЛ И ЗАПУСК
+        //  11. ЦИКЛ И ЗАПУСК
         // ============================================================
         function gameLoop() {
             update();
@@ -1504,9 +1613,11 @@
         updateUI();
         renderLeaderboard();
         updateMenuStats();
+        updateContinueButton();
         gameLoop();
 
         console.log('🏃 CYBER RUNNER 2077 запущен!');
+        console.log('💾 Прогресс сохраняется. Кнопка "Продолжить" в меню, если есть сохранение.');
     </script>
 </body>
 </html>

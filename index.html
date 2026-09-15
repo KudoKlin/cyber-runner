@@ -51,7 +51,6 @@
         }
         @keyframes scanLines { 0%{transform:translateY(-100%)} 100%{transform:translateY(100%)} }
 
-        /* Экраны */
         .screen {
             display: none;
             width: 100%;
@@ -69,7 +68,6 @@
         .screen.active { display: flex; opacity: 1; }
         .screen.fade-out { opacity: 0; }
 
-        /* Меню */
         .menu-content {
             background: linear-gradient(145deg, #0d0d1a, #1a0a2e);
             border-radius: 30px;
@@ -160,7 +158,6 @@
         }
         .menu-hint span { color: #ffdd00; }
 
-        /* Игра */
         .screen-game { justify-content: flex-start; padding-top: 15px; padding-bottom: 15px; }
 
         .game-topbar {
@@ -286,7 +283,6 @@
         .game-controls .btn-restart { border-color: rgba(255, 0, 255, 0.2); color: #ff00ff; }
         .game-controls .btn-restart:hover { background: rgba(255, 0, 255, 0.15); }
 
-        /* Общие контейнеры экранов */
         .records-content, .upgrades-content, .tasks-content, .skins-content {
             background: linear-gradient(145deg, #0d0d1a, #1a0a2e);
             border-radius: 30px;
@@ -384,7 +380,6 @@
         }
         .upgrade-panel .upgrade-item button:hover { background: rgba(255, 221, 0, 0.15); }
 
-        /* Задания */
         .task-item {
             display: flex;
             justify-content: space-between;
@@ -414,7 +409,6 @@
         }
         .task-item .task-claim:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        /* Скины */
         .skins-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -443,7 +437,6 @@
         .skin-price { font-size: 10px; color: #ffdd00; }
         .skin-status { font-size: 9px; color: rgba(0, 255, 255, 0.5); margin-top: 4px; }
 
-        /* Мобильная адаптация */
         @media (max-width: 600px) {
             .screen { padding: 10px; }
             .menu-content { padding: 25px 18px; border-radius: 22px; }
@@ -466,7 +459,6 @@
 </head>
 <body>
 
-    <!-- ЭКРАН 1: МЕНЮ -->
     <div class="screen screen-menu active" id="screenMenu">
         <div class="menu-content">
             <h1 class="menu-title">🏃 CYBER RUNNER 2077</h1>
@@ -492,7 +484,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 2: ИГРА -->
     <div class="screen screen-game" id="screenGame">
         <div class="game-topbar">
             <button class="back-btn" onclick="goHome()" title="В меню">←</button>
@@ -523,7 +514,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 3: РЕКОРДЫ -->
     <div class="screen screen-records" id="screenRecords">
         <button class="back-btn top-left" onclick="goHome()">←</button>
         <div class="records-content">
@@ -535,7 +525,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 4: АПГРЕЙДЫ -->
     <div class="screen screen-upgrades" id="screenUpgrades">
         <button class="back-btn top-left" onclick="goHome()">←</button>
         <div class="upgrades-content">
@@ -562,7 +551,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 5: ЗАДАНИЯ -->
     <div class="screen screen-tasks" id="screenTasks">
         <button class="back-btn top-left" onclick="goHome()">←</button>
         <div class="tasks-content">
@@ -572,7 +560,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 6: СКИНЫ -->
     <div class="screen screen-skins" id="screenSkins">
         <button class="back-btn top-left" onclick="goHome()">←</button>
         <div class="skins-content">
@@ -596,7 +583,7 @@
         let gamePaused = false;
         let score = 0;
         let coins = parseInt(localStorage.getItem('cyberRunnerCoins')) || 0;
-        let lives = 6;
+        let lives = 3;
         let best = parseInt(localStorage.getItem('cyberRunnerBest')) || 0;
         let leaderboard = JSON.parse(localStorage.getItem('cyberRunnerLeaderboard')) || [];
         let frameCount = 0;
@@ -604,23 +591,17 @@
         let gravity = 0.7;
         let jumpPower = -14;
 
-        let upgrades = { speed: 1, jump: 1, shield: 0 };
+        // ⬇⬇⬇ АПГРЕЙДЫ ТЕПЕРЬ ГРУЗЯТСЯ ИЗ LOCALSTORAGE
+        let upgrades = JSON.parse(localStorage.getItem('cyberRunnerUpgrades')) || { speed: 1, jump: 1, shield: 0 };
 
-        // Двойной прыжок
         let jumpsLeft = 1;
-
-        // Щит — держится до касания (макс 8 сек)
         let shieldActive = false;
         let shieldTimer = 0;
         let shieldCooldown = 0;
-
         let boostCooldown = 0;
+        let magnetTimer = 0;
+        let doubleCoinTimer = 0;
 
-        // Бонусы
-        let magnetTimer = 0;   // 10 сек = 600 кадров
-        let doubleCoinTimer = 0; // 15 сек = 900 кадров
-
-        // Биом
         let currentBiome = 0;
         const BIOMES = [
             { name: 'night',  top: '#05050f', mid: '#0a0a1a', bot: '#0a0a0f', ground: '#1a1a3a', accent: '#00ffff' },
@@ -629,7 +610,6 @@
             { name: 'acid',   top: '#0a1000', mid: '#1a2a0a', bot: '#051000', ground: '#3a5a1a', accent: '#aaff00' }
         ];
 
-        // Скин
         let activeSkin = localStorage.getItem('cyberRunnerSkin') || 'default';
         let ownedSkins = JSON.parse(localStorage.getItem('cyberRunnerOwnedSkins')) || ['default'];
 
@@ -642,12 +622,7 @@
         };
 
         const player = {
-            x: 80,
-            y: GROUND_Y - 50,
-            w: 30,
-            h: 50,
-            vy: 0,
-            jumping: false
+            x: 80, y: GROUND_Y - 50, w: 30, h: 50, vy: 0, jumping: false
         };
 
         let obstacles = [];
@@ -703,35 +678,25 @@
             const type = types[Math.floor(Math.random() * types.length)];
             const height = 20 + Math.random() * 30;
             const width = 15 + Math.random() * 20;
-
             obstacles.push({
-                x: W + 50,
-                y: GROUND_Y - height,
-                w: width,
-                h: height,
-                type: type,
-                color: BIOMES[currentBiome].accent
+                x: W + 50, y: GROUND_Y - height, w: width, h: height,
+                type: type, color: BIOMES[currentBiome].accent
             });
         }
-
         function spawnCoin() {
             coinsList.push({
                 x: W + 50 + Math.random() * 100,
                 y: GROUND_Y - 30 - Math.random() * 80,
-                r: 10,
-                collected: false
+                r: 10, collected: false
             });
         }
-
         function spawnPowerup() {
             const kinds = ['magnet', 'doublecoin'];
             const kind = kinds[Math.floor(Math.random() * kinds.length)];
             powerups.push({
                 x: W + 50 + Math.random() * 100,
                 y: GROUND_Y - 50 - Math.random() * 80,
-                r: 14,
-                kind: kind,
-                collected: false
+                r: 14, kind: kind, collected: false
             });
         }
 
@@ -740,22 +705,16 @@
         // ============================================================
         function update() {
             if (!gameRunning || gamePaused) return;
-
             frameCount++;
 
-            // Биом
             const newBiome = Math.floor(score / 200) % BIOMES.length;
             if (newBiome !== currentBiome) {
                 currentBiome = newBiome;
-                // смена биома — всплеск частиц
                 for (let i = 0; i < 30; i++) {
                     particles.push({
-                        x: Math.random() * W,
-                        y: Math.random() * H,
-                        vx: (Math.random() - 0.5) * 5,
-                        vy: (Math.random() - 0.5) * 5,
-                        life: 40,
-                        color: BIOMES[currentBiome].accent
+                        x: Math.random() * W, y: Math.random() * H,
+                        vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5,
+                        life: 40, color: BIOMES[currentBiome].accent
                     });
                 }
             }
@@ -775,7 +734,6 @@
                 player.y = GROUND_Y - player.h;
                 player.vy = 0;
                 player.jumping = false;
-                // восстанавливаем прыжки при касании земли
                 jumpsLeft = getMaxJumps();
             }
 
@@ -791,17 +749,12 @@
                 if (trail[i].life <= 0) trail.splice(i, 1);
             }
 
-            // Таймеры
-            if (shieldActive) {
-                shieldTimer--;
-                if (shieldTimer <= 0) shieldActive = false;
-            }
+            if (shieldActive) { shieldTimer--; if (shieldTimer <= 0) shieldActive = false; }
             if (shieldCooldown > 0) shieldCooldown--;
             if (boostCooldown > 0) boostCooldown--;
             if (magnetTimer > 0) magnetTimer--;
             if (doubleCoinTimer > 0) doubleCoinTimer--;
 
-            // Спавн
             spawnTimer++;
             let interval = Math.max(40, 80 - Math.floor(score / 50));
             if (spawnTimer >= interval) {
@@ -822,19 +775,16 @@
                 spawnPowerup();
             }
 
-            // Препятствия
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 const obs = obstacles[i];
                 obs.x -= speed;
 
-                if (obs.x < player.x + player.w &&
-                    obs.x + obs.w > player.x &&
-                    obs.y < player.y + player.h &&
-                    obs.y + obs.h > player.y) {
+                if (obs.x < player.x + player.w && obs.x + obs.w > player.x &&
+                    obs.y < player.y + player.h && obs.y + obs.h > player.y) {
 
                     if (shieldActive) {
                         obs.y = -100;
-                        shieldActive = false; // сломался
+                        shieldActive = false;
                         soundShield();
                         for (let j = 0; j < 15; j++) {
                             particles.push({
@@ -851,7 +801,6 @@
                     score = Math.max(0, score - 20);
                     updateUI();
                     saveGameState();
-                    trackTask('noHit', -1); // сброс серии
                     resetNoHitStreak();
 
                     for (let j = 0; j < 20; j++) {
@@ -872,8 +821,10 @@
                             localStorage.setItem('cyberRunnerBest', best);
                         }
                         saveLeaderboardEntry(score);
-                        saveCoins();
+                        saveProgress();
                         clearGameState();
+                        runsThisSession++;
+                        trackRuns();
                         updateUI();
                         return;
                     }
@@ -883,18 +834,17 @@
                 if (obs.x + obs.w < -20) {
                     obstacles.splice(i, 1);
                     score += 5;
+                    currentRunScore = score;
                     updateUI();
                     saveGameState();
-                    trackTask('score', 5);
+                    trackTask('score_total', 0);
                     updateNoHitStreak(1);
                 }
             }
 
-            // Монеты
             for (let i = coinsList.length - 1; i >= 0; i--) {
                 const coin = coinsList[i];
 
-                // Магнит
                 if (magnetTimer > 0) {
                     const dx = (player.x + player.w / 2) - coin.x;
                     const dy = (player.y + player.h / 2) - coin.y;
@@ -915,6 +865,7 @@
                     coins += add;
                     soundCoin();
                     updateUI();
+                    saveProgress();
                     saveGameState();
                     trackTask('coins', 1);
 
@@ -930,7 +881,6 @@
                 if (coin.x + coin.r < -20 || coin.collected) coinsList.splice(i, 1);
             }
 
-            // Бонусы
             for (let i = powerups.length - 1; i >= 0; i--) {
                 const pu = powerups[i];
                 pu.x -= speed;
@@ -943,6 +893,7 @@
 
                     if (pu.kind === 'magnet') magnetTimer = 600;
                     if (pu.kind === 'doublecoin') doubleCoinTimer = 900;
+                    trackTask('powerups', 1);
 
                     for (let j = 0; j < 20; j++) {
                         particles.push({
@@ -956,16 +907,10 @@
                 if (pu.x + pu.r < -20 || pu.collected) powerups.splice(i, 1);
             }
 
-            // Частицы
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
                 p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.life--;
                 if (p.life <= 0) particles.splice(i, 1);
-            }
-
-            // Задания по времени/очкам — обновим раз в секунду
-            if (frameCount % 60 === 0) {
-                trackTask('score_total', 0); // для статистики
             }
 
             document.getElementById('scoreDisplay').textContent = score;
@@ -1017,7 +962,6 @@
                 ctx.fill();
             }
 
-            // Монеты
             for (const coin of coinsList) {
                 if (coin.collected) continue;
                 const glow = Math.sin(frameCount * 0.1) * 0.5 + 0.5;
@@ -1035,7 +979,6 @@
                 ctx.fillText('$', coin.x, coin.y + 1);
             }
 
-            // Бонусы
             for (const pu of powerups) {
                 if (pu.collected) continue;
                 const pulse = Math.sin(frameCount * 0.15) * 3;
@@ -1054,7 +997,6 @@
                 ctx.fillText(pu.kind === 'magnet' ? '🧲' : '×2', pu.x, pu.y + 1);
             }
 
-            // Препятствия
             for (const obs of obstacles) {
                 ctx.shadowColor = obs.color;
                 ctx.shadowBlur = 25;
@@ -1086,7 +1028,6 @@
                 ctx.shadowBlur = 0;
             }
 
-            // Игрок
             const dx = player.x;
             const dy = player.y;
             const skin = SKINS[activeSkin] || SKINS['default'];
@@ -1110,7 +1051,6 @@
                 ctx.shadowBlur = 0;
             }
 
-            // Магнит — аура
             if (magnetTimer > 0) {
                 ctx.strokeStyle = `rgba(0, 170, 255, ${0.2 + Math.sin(frameCount * 0.2) * 0.1})`;
                 ctx.lineWidth = 2;
@@ -1185,7 +1125,6 @@
             }
             ctx.shadowBlur = 0;
 
-            // Частицы
             for (const p of particles) {
                 const alpha = p.life / 30;
                 ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
@@ -1197,7 +1136,6 @@
                 ctx.shadowBlur = 0;
             }
 
-            // Индикаторы бонусов
             let badgeY = 45;
             if (magnetTimer > 0) {
                 ctx.fillStyle = 'rgba(0, 170, 255, 0.8)';
@@ -1213,19 +1151,16 @@
                 ctx.fillText(`×2 ${Math.ceil(doubleCoinTimer / 60)}с`, 15, badgeY);
             }
 
-            // Номер биома
             ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
             ctx.font = '10px Orbitron';
             ctx.textAlign = 'left';
             ctx.fillText(`BIOME: ${BIOMES[currentBiome].name.toUpperCase()}`, 15, H - 15);
 
-            // SCORE
             ctx.fillStyle = 'rgba(0, 255, 255, 0.1)';
             ctx.font = '12px Orbitron';
             ctx.textAlign = 'right';
             ctx.fillText('SCORE: ' + score, W - 15, 25);
 
-            // Game Over
             if (!gameRunning && document.getElementById('screenGame').classList.contains('active')) {
                 ctx.fillStyle = 'rgba(0,0,0,0.75)';
                 ctx.fillRect(0, 0, W, H);
@@ -1245,7 +1180,6 @@
                 ctx.textAlign = 'left';
             }
 
-            // Pause
             if (gamePaused && gameRunning) {
                 ctx.fillStyle = 'rgba(0,0,0,0.6)';
                 ctx.fillRect(0, 0, W, H);
@@ -1261,7 +1195,7 @@
         }
 
         // ============================================================
-        //  6. ЭКРАНЫ (с плавными переходами)
+        //  6. ЭКРАНЫ
         // ============================================================
         function showScreen(id) {
             const current = document.querySelector('.screen.active');
@@ -1299,7 +1233,7 @@
             lives = 3;
             upgrades = { speed: 1, jump: 1, shield: 0 };
             clearGameState();
-            saveCoins();
+            saveProgress();
             restartGame();
             showScreen('screenGame');
         }
@@ -1311,7 +1245,8 @@
             score = state.score || 0;
             coins = state.coins || 0;
             lives = state.lives || 3;
-            upgrades = state.upgrades || { speed: 1, jump: 1, shield: 0 };
+            // Апгрейды берём из отдельного ключа — они не зависят от партии
+            upgrades = JSON.parse(localStorage.getItem('cyberRunnerUpgrades')) || { speed: 1, jump: 1, shield: 0 };
 
             obstacles = []; coinsList = []; powerups = []; particles = []; trail = [];
             spawnTimer = 0; coinSpawnTimer = 0; powerupSpawnTimer = 0; frameCount = 0;
@@ -1328,7 +1263,9 @@
             const pauseBtn = document.getElementById('pauseBtn');
             if (pauseBtn) pauseBtn.textContent = '⏸';
 
-            saveCoins();
+            currentRunScore = 0;
+            noHitStreak = 0;
+
             updateUI();
             showScreen('screenGame');
         }
@@ -1352,10 +1289,19 @@
         }
 
         // ============================================================
-        //  7. СОХРАНЕНИЕ
+        //  7. СОХРАНЕНИЕ (РАЗДЕЛЕНО НА PROGRESS И GAME STATE)
         // ============================================================
-        function saveCoins() { localStorage.setItem('cyberRunnerCoins', coins); }
+        // Сохраняет ПОСТОЯННЫЙ прогресс — монеты, апгрейды, скины
+        // Вызывается ВСЕГДА, даже в меню
+        function saveProgress() {
+            localStorage.setItem('cyberRunnerCoins', coins);
+            localStorage.setItem('cyberRunnerUpgrades', JSON.stringify(upgrades));
+            localStorage.setItem('cyberRunnerOwnedSkins', JSON.stringify(ownedSkins));
+            localStorage.setItem('cyberRunnerSkin', activeSkin);
+        }
 
+        // Сохраняет ТЕКУЩУЮ партию — для кнопки «Продолжить»
+        // Только когда игра идёт
         function saveGameState() {
             if (!gameRunning) return;
             const state = {
@@ -1390,6 +1336,11 @@
                 btn.style.display = 'none';
                 newBtn.classList.add('primary');
             }
+        }
+
+        // Старая функция для совместимости — теперь сохраняет и апгрейды
+        function saveCoins() {
+            saveProgress();
         }
 
         // ============================================================
@@ -1441,7 +1392,6 @@
         //  9. ДЕЙСТВИЯ
         // ============================================================
         function getMaxJumps() {
-            // Уровень 3+ даёт двойной прыжок
             return upgrades.jump >= 3 ? 2 : 1;
         }
 
@@ -1452,8 +1402,6 @@
                 player.jumping = true;
                 jumpsLeft--;
                 soundJump();
-
-                // Эффект облачка при двойном прыжке
                 if (jumpsLeft === 0 && getMaxJumps() === 2) {
                     for (let i = 0; i < 10; i++) {
                         particles.push({
@@ -1461,8 +1409,7 @@
                             y: player.y + player.h,
                             vx: (Math.random() - 0.5) * 6,
                             vy: Math.random() * 3,
-                            life: 20,
-                            color: '#ffffff'
+                            life: 20, color: '#ffffff'
                         });
                     }
                 }
@@ -1491,11 +1438,12 @@
             if (shieldActive || shieldCooldown > 0) return;
             if (upgrades.shield > 0) {
                 shieldActive = true;
-                shieldTimer = 480; // 8 секунд максимум
-                shieldCooldown = 180; // 3 сек кулдаун
+                shieldTimer = 480;
+                shieldCooldown = 180;
                 upgrades.shield--;
                 soundShield();
                 updateUI();
+                saveProgress();   // ← сохраняем апгрейды сразу
                 saveGameState();
             }
         }
@@ -1523,6 +1471,8 @@
             player.vy = 0;
             player.jumping = false;
             jumpsLeft = getMaxJumps();
+            currentRunScore = 0;
+            noHitStreak = 0;
             updateUI();
             saveGameState();
         }
@@ -1532,13 +1482,14 @@
             const maxLevels = { speed: 10, jump: 5, shield: 5 };
             if (coins < costs[type]) { playBeep(200, 0.2, 'sawtooth', 0.1); return; }
             if (upgrades[type] >= maxLevels[type]) { playBeep(150, 0.2, 'sawtooth', 0.1); return; }
+
             coins -= costs[type];
             upgrades[type]++;
             soundCoin();
-            saveCoins();
+            saveProgress();   // ← сохраняем апгрейды сразу
             saveGameState();
             updateUI();
-            // Обновить прыжки, если купили
+
             if (type === 'jump') jumpsLeft = Math.max(jumpsLeft, getMaxJumps());
 
             for (let i = 0; i < 20; i++) {
@@ -1557,7 +1508,7 @@
         // ============================================================
         const TASK_TEMPLATES = [
             { id: 'coins',   text: 'Собери {n} монет',           goal: 100, reward: 60  },
-            { id: 'score',   text: 'Набери {n} очков',           goal: 300, reward: 80  },
+            { id: 'score',   text: 'Набери {n} очков за игру',   goal: 300, reward: 80  },
             { id: 'runs',    text: 'Сыграй {n} игры',            goal: 3,   reward: 50  },
             { id: 'nohit',   text: 'Пройди {n} очков без удара', goal: 150, reward: 100 },
             { id: 'powerups',text: 'Подбери {n} бонуса',         goal: 2,   reward: 70  }
@@ -1572,14 +1523,11 @@
             const saved = JSON.parse(localStorage.getItem('cyberRunnerDaily') || 'null');
             if (saved && saved.date === todayKey()) return saved.tasks;
 
-            // Генерим 3 новые задачи
             const shuffled = [...TASK_TEMPLATES].sort(() => Math.random() - 0.5);
             const picked = shuffled.slice(0, 3).map(t => ({
                 ...t,
                 goal: Math.round(t.goal * (0.8 + Math.random() * 0.6)),
-                progress: 0,
-                claimed: false,
-                done: false
+                progress: 0, claimed: false, done: false
             }));
             const data = { date: todayKey(), tasks: picked };
             localStorage.setItem('cyberRunnerDaily', JSON.stringify(data));
@@ -1592,16 +1540,12 @@
 
         let dailyTasks = loadDailyTasks();
 
-        // Трекеры текущей игры
         let currentRunScore = 0;
-        let currentRunHits = 0;
         let noHitStreak = 0;
         let runsThisSession = 0;
 
         function trackTask(id, amount) {
-            if (id === 'score') {
-                // уже добавляем в update
-            } else if (id === 'coins') {
+            if (id === 'coins') {
                 dailyTasks.forEach(t => {
                     if (t.id === 'coins' && !t.done) {
                         t.progress += amount;
@@ -1618,13 +1562,22 @@
             } else if (id === 'score_total') {
                 dailyTasks.forEach(t => {
                     if (t.id === 'score' && !t.done) {
-                        t.progress = Math.max(t.progress, currentRunScore);
+                        t.progress = Math.max(t.progress, score);
                         if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; }
                     }
                 });
-            } else if (id === 'noHit') {
-                // при ударе сбрасываем
             }
+            saveDailyTasks();
+            updateTaskBadge();
+        }
+
+        function trackRuns() {
+            dailyTasks.forEach(t => {
+                if (t.id === 'runs' && !t.done) {
+                    t.progress += 1;
+                    if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; }
+                }
+            });
             saveDailyTasks();
             updateTaskBadge();
         }
@@ -1674,7 +1627,6 @@
                 `;
             }).join('');
 
-            // Таймер до сброса
             const now = new Date();
             const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
             const diff = tomorrow - now;
@@ -1689,7 +1641,7 @@
             t.claimed = true;
             coins += t.reward;
             soundCoin();
-            saveCoins();
+            saveProgress();
             saveDailyTasks();
             updateUI();
             renderTasks();
@@ -1706,10 +1658,9 @@
             grid.innerHTML = Object.entries(SKINS).map(([id, skin]) => {
                 const owned = ownedSkins.includes(id);
                 const active = activeSkin === id;
-                const c = skin.colors[0];
                 return `
                     <div class="skin-card ${active ? 'active' : ''} ${owned ? 'owned' : ''}" onclick="selectSkin('${id}')">
-                        <div class="skin-preview" style="background: linear-gradient(135deg, ${skin.colors[0]}, ${skin.colors[1]}); color: ${c};"></div>
+                        <div class="skin-preview" style="background: linear-gradient(135deg, ${skin.colors[0]}, ${skin.colors[1]}); color: ${skin.colors[0]};"></div>
                         <div class="skin-name">${skin.name}</div>
                         ${owned
                             ? `<div class="skin-status">${active ? '✓ АКТИВЕН' : 'НАЖМИ'}</div>`
@@ -1725,13 +1676,12 @@
 
             if (ownedSkins.includes(id)) {
                 activeSkin = id;
-                localStorage.setItem('cyberRunnerSkin', id);
+                saveProgress();
                 renderSkins();
                 playBeep(1000, 0.1, 'sine', 0.12);
                 return;
             }
 
-            // Покупка
             if (coins < skin.price) {
                 playBeep(200, 0.2, 'sawtooth', 0.1);
                 alert('Не хватает монет!');
@@ -1742,18 +1692,17 @@
             coins -= skin.price;
             ownedSkins.push(id);
             activeSkin = id;
-            localStorage.setItem('cyberRunnerCoins', coins);
-            localStorage.setItem('cyberRunnerOwnedSkins', JSON.stringify(ownedSkins));
-            localStorage.setItem('cyberRunnerSkin', id);
+            saveProgress();
             soundCoin();
             updateUI();
             renderSkins();
         }
 
         // ============================================================
-        //  12. СВАЙПЫ
+        //  12. СВАЙПЫ И ТАЧИ
         // ============================================================
         let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+
         canvas.addEventListener('touchstart', function(e) {
             e.preventDefault();
             initAudio();
@@ -1772,18 +1721,15 @@
             const dy = touch.clientY - touchStartY;
             const dt = Date.now() - touchStartTime;
 
-            // Если это тап без движения — прыжок
             if (Math.abs(dx) < 30 && Math.abs(dy) < 30 && dt < 300) {
                 jump();
                 return;
             }
-
-            // Свайп
             if (Math.abs(dy) > Math.abs(dx)) {
-                if (dy < -40) jump();        // свайп вверх
+                if (dy < -40) jump();
             } else {
-                if (dx > 40) boost();        // свайп вправо
-                if (dx < -40) useShield();   // свайп влево
+                if (dx > 40) boost();
+                if (dx < -40) useShield();
             }
         }, { passive: false });
 
@@ -1843,8 +1789,8 @@
         updateTaskBadge();
         gameLoop();
 
-        console.log('🏃 CYBER RUNNER 2077 — все фичи включены!');
-        console.log('🎮 Двойной прыжок, биомы, магнит, x2 монеты, задания, скины, свайпы.');
+        console.log('🏃 CYBER RUNNER 2077 — фикс апгрейдов применён!');
+        console.log('💡 Апгрейды теперь сохраняются отдельно от партии и не теряются.');
     </script>
 </body>
 </html>

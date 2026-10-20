@@ -8,8 +8,16 @@
     <meta property="og:title" content="🏃 CYBER RUNNER 2077">
     <meta property="og:description" content="Киберпанк-раннер. Прыгай, собирай монеты, ставь рекорды!">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kudoklin.github.io/cyber-runner/">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0a0f'/%3E%3Ctext y='.9em' font-size='80' x='10'%3E🏃%3C/text%3E%3C/svg%3E">
     <title>🏃 CYBER RUNNER 2077</title>
+    
+    <!-- PWA Поддержка -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cyber Runner">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
@@ -252,7 +260,6 @@
             touch-action: none;
         }
 
-        /* Хроматическая аберрация (Glitch) при ударе */
         @keyframes glitch-anim {
             0% { transform: translate(0); filter: none; }
             20% { transform: translate(-3px, 2px); filter: drop-shadow(3px 0px 0px rgba(255,0,0,0.7)) drop-shadow(-3px 0px 0px rgba(0,255,255,0.7)); }
@@ -501,7 +508,6 @@
         .skin-price { font-size: 11px; color: #ffdd00; font-weight: 700; }
         .skin-status { font-size: 10px; color: rgba(0, 255, 255, 0.6); margin-top: 6px; letter-spacing: 1px; }
 
-        /* Модальное окно оффлайн-дохода */
         .offline-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -566,7 +572,6 @@
 </head>
 <body>
 
-    <!-- Модальное окно оффлайн-дохода -->
     <div class="offline-modal" id="offlineModal">
         <div class="offline-content">
             <div class="offline-title">📡 СВЯЗЬ ВОССТАНОВЛЕНА</div>
@@ -688,9 +693,6 @@
     </div>
 
     <script>
-        // ============================================================
-        //  1. НАСТРОЙКИ И СОСТОЯНИЕ
-        // ============================================================
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const W = canvas.width;
@@ -753,9 +755,6 @@
         let bgOffset1 = 0;
         let bgOffset2 = 0;
 
-        // ============================================================
-        //  2. ЗВУКИ, ГОЛОС И HAPTICS
-        // ============================================================
         let audioCtx = null;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -779,14 +778,13 @@
             if (navigator.vibrate) navigator.vibrate(ms);
         }
         
-        // Голосовой синтез (Web Speech API)
         function speak(text) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Прерываем предыдущую фразу, чтобы не было очереди
+                window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'ru-RU';
-                utterance.rate = 1.3; // Быстрее, как у ИИ
-                utterance.pitch = 0.7; // Ниже, более роботизированно
+                utterance.rate = 1.3;
+                utterance.pitch = 0.7;
                 utterance.volume = 0.8;
                 window.speechSynthesis.speak(utterance);
             }
@@ -813,27 +811,16 @@
             speak("Система отказала");
         }
 
-        // ============================================================
-        //  3. СПАВН
-        // ============================================================
         function spawnObstacle() {
             const types = ['box', 'spike', 'crate'];
             const type = types[Math.floor(Math.random() * types.length)];
             const height = type === 'spike' ? 25 + Math.random() * 20 : 30 + Math.random() * 25;
             const width = type === 'spike' ? 20 : 25 + Math.random() * 15;
-            
             const isDouble = score > 300 && Math.random() < 0.2;
             
-            obstacles.push({
-                x: W + 50, y: GROUND_Y - height, w: width, h: height,
-                type: type, color: BIOMES[currentBiome].accent
-            });
-            
+            obstacles.push({ x: W + 50, y: GROUND_Y - height, w: width, h: height, type: type, color: BIOMES[currentBiome].accent });
             if (isDouble) {
-                obstacles.push({
-                    x: W + 50 + width + 15, y: GROUND_Y - (height * 0.7), w: width * 0.8, h: height * 0.7,
-                    type: 'box', color: BIOMES[currentBiome].accent
-                });
+                obstacles.push({ x: W + 50 + width + 15, y: GROUND_Y - (height * 0.7), w: width * 0.8, h: height * 0.7, type: 'box', color: BIOMES[currentBiome].accent });
             }
         }
         
@@ -843,11 +830,7 @@
                 coinsList.push({ x: W + 50 + Math.random() * 100, y: GROUND_Y - 30 - Math.random() * 80, r: 10, collected: false });
             } else {
                 for(let i=0; i<3; i++) {
-                    coinsList.push({ 
-                        x: W + 50 + i * 35, 
-                        y: GROUND_Y - 40 - Math.sin(i/2 * Math.PI) * 60, 
-                        r: 10, collected: false 
-                    });
+                    coinsList.push({ x: W + 50 + i * 35, y: GROUND_Y - 40 - Math.sin(i/2 * Math.PI) * 60, r: 10, collected: false });
                 }
             }
         }
@@ -855,16 +838,9 @@
         function spawnPowerup() {
             const kinds = ['magnet', 'doublecoin'];
             const kind = kinds[Math.floor(Math.random() * kinds.length)];
-            powerups.push({
-                x: W + 50 + Math.random() * 100,
-                y: GROUND_Y - 60 - Math.random() * 60,
-                r: 14, kind: kind, collected: false
-            });
+            powerups.push({ x: W + 50 + Math.random() * 100, y: GROUND_Y - 60 - Math.random() * 60, r: 14, kind: kind, collected: false });
         }
 
-        // ============================================================
-        //  4. ОБНОВЛЕНИЕ
-        // ============================================================
         function update() {
             if (!gameRunning || gamePaused) return;
             frameCount++;
@@ -873,21 +849,14 @@
             if (newBiome !== currentBiome) {
                 currentBiome = newBiome;
                 for (let i = 0; i < 40; i++) {
-                    particles.push({
-                        x: Math.random() * W, y: Math.random() * H,
-                        vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8,
-                        life: 50, color: BIOMES[currentBiome].accent, size: 2 + Math.random() * 3
-                    });
+                    particles.push({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8, life: 50, color: BIOMES[currentBiome].accent, size: 2 + Math.random() * 3 });
                 }
             }
 
             const baseSpeed = 5 + (upgrades.speed - 1) * 1.2;
             const scoreBonus = Math.floor(score / 100) * 0.3;
-            if (boostCooldown > 45) {
-                speed = Math.min(22, baseSpeed + scoreBonus + 5);
-            } else {
-                speed = Math.min(16, baseSpeed + scoreBonus);
-            }
+            if (boostCooldown > 45) { speed = Math.min(22, baseSpeed + scoreBonus + 5); } 
+            else { speed = Math.min(16, baseSpeed + scoreBonus); }
 
             player.vy += gravity;
             player.y += player.vy;
@@ -900,10 +869,7 @@
             }
 
             legTimer++;
-            if (legTimer > (speed > 10 ? 3 : 5)) { 
-                legTimer = 0; 
-                legFrame = (legFrame + 1) % 2; 
-            }
+            if (legTimer > (speed > 10 ? 3 : 5)) { legTimer = 0; legFrame = (legFrame + 1) % 2; }
 
             if (frameCount % 2 === 0) {
                 trail.push({ x: player.x + player.w / 2, y: player.y + player.h / 2, life: 15, maxLife: 15 });
@@ -923,545 +889,250 @@
 
             spawnTimer++;
             let interval = Math.max(35, 75 - Math.floor(score / 30));
-            if (spawnTimer >= interval) {
-                spawnTimer = 0;
-                if (Math.random() < 0.75) spawnObstacle();
-            }
+            if (spawnTimer >= interval) { spawnTimer = 0; if (Math.random() < 0.75) spawnObstacle(); }
 
             coinSpawnTimer++;
-            if (coinSpawnTimer >= 30 + Math.random() * 40) {
-                coinSpawnTimer = 0;
-                if (Math.random() < 0.6) spawnCoin();
-            }
+            if (coinSpawnTimer >= 30 + Math.random() * 40) { coinSpawnTimer = 0; if (Math.random() < 0.6) spawnCoin(); }
 
             powerupSpawnTimer++;
-            if (powerupSpawnTimer >= 400 + Math.random() * 300) {
-                powerupSpawnTimer = 0;
-                spawnPowerup();
-            }
+            if (powerupSpawnTimer >= 400 + Math.random() * 300) { powerupSpawnTimer = 0; spawnPowerup(); }
 
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 const obs = obstacles[i];
                 obs.x -= speed;
+                const hitX = player.x + 6, hitY = player.y + 6, hitW = player.w - 12, hitH = player.h - 12;
 
-                const hitX = player.x + 6;
-                const hitY = player.y + 6;
-                const hitW = player.w - 12;
-                const hitH = player.h - 12;
-
-                if (obs.x < hitX + hitW && obs.x + obs.w > hitX &&
-                    obs.y < hitY + hitH && obs.y + obs.h > hitY) {
-
+                if (obs.x < hitX + hitW && obs.x + obs.w > hitX && obs.y < hitY + hitH && obs.y + obs.h > hitY) {
                     if (shieldActive) {
-                        obs.y = -100;
-                        shieldActive = false;
-                        soundShield();
-                        screenShake = 8;
-                        triggerGlitch(); // Хроматическая аберрация
-                        for (let j = 0; j < 20; j++) {
-                            particles.push({
-                                x: obs.x + obs.w / 2, y: obs.y + obs.h / 2,
-                                vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.5) * 12,
-                                life: 25, color: '#00ffff', size: 3
-                            });
-                        }
+                        obs.y = -100; shieldActive = false; soundShield(); screenShake = 8; triggerGlitch();
+                        for (let j = 0; j < 20; j++) particles.push({ x: obs.x + obs.w / 2, y: obs.y + obs.h / 2, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.5) * 12, life: 25, color: '#00ffff', size: 3 });
                         continue;
                     }
-
-                    lives--;
-                    soundHit();
-                    screenShake = 12;
-                    triggerGlitch(); // Хроматическая аберрация
-                    score = Math.max(0, score - 15);
-                    updateUI();
-                    saveGameState();
-                    resetNoHitStreak();
-
-                    for (let j = 0; j < 25; j++) {
-                        particles.push({
-                            x: player.x + player.w / 2, y: player.y + player.h / 2,
-                            vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 0.5) * 15 - 5,
-                            life: 35, color: '#ff0055', size: 3
-                        });
-                    }
-
+                    lives--; soundHit(); screenShake = 12; triggerGlitch(); score = Math.max(0, score - 15);
+                    updateUI(); saveGameState(); resetNoHitStreak();
+                    for (let j = 0; j < 25; j++) particles.push({ x: player.x + player.w / 2, y: player.y + player.h / 2, vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 0.5) * 15 - 5, life: 35, color: '#ff0055', size: 3 });
                     obstacles.splice(i, 1);
-
                     if (lives <= 0) {
-                        gameRunning = false;
-                        soundGameOver();
-                        if (score > best) {
-                            best = score;
-                            localStorage.setItem('cyberRunnerBest', best);
-                        }
-                        saveLeaderboardEntry(score);
-                        saveProgress();
-                        clearGameState();
-                        runsThisSession++;
-                        trackRuns();
-                        updateUI();
-                        return;
+                        gameRunning = false; soundGameOver();
+                        if (score > best) { best = score; localStorage.setItem('cyberRunnerBest', best); }
+                        saveLeaderboardEntry(score); saveProgress(); clearGameState(); runsThisSession++; trackRuns(); updateUI(); return;
                     }
                     continue;
                 }
-
                 if (obs.x + obs.w < -20) {
-                    obstacles.splice(i, 1);
-                    score += 5;
-                    updateUI();
-                    saveGameState();
-                    trackTask('score_total', 0);
-                    updateNoHitStreak(5);
+                    obstacles.splice(i, 1); score += 5; updateUI(); saveGameState(); trackTask('score_total', 0); updateNoHitStreak(5);
                 }
             }
 
             for (let i = coinsList.length - 1; i >= 0; i--) {
                 const coin = coinsList[i];
-
                 if (magnetTimer > 0) {
-                    const dx = (player.x + player.w / 2) - coin.x;
-                    const dy = (player.y + player.h / 2) - coin.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 250 && dist > 1) {
-                        coin.x += dx / dist * 8;
-                        coin.y += dy / dist * 8;
-                    }
+                    const dx = (player.x + player.w / 2) - coin.x, dy = (player.y + player.h / 2) - coin.y, dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 250 && dist > 1) { coin.x += dx / dist * 8; coin.y += dy / dist * 8; }
                 }
-
                 coin.x -= speed;
-
-                if (!coin.collected &&
-                    coin.x + coin.r > player.x && coin.x - coin.r < player.x + player.w &&
-                    coin.y + coin.r > player.y && coin.y - coin.r < player.y + player.h) {
-                    coin.collected = true;
-                    const add = (doubleCoinTimer > 0 ? 20 : 10);
-                    coins += add;
-                    soundCoin();
-                    updateUI();
-                    saveProgress();
-                    saveGameState();
-                    trackTask('coins', 1);
-
-                    for (let j = 0; j < 12; j++) {
-                        particles.push({
-                            x: coin.x, y: coin.y,
-                            vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8 - 3,
-                            life: 25, color: '#ffdd00', size: 2
-                        });
-                    }
+                if (!coin.collected && coin.x + coin.r > player.x && coin.x - coin.r < player.x + player.w && coin.y + coin.r > player.y && coin.y - coin.r < player.y + player.h) {
+                    coin.collected = true; const add = (doubleCoinTimer > 0 ? 20 : 10); coins += add; soundCoin(); updateUI(); saveProgress(); saveGameState(); trackTask('coins', 1);
+                    for (let j = 0; j < 12; j++) particles.push({ x: coin.x, y: coin.y, vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8 - 3, life: 25, color: '#ffdd00', size: 2 });
                 }
-
                 if (coin.x + coin.r < -20 || coin.collected) coinsList.splice(i, 1);
             }
 
             for (let i = powerups.length - 1; i >= 0; i--) {
-                const pu = powerups[i];
-                pu.x -= speed;
-
-                if (!pu.collected &&
-                    pu.x + pu.r > player.x && pu.x - pu.r < player.x + player.w &&
-                    pu.y + pu.r > player.y && pu.y - pu.r < player.y + player.h) {
-                    pu.collected = true;
-                    soundBonus();
-
+                const pu = powerups[i]; pu.x -= speed;
+                if (!pu.collected && pu.x + pu.r > player.x && pu.x - pu.r < player.x + player.w && pu.y + pu.r > player.y && pu.y - pu.r < player.y + player.h) {
+                    pu.collected = true; soundBonus();
                     if (pu.kind === 'magnet') magnetTimer = 600;
                     if (pu.kind === 'doublecoin') doubleCoinTimer = 900;
                     trackTask('powerups', 1);
-
-                    for (let j = 0; j < 25; j++) {
-                        particles.push({
-                            x: pu.x, y: pu.y,
-                            vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.5) * 12,
-                            life: 35, color: pu.kind === 'magnet' ? '#00aaff' : '#ffdd00', size: 3
-                        });
-                    }
+                    for (let j = 0; j < 25; j++) particles.push({ x: pu.x, y: pu.y, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.5) * 12, life: 35, color: pu.kind === 'magnet' ? '#00aaff' : '#ffdd00', size: 3 });
                 }
-
                 if (pu.x + pu.r < -20 || pu.collected) powerups.splice(i, 1);
             }
 
             for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--;
+                const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--;
                 if (p.life <= 0) particles.splice(i, 1);
             }
             if (particles.length > 200) particles.splice(0, particles.length - 200);
-
             document.getElementById('scoreDisplay').textContent = score;
         }
 
-        // ============================================================
-        //  5. ОТРИСОВКА
-        // ============================================================
         function draw() {
             ctx.clearRect(0, 0, W, H);
-
             let shakeX = 0, shakeY = 0;
-            if (screenShake > 0.5) {
-                shakeX = (Math.random() - 0.5) * screenShake;
-                shakeY = (Math.random() - 0.5) * screenShake;
-            }
-            ctx.save();
-            ctx.translate(shakeX, shakeY);
+            if (screenShake > 0.5) { shakeX = (Math.random() - 0.5) * screenShake; shakeY = (Math.random() - 0.5) * screenShake; }
+            ctx.save(); ctx.translate(shakeX, shakeY);
 
             const b = BIOMES[currentBiome];
-            
             bgOffset1 = (bgOffset1 - speed * 0.2) % W;
             ctx.fillStyle = b.building;
             for (let i = 0; i < W + 100; i += 60) {
                 const h = 50 + Math.sin(i * 0.05) * 30 + Math.cos(i * 0.02) * 40;
                 ctx.fillRect(i + bgOffset1, GROUND_Y - h, 65, h);
             }
-            
             bgOffset2 = (bgOffset2 - speed * 0.5) % 40;
-            ctx.strokeStyle = b.accent + '22';
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = b.accent + '22'; ctx.lineWidth = 1;
             for (let i = 0; i < W + 40; i += 40) {
-                const x = i + bgOffset2;
-                ctx.beginPath();
-                ctx.moveTo(x, GROUND_Y);
-                ctx.lineTo(x - 20, H);
-                ctx.stroke();
+                const x = i + bgOffset2; ctx.beginPath(); ctx.moveTo(x, GROUND_Y); ctx.lineTo(x - 20, H); ctx.stroke();
             }
 
             const grad = ctx.createLinearGradient(0, 0, 0, H);
-            grad.addColorStop(0, b.top);
-            grad.addColorStop(0.6, b.mid);
-            grad.addColorStop(1, b.bot);
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, W, H);
+            grad.addColorStop(0, b.top); grad.addColorStop(0.6, b.mid); grad.addColorStop(1, b.bot);
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 
             ctx.fillStyle = 'rgba(255,255,255,0.2)';
             for (let i = 0; i < 30; i++) {
-                const sx = (i * 37 + 13 + frameCount * 0.05) % W;
-                const sy = (i * 53 + 7) % (GROUND_Y - 50);
-                ctx.beginPath();
-                ctx.arc(sx, sy, 1, 0, Math.PI * 2);
-                ctx.fill();
+                const sx = (i * 37 + 13 + frameCount * 0.05) % W, sy = (i * 53 + 7) % (GROUND_Y - 50);
+                ctx.beginPath(); ctx.arc(sx, sy, 1, 0, Math.PI * 2); ctx.fill();
             }
 
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = b.accent;
-            ctx.fillStyle = b.ground;
-            ctx.fillRect(0, GROUND_Y, W, 4);
-            ctx.shadowBlur = 0;
+            ctx.shadowBlur = 15; ctx.shadowColor = b.accent; ctx.fillStyle = b.ground; ctx.fillRect(0, GROUND_Y, W, 4); ctx.shadowBlur = 0;
 
             for (const t of trail) {
-                const alpha = t.life / t.maxLife;
-                ctx.fillStyle = `rgba(0, 255, 255, ${alpha * 0.3})`;
-                ctx.beginPath();
-                ctx.arc(t.x, t.y, 8 * alpha, 0, Math.PI * 2);
-                ctx.fill();
+                const alpha = t.life / t.maxLife; ctx.fillStyle = `rgba(0, 255, 255, ${alpha * 0.3})`;
+                ctx.beginPath(); ctx.arc(t.x, t.y, 8 * alpha, 0, Math.PI * 2); ctx.fill();
             }
 
             for (const coin of coinsList) {
                 if (coin.collected) continue;
                 const glow = Math.sin(frameCount * 0.15) * 0.5 + 0.5;
-                ctx.shadowColor = '#ffdd00';
-                ctx.shadowBlur = 15 + glow * 10;
-                ctx.fillStyle = '#ffdd00';
-                ctx.beginPath();
-                ctx.arc(coin.x, coin.y, coin.r, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = '#0a0a0f';
-                ctx.font = 'bold 10px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('$', coin.x, coin.y + 1);
+                ctx.shadowColor = '#ffdd00'; ctx.shadowBlur = 15 + glow * 10; ctx.fillStyle = '#ffdd00';
+                ctx.beginPath(); ctx.arc(coin.x, coin.y, coin.r, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+                ctx.fillStyle = '#0a0a0f'; ctx.font = 'bold 10px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('$', coin.x, coin.y + 1);
             }
 
             for (const pu of powerups) {
                 if (pu.collected) continue;
-                const pulse = Math.sin(frameCount * 0.2) * 3;
-                const color = pu.kind === 'magnet' ? '#00aaff' : '#ffdd00';
-                ctx.shadowColor = color;
-                ctx.shadowBlur = 20;
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.arc(pu.x, pu.y, pu.r + pulse * 0.3, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = '#0a0a0f';
-                ctx.font = 'bold 12px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(pu.kind === 'magnet' ? '🧲' : '×2', pu.x, pu.y + 1);
+                const pulse = Math.sin(frameCount * 0.2) * 3; const color = pu.kind === 'magnet' ? '#00aaff' : '#ffdd00';
+                ctx.shadowColor = color; ctx.shadowBlur = 20; ctx.fillStyle = color;
+                ctx.beginPath(); ctx.arc(pu.x, pu.y, pu.r + pulse * 0.3, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+                ctx.fillStyle = '#0a0a0f'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(pu.kind === 'magnet' ? '🧲' : '×2', pu.x, pu.y + 1);
             }
 
             for (const obs of obstacles) {
-                ctx.shadowColor = obs.color;
-                ctx.shadowBlur = 15;
+                ctx.shadowColor = obs.color; ctx.shadowBlur = 15;
                 if (obs.type === 'spike') {
-                    ctx.fillStyle = obs.color;
-                    ctx.beginPath();
-                    ctx.moveTo(obs.x, obs.y + obs.h);
-                    ctx.lineTo(obs.x + obs.w / 2, obs.y);
-                    ctx.lineTo(obs.x + obs.w, obs.y + obs.h);
-                    ctx.closePath();
-                    ctx.fill();
+                    ctx.fillStyle = obs.color; ctx.beginPath(); ctx.moveTo(obs.x, obs.y + obs.h); ctx.lineTo(obs.x + obs.w / 2, obs.y); ctx.lineTo(obs.x + obs.w, obs.y + obs.h); ctx.closePath(); ctx.fill();
                 } else if (obs.type === 'crate') {
-                    const grd = ctx.createLinearGradient(obs.x, obs.y, obs.x + obs.w, obs.y + obs.h);
-                    grd.addColorStop(0, obs.color);
-                    grd.addColorStop(1, '#8800ff');
-                    ctx.fillStyle = grd;
-                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
-                    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(obs.x + 3, obs.y + 3, obs.w - 6, obs.h - 6);
+                    const grd = ctx.createLinearGradient(obs.x, obs.y, obs.x + obs.w, obs.y + obs.h); grd.addColorStop(0, obs.color); grd.addColorStop(1, '#8800ff');
+                    ctx.fillStyle = grd; ctx.fillRect(obs.x, obs.y, obs.w, obs.h); ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1; ctx.strokeRect(obs.x + 3, obs.y + 3, obs.w - 6, obs.h - 6);
                 } else {
-                    const grd = ctx.createLinearGradient(obs.x, obs.y, obs.x + obs.w, obs.y + obs.h);
-                    grd.addColorStop(0, obs.color);
-                    grd.addColorStop(1, '#ff0055');
-                    ctx.fillStyle = grd;
-                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    const grd = ctx.createLinearGradient(obs.x, obs.y, obs.x + obs.w, obs.y + obs.h); grd.addColorStop(0, obs.color); grd.addColorStop(1, '#ff0055');
+                    ctx.fillStyle = grd; ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
                 }
                 ctx.shadowBlur = 0;
             }
 
-            const dx = player.x;
-            const dy = player.y;
+            const dx = player.x, dy = player.y;
             const skin = SKINS[activeSkin] || SKINS['default'];
-            const skinMain = skin.colors[0];
-            const skinDark = skin.colors[1];
-            const skinLeg = skin.colors[2];
-
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-            ctx.beginPath();
-            ctx.ellipse(dx + player.w / 2, GROUND_Y + 2, 15, 4, 0, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'; ctx.beginPath(); ctx.ellipse(dx + player.w / 2, GROUND_Y + 2, 15, 4, 0, 0, Math.PI * 2); ctx.fill();
 
             if (shieldActive) {
-                ctx.shadowColor = '#00ffff';
-                ctx.shadowBlur = 30;
-                ctx.strokeStyle = `rgba(0, 255, 255, ${0.4 + Math.sin(frameCount * 0.3) * 0.2})`;
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(dx + player.w / 2, dy + player.h / 2, 32, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.shadowBlur = 0;
+                ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 30; ctx.strokeStyle = `rgba(0, 255, 255, ${0.4 + Math.sin(frameCount * 0.3) * 0.2})`; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(dx + player.w / 2, dy + player.h / 2, 32, 0, Math.PI * 2); ctx.stroke(); ctx.shadowBlur = 0;
             }
-
             if (magnetTimer > 0) {
-                ctx.strokeStyle = `rgba(0, 170, 255, ${0.15 + Math.sin(frameCount * 0.2) * 0.1})`;
-                ctx.lineWidth = 2;
-                ctx.setLineDash([5, 5]);
-                ctx.beginPath();
-                ctx.arc(dx + player.w / 2, dy + player.h / 2, 70 + Math.sin(frameCount * 0.1) * 5, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.setLineDash([]);
+                ctx.strokeStyle = `rgba(0, 170, 255, ${0.15 + Math.sin(frameCount * 0.2) * 0.1})`; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+                ctx.beginPath(); ctx.arc(dx + player.w / 2, dy + player.h / 2, 70 + Math.sin(frameCount * 0.1) * 5, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
             }
 
-            ctx.shadowColor = skinMain;
-            ctx.shadowBlur = 20;
+            ctx.shadowColor = skin.colors[0]; ctx.shadowBlur = 20;
             const bodyGrad = ctx.createLinearGradient(dx, dy, dx + player.w, dy + player.h);
-            bodyGrad.addColorStop(0, skinMain);
-            bodyGrad.addColorStop(1, skinDark);
-            ctx.fillStyle = bodyGrad;
+            bodyGrad.addColorStop(0, skin.colors[0]); bodyGrad.addColorStop(1, skin.colors[1]); ctx.fillStyle = bodyGrad;
+            if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(dx + 5, dy + 12, player.w - 10, player.h - 22, 6); ctx.fill(); } 
+            else { ctx.fillRect(dx + 5, dy + 12, player.w - 10, player.h - 22); }
 
-            if (ctx.roundRect) {
-                ctx.beginPath();
-                ctx.roundRect(dx + 5, dy + 12, player.w - 10, player.h - 22, 6);
-                ctx.fill();
-            } else {
-                ctx.fillRect(dx + 5, dy + 12, player.w - 10, player.h - 22);
-            }
+            ctx.fillStyle = skin.colors[0]; ctx.beginPath(); ctx.arc(dx + player.w - 8, dy + 12, 11, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 15; ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.ellipse(dx + player.w - 2, dy + 9, 5, 3, 0, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+            ctx.fillStyle = '#0a0a0f'; ctx.beginPath(); ctx.arc(dx + player.w, dy + 8, 1.5, 0, Math.PI * 2); ctx.fill();
 
-            ctx.fillStyle = skinMain;
-            ctx.beginPath();
-            ctx.arc(dx + player.w - 8, dy + 12, 11, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.shadowColor = '#ffffff';
-            ctx.shadowBlur = 15;
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            ctx.ellipse(dx + player.w - 2, dy + 9, 5, 3, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
-            ctx.fillStyle = '#0a0a0f';
-            ctx.beginPath();
-            ctx.arc(dx + player.w, dy + 8, 1.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = skinLeg;
-            ctx.shadowBlur = 10;
+            ctx.fillStyle = skin.colors[2]; ctx.shadowBlur = 10;
             const legOff = player.jumping ? 0 : (legFrame === 0 ? 6 : -6);
-            ctx.fillRect(dx + 8, dy + player.h - 8, 7, 8 + legOff);
-            ctx.fillRect(dx + player.w - 15, dy + player.h - 8, 7, 8 - legOff);
-            ctx.shadowBlur = 0;
+            ctx.fillRect(dx + 8, dy + player.h - 8, 7, 8 + legOff); ctx.fillRect(dx + player.w - 15, dy + player.h - 8, 7, 8 - legOff); ctx.shadowBlur = 0;
 
-            ctx.strokeStyle = skinMain;
-            ctx.lineWidth = 3;
-            ctx.shadowColor = skinMain;
-            ctx.shadowBlur = 10;
-            ctx.beginPath();
-            ctx.moveTo(dx + 8, dy + 18);
-            ctx.quadraticCurveTo(dx - 15 - (speed * 2), dy + 15 + Math.sin(frameCount * 0.5) * 5, dx - 10 - (speed * 3), dy + 25);
-            ctx.stroke();
-            ctx.shadowBlur = 0;
+            ctx.strokeStyle = skin.colors[0]; ctx.lineWidth = 3; ctx.shadowColor = skin.colors[0]; ctx.shadowBlur = 10;
+            ctx.beginPath(); ctx.moveTo(dx + 8, dy + 18); ctx.quadraticCurveTo(dx - 15 - (speed * 2), dy + 15 + Math.sin(frameCount * 0.5) * 5, dx - 10 - (speed * 3), dy + 25); ctx.stroke(); ctx.shadowBlur = 0;
 
             for (const p of particles) {
-                const alpha = p.life / 35;
-                ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
-                ctx.shadowColor = p.color;
-                ctx.shadowBlur = 10;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, (p.size || 3) * alpha, 0, Math.PI * 2);
-                ctx.fill();
+                const alpha = p.life / 35; ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+                ctx.shadowColor = p.color; ctx.shadowBlur = 10; ctx.beginPath(); ctx.arc(p.x, p.y, (p.size || 3) * alpha, 0, Math.PI * 2); ctx.fill();
             }
             ctx.shadowBlur = 0;
 
-            let badgeY = 35;
-            ctx.textAlign = 'left';
-            if (magnetTimer > 0) {
-                ctx.fillStyle = 'rgba(0, 170, 255, 0.9)';
-                ctx.font = 'bold 12px Orbitron';
-                ctx.fillText(`🧲 ${Math.ceil(magnetTimer / 60)}с`, 15, badgeY);
-                badgeY += 22;
-            }
-            if (doubleCoinTimer > 0) {
-                ctx.fillStyle = 'rgba(255, 221, 0, 0.9)';
-                ctx.font = 'bold 12px Orbitron';
-                ctx.fillText(`×2 ${Math.ceil(doubleCoinTimer / 60)}с`, 15, badgeY);
-            }
-
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-            ctx.font = '10px Rajdhani';
-            ctx.fillText(`SECTOR: ${BIOMES[currentBiome].name.toUpperCase()}`, 15, H - 15);
-
+            let badgeY = 35; ctx.textAlign = 'left';
+            if (magnetTimer > 0) { ctx.fillStyle = 'rgba(0, 170, 255, 0.9)'; ctx.font = 'bold 12px Orbitron'; ctx.fillText(`🧲 ${Math.ceil(magnetTimer / 60)}с`, 15, badgeY); badgeY += 22; }
+            if (doubleCoinTimer > 0) { ctx.fillStyle = 'rgba(255, 221, 0, 0.9)'; ctx.font = 'bold 12px Orbitron'; ctx.fillText(`×2 ${Math.ceil(doubleCoinTimer / 60)}с`, 15, badgeY); }
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; ctx.font = '10px Rajdhani'; ctx.fillText(`SECTOR: ${BIOMES[currentBiome].name.toUpperCase()}`, 15, H - 15);
             ctx.restore();
 
             if (!gameRunning && document.getElementById('screenGame').classList.contains('active')) {
-                ctx.fillStyle = 'rgba(5,5,10,0.8)';
-                ctx.fillRect(0, 0, W, H);
-                ctx.textAlign = 'center';
-                ctx.shadowColor = '#ff0055';
-                ctx.shadowBlur = 40;
-                ctx.fillStyle = '#ff0055';
-                ctx.font = 'bold 40px Orbitron';
-                ctx.fillText('☠ СИСТЕМА ОТКАЗАЛА', W / 2, H / 2 - 20);
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = '#00ffff';
-                ctx.font = '18px Rajdhani';
-                ctx.fillText(`Финальный счёт: ${score}`, W / 2, H / 2 + 20);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-                ctx.font = '14px Rajdhani';
-                ctx.fillText('Нажми "Заново" или вернись в меню', W / 2, H / 2 + 50);
-                ctx.textAlign = 'left';
+                ctx.fillStyle = 'rgba(5,5,10,0.8)'; ctx.fillRect(0, 0, W, H); ctx.textAlign = 'center'; ctx.shadowColor = '#ff0055'; ctx.shadowBlur = 40;
+                ctx.fillStyle = '#ff0055'; ctx.font = 'bold 40px Orbitron'; ctx.fillText('☠ СИСТЕМА ОТКАЗАЛА', W / 2, H / 2 - 20); ctx.shadowBlur = 0;
+                ctx.fillStyle = '#00ffff'; ctx.font = '18px Rajdhani'; ctx.fillText(`Финальный счёт: ${score}`, W / 2, H / 2 + 20);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; ctx.font = '14px Rajdhani'; ctx.fillText('Нажми "Заново" или вернись в меню', W / 2, H / 2 + 50); ctx.textAlign = 'left';
             }
-
             if (gamePaused && gameRunning) {
-                ctx.fillStyle = 'rgba(5,5,10,0.7)';
-                ctx.fillRect(0, 0, W, H);
-                ctx.textAlign = 'center';
-                ctx.shadowColor = '#00ffff';
-                ctx.shadowBlur = 30;
-                ctx.fillStyle = '#00ffff';
-                ctx.font = 'bold 36px Orbitron';
-                ctx.fillText('⏸ ПАУЗА', W / 2, H / 2);
-                ctx.shadowBlur = 0;
-                ctx.textAlign = 'left';
+                ctx.fillStyle = 'rgba(5,5,10,0.7)'; ctx.fillRect(0, 0, W, H); ctx.textAlign = 'center'; ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 30;
+                ctx.fillStyle = '#00ffff'; ctx.font = 'bold 36px Orbitron'; ctx.fillText('⏸ ПАУЗА', W / 2, H / 2); ctx.shadowBlur = 0; ctx.textAlign = 'left';
             }
         }
 
-        // ============================================================
-        //  6. ЭКРАНЫ И НАВИГАЦИЯ
-        // ============================================================
         function showScreen(id) {
             const current = document.querySelector('.screen.active');
             const next = document.getElementById(id);
             if (!next || current === next) return;
-
             if (current) {
                 current.classList.add('fade-out');
                 setTimeout(() => {
-                    current.classList.remove('active', 'fade-out');
-                    next.classList.add('active');
+                    current.classList.remove('active', 'fade-out'); next.classList.add('active');
                     if (id === 'screenRecords') renderLeaderboard();
                     if (id === 'screenTasks') renderTasks();
                     if (id === 'screenSkins') renderSkins();
                     if (id === 'screenUpgrades') updateUpgradeUI();
                 }, 250);
-            } else {
-                next.classList.add('active');
-            }
+            } else { next.classList.add('active'); }
         }
 
         function goHome() {
             if (gameRunning) saveGameState();
-            gameRunning = false;
-            gamePaused = false;
-            showScreen('screenMenu');
-            updateMenuStats();
-            updateContinueButton();
+            gameRunning = false; gamePaused = false;
+            showScreen('screenMenu'); updateMenuStats(); updateContinueButton();
         }
 
         function startNewGame() {
-            coins = 0;
-            score = 0;
-            lives = 3;
-            clearGameState();
-            saveProgress();
-            restartGame();
-            showScreen('screenGame');
+            coins = 0; score = 0; lives = 3; clearGameState(); saveProgress(); restartGame(); showScreen('screenGame');
         }
 
         function continueGame() {
             const state = loadGameState();
             if (!state) { startNewGame(); return; }
-
-            score = state.score || 0;
-            coins = state.coins || 0;
-            lives = state.lives || 3;
+            score = state.score || 0; coins = state.coins || 0; lives = state.lives || 3;
             upgrades = JSON.parse(localStorage.getItem('cyberRunnerUpgrades')) || { speed: 1, jump: 1, shield: 0 };
-
             obstacles = []; coinsList = []; powerups = []; particles = []; trail = [];
             spawnTimer = 0; coinSpawnTimer = 0; powerupSpawnTimer = 0; frameCount = 0;
-            shieldActive = false; shieldTimer = 0; shieldCooldown = 0; boostCooldown = 0;
-            magnetTimer = 0; doubleCoinTimer = 0; screenShake = 0;
-
+            shieldActive = false; shieldTimer = 0; shieldCooldown = 0; boostCooldown = 0; magnetTimer = 0; doubleCoinTimer = 0; screenShake = 0;
             player.y = state.playerY !== undefined ? state.playerY : (GROUND_Y - player.h);
-            player.vy = state.playerVy || 0;
-            player.jumping = state.playerJumping || false;
-            jumpsLeft = getMaxJumps();
-
-            gameRunning = true;
-            gamePaused = false;
-            const pauseBtn = document.getElementById('pauseBtn');
-            if (pauseBtn) pauseBtn.textContent = '⏸';
-
-            currentRunScore = 0;
-            noHitStreak = 0;
-
-            updateUI();
-            showScreen('screenGame');
+            player.vy = state.playerVy || 0; player.jumping = state.playerJumping || false; jumpsLeft = getMaxJumps();
+            gameRunning = true; gamePaused = false;
+            const pauseBtn = document.getElementById('pauseBtn'); if (pauseBtn) pauseBtn.textContent = '⏸';
+            currentRunScore = 0; noHitStreak = 0; updateUI(); showScreen('screenGame');
         }
 
         function updateMenuStats() {
-            const menuBest = document.getElementById('menuBest');
-            const menuCoins = document.getElementById('menuCoins');
-            if (menuBest) menuBest.textContent = best;
-            if (menuCoins) menuCoins.textContent = coins;
+            const menuBest = document.getElementById('menuBest'); const menuCoins = document.getElementById('menuCoins');
+            if (menuBest) menuBest.textContent = best; if (menuCoins) menuCoins.textContent = coins;
         }
 
         function clearRecords() {
             if (!confirm('Удалить все рекорды из системы?')) return;
-            leaderboard = [];
-            localStorage.removeItem('cyberRunnerLeaderboard');
-            renderLeaderboard();
+            leaderboard = []; localStorage.removeItem('cyberRunnerLeaderboard'); renderLeaderboard();
         }
 
-        // ============================================================
-        //  7. СОХРАНЕНИЕ И ОФФЛАЙН-ДОХОД
-        // ============================================================
         function saveProgress() {
             try {
-                localStorage.setItem('cyberRunnerCoins', coins);
-                localStorage.setItem('cyberRunnerUpgrades', JSON.stringify(upgrades));
-                localStorage.setItem('cyberRunnerOwnedSkins', JSON.stringify(ownedSkins));
-                localStorage.setItem('cyberRunnerSkin', activeSkin);
+                localStorage.setItem('cyberRunnerCoins', coins); localStorage.setItem('cyberRunnerUpgrades', JSON.stringify(upgrades));
+                localStorage.setItem('cyberRunnerOwnedSkins', JSON.stringify(ownedSkins)); localStorage.setItem('cyberRunnerSkin', activeSkin);
                 localStorage.setItem('cyberRunnerLastLogin', Date.now());
             } catch(e) {}
         }
@@ -1469,25 +1140,16 @@
         function saveGameState() {
             if (!gameRunning) return;
             try {
-                const state = {
-                    score: score, coins: coins, lives: lives,
-                    playerY: player.y, playerVy: player.vy, playerJumping: player.jumping,
-                    timestamp: Date.now()
-                };
+                const state = { score: score, coins: coins, lives: lives, playerY: player.y, playerVy: player.vy, playerJumping: player.jumping, timestamp: Date.now() };
                 localStorage.setItem('cyberRunnerSave', JSON.stringify(state));
             } catch(e) {}
         }
 
         function loadGameState() {
             try {
-                const raw = localStorage.getItem('cyberRunnerSave');
-                if (!raw) return null;
-                const state = JSON.parse(raw);
-                if (!state || typeof state.score !== 'number') return null;
-                if (Date.now() - state.timestamp > 86400000) {
-                    clearGameState();
-                    return null;
-                }
+                const raw = localStorage.getItem('cyberRunnerSave'); if (!raw) return null;
+                const state = JSON.parse(raw); if (!state || typeof state.score !== 'number') return null;
+                if (Date.now() - state.timestamp > 86400000) { clearGameState(); return null; }
                 return state;
             } catch (e) { return null; }
         }
@@ -1496,75 +1158,46 @@
         function hasSavedGame() { return loadGameState() !== null; }
 
         function updateContinueButton() {
-            const btn = document.getElementById('continueBtn');
-            const newBtn = document.getElementById('newGameBtn');
+            const btn = document.getElementById('continueBtn'); const newBtn = document.getElementById('newGameBtn');
             if (!btn || !newBtn) return;
-            if (hasSavedGame()) {
-                btn.style.display = 'block';
-                newBtn.classList.remove('primary');
-            } else {
-                btn.style.display = 'none';
-                newBtn.classList.add('primary');
-            }
+            if (hasSavedGame()) { btn.style.display = 'block'; newBtn.classList.remove('primary'); } 
+            else { btn.style.display = 'none'; newBtn.classList.add('primary'); }
         }
 
-        // Оффлайн-доход
         function checkOfflineEarnings() {
-            const now = Date.now();
-            const lastLogin = parseInt(localStorage.getItem('cyberRunnerLastLogin')) || now;
-            const diffMs = now - lastLogin;
-            const diffMins = Math.floor(diffMs / 60000);
-
-            if (diffMins > 30) { // Минимум 30 минут оффлайна
-                const earned = Math.min(500, Math.floor(diffMins * 0.5)); // 0.5 монет в минуту, макс 500
-                if (earned > 0) {
-                    coins += earned;
-                    saveProgress();
-                    showOfflineModal(earned, diffMins);
-                }
+            const now = Date.now(); const lastLogin = parseInt(localStorage.getItem('cyberRunnerLastLogin')) || now;
+            const diffMs = now - lastLogin; const diffMins = Math.floor(diffMs / 60000);
+            if (diffMins > 30) {
+                const earned = Math.min(500, Math.floor(diffMins * 0.5));
+                if (earned > 0) { coins += earned; saveProgress(); showOfflineModal(earned, diffMins); }
             }
-            // Обновляем время входа в любом случае
             localStorage.setItem('cyberRunnerLastLogin', now);
         }
 
         function showOfflineModal(earned, mins) {
-            document.getElementById('offlineTime').textContent = mins;
-            document.getElementById('offlineCoins').textContent = earned;
+            document.getElementById('offlineTime').textContent = mins; document.getElementById('offlineCoins').textContent = earned;
             document.getElementById('offlineModal').classList.add('active');
         }
 
         function closeOfflineModal() {
-            document.getElementById('offlineModal').classList.remove('active');
-            updateMenuStats();
+            document.getElementById('offlineModal').classList.remove('active'); updateMenuStats();
         }
 
-        // ============================================================
-        //  8. UI И РЕКОРДЫ
-        // ============================================================
         function updateUI() {
-            document.getElementById('scoreDisplay').textContent = score;
-            document.getElementById('coinsDisplay').textContent = coins;
-            document.getElementById('livesDisplay').textContent = lives;
-            document.getElementById('bestDisplay').textContent = best;
+            document.getElementById('scoreDisplay').textContent = score; document.getElementById('coinsDisplay').textContent = coins;
+            document.getElementById('livesDisplay').textContent = lives; document.getElementById('bestDisplay').textContent = best;
             document.getElementById('shieldBtn').textContent = `🛡️ Щит (${upgrades.shield})`;
-            updateMenuStats();
-            updateContinueButton();
+            updateMenuStats(); updateContinueButton();
         }
         
         function updateUpgradeUI() {
             updateUI();
-            document.getElementById('speedLevel').textContent = upgrades.speed;
-            document.getElementById('jumpLevel').textContent = upgrades.jump;
-            document.getElementById('shieldLevel').textContent = upgrades.shield;
-            document.getElementById('upgradeCoins').textContent = coins;
-            
-            const costs = { speed: 50, jump: 30, shield: 40 };
-            const maxLevels = { speed: 10, jump: 5, shield: 5 };
-            
+            document.getElementById('speedLevel').textContent = upgrades.speed; document.getElementById('jumpLevel').textContent = upgrades.jump;
+            document.getElementById('shieldLevel').textContent = upgrades.shield; document.getElementById('upgradeCoins').textContent = coins;
+            const costs = { speed: 50, jump: 30, shield: 40 }; const maxLevels = { speed: 10, jump: 5, shield: 5 };
             document.getElementById('btnSpeed').disabled = upgrades.speed >= maxLevels.speed || coins < costs.speed;
             document.getElementById('btnJump').disabled = upgrades.jump >= maxLevels.jump || coins < costs.jump;
             document.getElementById('btnShield').disabled = upgrades.shield >= maxLevels.shield || coins < costs.shield;
-            
             document.getElementById('btnSpeed').textContent = upgrades.speed >= maxLevels.speed ? 'MAX' : `⬆ ${costs.speed}💰`;
             document.getElementById('btnJump').textContent = upgrades.jump >= maxLevels.jump ? 'MAX' : `⬆ ${costs.jump}💰`;
             document.getElementById('btnShield').textContent = upgrades.shield >= maxLevels.shield ? 'MAX' : `⬆ ${costs.shield}💰`;
@@ -1572,443 +1205,204 @@
 
         function saveLeaderboardEntry(finalScore) {
             if (finalScore <= 0) return;
-            const entry = {
-                score: finalScore,
-                date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })
-            };
-            leaderboard.push(entry);
-            leaderboard.sort((a, b) => b.score - a.score);
-            leaderboard = leaderboard.slice(0, 5);
+            const entry = { score: finalScore, date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }) };
+            leaderboard.push(entry); leaderboard.sort((a, b) => b.score - a.score); leaderboard = leaderboard.slice(0, 5);
             try { localStorage.setItem('cyberRunnerLeaderboard', JSON.stringify(leaderboard)); } catch(e) {}
             renderLeaderboard();
         }
 
         function renderLeaderboard() {
-            const list = document.getElementById('leaderboardList');
-            if (!list) return;
-            if (leaderboard.length === 0) {
-                list.innerHTML = '<li class="leaderboard-empty">Пока нет рекордов — сыграй!</li>';
-                return;
-            }
-            list.innerHTML = leaderboard.map((entry, i) => `
-                <li>
-                    <span class="rank">#${i + 1}</span>
-                    <span class="score-val">${entry.score}</span>
-                    <span class="date-val">${entry.date}</span>
-                </li>
-            `).join('');
+            const list = document.getElementById('leaderboardList'); if (!list) return;
+            if (leaderboard.length === 0) { list.innerHTML = '<li class="leaderboard-empty">Пока нет рекордов — сыграй!</li>'; return; }
+            list.innerHTML = leaderboard.map((entry, i) => `<li><span class="rank">#${i + 1}</span><span class="score-val">${entry.score}</span><span class="date-val">${entry.date}</span></li>`).join('');
         }
 
-        // ============================================================
-        //  9. ДЕЙСТВИЯ
-        // ============================================================
-        function getMaxJumps() {
-            return upgrades.jump >= 3 ? 2 : 1;
-        }
+        function getMaxJumps() { return upgrades.jump >= 3 ? 2 : 1; }
 
         function jump() {
             if (!gameRunning || gamePaused) return;
             if (jumpsLeft > 0) {
-                player.vy = jumpPower - (upgrades.jump - 1) * 1.5;
-                player.jumping = true;
-                jumpsLeft--;
-                soundJump();
+                player.vy = jumpPower - (upgrades.jump - 1) * 1.5; player.jumping = true; jumpsLeft--; soundJump();
                 if (jumpsLeft === 0 && getMaxJumps() === 2) {
-                    for (let i = 0; i < 12; i++) {
-                        particles.push({
-                            x: player.x + player.w / 2, y: player.y + player.h,
-                            vx: (Math.random() - 0.5) * 6, vy: Math.random() * 3,
-                            life: 20, color: '#ffffff', size: 2
-                        });
-                    }
+                    for (let i = 0; i < 12; i++) particles.push({ x: player.x + player.w / 2, y: player.y + player.h, vx: (Math.random() - 0.5) * 6, vy: Math.random() * 3, life: 20, color: '#ffffff', size: 2 });
                 }
             }
         }
 
         function boost() {
-            if (!gameRunning || gamePaused) return;
-            if (boostCooldown > 0) return;
-            speed = Math.min(22, speed + 5);
-            boostCooldown = 90;
-            playBeep(800, 0.1, 'sawtooth', 0.1);
-            setTimeout(() => playBeep(1000, 0.1, 'sawtooth', 0.1), 50);
-            haptic(20);
-            for (let i = 0; i < 20; i++) {
-                particles.push({
-                    x: player.x, y: player.y + player.h / 2 + (Math.random() - 0.5) * 30,
-                    vx: -Math.random() * 10, vy: (Math.random() - 0.5) * 4,
-                    life: 25, color: '#ff00ff', size: 3
-                });
-            }
+            if (!gameRunning || gamePaused) return; if (boostCooldown > 0) return;
+            speed = Math.min(22, speed + 5); boostCooldown = 90;
+            playBeep(800, 0.1, 'sawtooth', 0.1); setTimeout(() => playBeep(1000, 0.1, 'sawtooth', 0.1), 50); haptic(20);
+            for (let i = 0; i < 20; i++) particles.push({ x: player.x, y: player.y + player.h / 2 + (Math.random() - 0.5) * 30, vx: -Math.random() * 10, vy: (Math.random() - 0.5) * 4, life: 25, color: '#ff00ff', size: 3 });
         }
 
         function useShield() {
-            if (!gameRunning || gamePaused) return;
-            if (shieldActive || shieldCooldown > 0) return;
+            if (!gameRunning || gamePaused) return; if (shieldActive || shieldCooldown > 0) return;
             if (upgrades.shield > 0) {
-                shieldActive = true;
-                shieldTimer = 480;
-                shieldCooldown = 180;
-                upgrades.shield--;
-                soundShield();
-                updateUI();
-                updateUpgradeUI();
-                saveProgress();
-                saveGameState();
+                shieldActive = true; shieldTimer = 480; shieldCooldown = 180; upgrades.shield--;
+                soundShield(); updateUI(); updateUpgradeUI(); saveProgress(); saveGameState();
             }
         }
 
         function togglePause() {
-            if (!gameRunning) return;
-            gamePaused = !gamePaused;
-            const btn = document.getElementById('pauseBtn');
-            if (btn) btn.textContent = gamePaused ? '▶' : '⏸';
+            if (!gameRunning) return; gamePaused = !gamePaused;
+            const btn = document.getElementById('pauseBtn'); if (btn) btn.textContent = gamePaused ? '▶' : '⏸';
         }
 
         function restartGame() {
-            gameRunning = true;
-            gamePaused = false;
-            const pauseBtn = document.getElementById('pauseBtn');
-            if (pauseBtn) pauseBtn.textContent = '⏸';
-            score = 0;
-            lives = 3;
-            obstacles = []; coinsList = []; powerups = []; particles = []; trail = [];
+            gameRunning = true; gamePaused = false; const pauseBtn = document.getElementById('pauseBtn'); if (pauseBtn) pauseBtn.textContent = '⏸';
+            score = 0; lives = 3; obstacles = []; coinsList = []; powerups = []; particles = []; trail = [];
             spawnTimer = 0; coinSpawnTimer = 0; powerupSpawnTimer = 0; frameCount = 0;
-            shieldActive = false; shieldTimer = 0; shieldCooldown = 0; boostCooldown = 0;
-            magnetTimer = 0; doubleCoinTimer = 0; screenShake = 0;
-            currentBiome = 0;
-            player.y = GROUND_Y - player.h;
-            player.vy = 0;
-            player.jumping = false;
-            jumpsLeft = getMaxJumps();
-            currentRunScore = 0;
-            noHitStreak = 0;
-            updateUI();
-            saveGameState();
+            shieldActive = false; shieldTimer = 0; shieldCooldown = 0; boostCooldown = 0; magnetTimer = 0; doubleCoinTimer = 0; screenShake = 0; currentBiome = 0;
+            player.y = GROUND_Y - player.h; player.vy = 0; player.jumping = false; jumpsLeft = getMaxJumps();
+            currentRunScore = 0; noHitStreak = 0; updateUI(); saveGameState();
         }
 
         function buyUpgrade(type) {
-            const costs = { speed: 50, jump: 30, shield: 40 };
-            const maxLevels = { speed: 10, jump: 5, shield: 5 };
+            const costs = { speed: 50, jump: 30, shield: 40 }; const maxLevels = { speed: 10, jump: 5, shield: 5 };
             if (coins < costs[type]) { playBeep(200, 0.2, 'sawtooth', 0.1); return; }
             if (upgrades[type] >= maxLevels[type]) { return; }
-
-            coins -= costs[type];
-            upgrades[type]++;
-            soundCoin();
-            saveProgress();
-            saveGameState();
-            updateUpgradeUI();
-
+            coins -= costs[type]; upgrades[type]++; soundCoin(); saveProgress(); saveGameState(); updateUpgradeUI();
             if (type === 'jump') jumpsLeft = Math.max(jumpsLeft, getMaxJumps());
-
-            for (let i = 0; i < 25; i++) {
-                particles.push({
-                    x: W / 2 + (Math.random() - 0.5) * 100,
-                    y: H / 2 + (Math.random() - 0.5) * 100,
-                    vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.5) * 12 - 5,
-                    life: 35, color: '#00ffff', size: 3
-                });
-            }
+            for (let i = 0; i < 25; i++) particles.push({ x: W / 2 + (Math.random() - 0.5) * 100, y: H / 2 + (Math.random() - 0.5) * 100, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.5) * 12 - 5, life: 35, color: '#00ffff', size: 3 });
         }
 
-        // ============================================================
-        //  10. ЕЖЕДНЕВНЫЕ ЗАДАНИЯ
-        // ============================================================
         const TASK_TEMPLATES = [
-            { id: 'coins',   text: 'Собери {n} монет',           goal: 50, reward: 60  },
-            { id: 'score',   text: 'Набери {n} очков за забег',  goal: 200, reward: 80  },
-            { id: 'runs',    text: 'Сыграй {n} забега',          goal: 3,   reward: 50  },
-            { id: 'nohit',   text: 'Пройди {n} очков без урона', goal: 100, reward: 100 },
-            { id: 'powerups',text: 'Подбери {n} бонуса',         goal: 2,   reward: 70  }
+            { id: 'coins', text: 'Собери {n} монет', goal: 50, reward: 60 },
+            { id: 'score', text: 'Набери {n} очков за забег', goal: 200, reward: 80 },
+            { id: 'runs', text: 'Сыграй {n} забега', goal: 3, reward: 50 },
+            { id: 'nohit', text: 'Пройди {n} очков без урона', goal: 100, reward: 100 },
+            { id: 'powerups', text: 'Подбери {n} бонуса', goal: 2, reward: 70 }
         ];
 
-        function todayKey() {
-            const d = new Date();
-            return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-        }
+        function todayKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; }
 
         function loadDailyTasks() {
-            try {
-                const saved = JSON.parse(localStorage.getItem('cyberRunnerDaily') || 'null');
-                if (saved && saved.date === todayKey()) return saved.tasks;
-            } catch(e) {}
-
+            try { const saved = JSON.parse(localStorage.getItem('cyberRunnerDaily') || 'null'); if (saved && saved.date === todayKey()) return saved.tasks; } catch(e) {}
             const shuffled = [...TASK_TEMPLATES].sort(() => Math.random() - 0.5);
-            const picked = shuffled.slice(0, 3).map(t => ({
-                ...t,
-                goal: Math.round(t.goal * (0.8 + Math.random() * 0.6)),
-                progress: 0, claimed: false, done: false
-            }));
-            const data = { date: todayKey(), tasks: picked };
-            try { localStorage.setItem('cyberRunnerDaily', JSON.stringify(data)); } catch(e) {}
+            const picked = shuffled.slice(0, 3).map(t => ({ ...t, goal: Math.round(t.goal * (0.8 + Math.random() * 0.6)), progress: 0, claimed: false, done: false }));
+            try { localStorage.setItem('cyberRunnerDaily', JSON.stringify({ date: todayKey(), tasks: picked })); } catch(e) {}
             return picked;
         }
 
-        function saveDailyTasks() {
-            try { localStorage.setItem('cyberRunnerDaily', JSON.stringify({ date: todayKey(), tasks: dailyTasks })); } catch(e) {}
-        }
+        function saveDailyTasks() { try { localStorage.setItem('cyberRunnerDaily', JSON.stringify({ date: todayKey(), tasks: dailyTasks })); } catch(e) {} }
 
         let dailyTasks = loadDailyTasks();
-        let currentRunScore = 0;
-        let noHitStreak = 0;
-        let runsThisSession = 0;
+        let currentRunScore = 0; let noHitStreak = 0; let runsThisSession = 0;
 
         function trackTask(id, amount) {
             let changed = false;
-            if (id === 'coins') {
-                dailyTasks.forEach(t => {
-                    if (t.id === 'coins' && !t.done) {
-                        t.progress += amount;
-                        if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; }
-                    }
-                });
-            } else if (id === 'powerups') {
-                dailyTasks.forEach(t => {
-                    if (t.id === 'powerups' && !t.done) {
-                        t.progress += amount;
-                        if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; }
-                    }
-                });
-            } else if (id === 'score_total') {
-                dailyTasks.forEach(t => {
-                    if (t.id === 'score' && !t.done) {
-                        t.progress = Math.max(t.progress, score);
-                        if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; }
-                    }
-                });
-            }
+            if (id === 'coins') { dailyTasks.forEach(t => { if (t.id === 'coins' && !t.done) { t.progress += amount; if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; } } }); } 
+            else if (id === 'powerups') { dailyTasks.forEach(t => { if (t.id === 'powerups' && !t.done) { t.progress += amount; if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; } } }); } 
+            else if (id === 'score_total') { dailyTasks.forEach(t => { if (t.id === 'score' && !t.done) { t.progress = Math.max(t.progress, score); if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; } } }); }
             if (changed) { saveDailyTasks(); updateTaskBadge(); }
         }
 
         function trackRuns() {
             let changed = false;
-            dailyTasks.forEach(t => {
-                if (t.id === 'runs' && !t.done) {
-                    t.progress += 1;
-                    if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; }
-                }
-            });
+            dailyTasks.forEach(t => { if (t.id === 'runs' && !t.done) { t.progress += 1; if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; } } });
             if (changed) { saveDailyTasks(); updateTaskBadge(); }
         }
 
         function updateNoHitStreak(amount) {
-            noHitStreak += amount;
-            let changed = false;
-            dailyTasks.forEach(t => {
-                if (t.id === 'nohit' && !t.done) {
-                    t.progress = Math.max(t.progress, noHitStreak);
-                    if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; }
-                }
-            });
+            noHitStreak += amount; let changed = false;
+            dailyTasks.forEach(t => { if (t.id === 'nohit' && !t.done) { t.progress = Math.max(t.progress, noHitStreak); if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; } } });
             if (changed) { saveDailyTasks(); updateTaskBadge(); }
         }
 
-        function resetNoHitStreak() {
-            noHitStreak = 0;
-        }
+        function resetNoHitStreak() { noHitStreak = 0; }
 
         function updateTaskBadge() {
-            const badge = document.getElementById('taskBadge');
-            if (!badge) return;
+            const badge = document.getElementById('taskBadge'); if (!badge) return;
             const doneCount = dailyTasks.filter(t => t.done && !t.claimed).length;
             badge.textContent = doneCount > 0 ? `(${doneCount}!)` : '';
         }
 
         function renderTasks() {
-            const list = document.getElementById('tasksList');
-            if (!list) return;
-
+            const list = document.getElementById('tasksList'); if (!list) return;
             list.innerHTML = dailyTasks.map((t, i) => {
-                const progress = Math.min(t.progress, t.goal);
-                const text = t.text.replace('{n}', t.goal);
-                const canClaim = t.done && !t.claimed;
-                return `
-                    <div class="task-item ${t.done ? 'done' : ''}">
-                        <div class="task-info">
-                            <div>${text}</div>
-                            <div class="task-progress">${progress} / ${t.goal}</div>
-                        </div>
-                        <div class="task-reward">+${t.reward}💰</div>
-                        ${t.claimed
-                            ? '<span style="font-size:12px;color:#00ff66;">✓</span>'
-                            : `<button class="task-claim" ${canClaim ? '' : 'disabled'} onclick="claimTask(${i})">ЗАБРАТЬ</button>`}
-                    </div>
-                `;
+                const progress = Math.min(t.progress, t.goal); const text = t.text.replace('{n}', t.goal); const canClaim = t.done && !t.claimed;
+                return `<div class="task-item ${t.done ? 'done' : ''}"><div class="task-info"><div>${text}</div><div class="task-progress">${progress} / ${t.goal}</div></div><div class="task-reward">+${t.reward}💰</div>${t.claimed ? '<span style="font-size:12px;color:#00ff66;">✓</span>' : `<button class="task-claim" ${canClaim ? '' : 'disabled'} onclick="claimTask(${i})">ЗАБРАТЬ</button>`}</div>`;
             }).join('');
-
-            const now = new Date();
-            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-            const diff = tomorrow - now;
-            const hours = Math.floor(diff / 3600000);
-            const minutes = Math.floor((diff % 3600000) / 60000);
-            document.getElementById('tasksDate').textContent = `Обновление через: ${hours}ч ${minutes}м`;
+            const now = new Date(); const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1); const diff = tomorrow - now;
+            document.getElementById('tasksDate').textContent = `Обновление через: ${Math.floor(diff / 3600000)}ч ${Math.floor((diff % 3600000) / 60000)}м`;
         }
 
         function claimTask(index) {
-            const t = dailyTasks[index];
-            if (!t || !t.done || t.claimed) return;
-            t.claimed = true;
-            coins += t.reward;
-            soundCoin();
-            saveProgress();
-            saveDailyTasks();
-            updateUI();
-            renderTasks();
-            updateTaskBadge();
+            const t = dailyTasks[index]; if (!t || !t.done || t.claimed) return;
+            t.claimed = true; coins += t.reward; soundCoin(); saveProgress(); saveDailyTasks(); updateUI(); renderTasks(); updateTaskBadge();
         }
 
-        // ============================================================
-        //  11. СКИНЫ
-        // ============================================================
         function renderSkins() {
-            const grid = document.getElementById('skinsGrid');
-            if (!grid) return;
-            document.getElementById('skinsCoins').textContent = coins;
-
+            const grid = document.getElementById('skinsGrid'); if (!grid) return; document.getElementById('skinsCoins').textContent = coins;
             grid.innerHTML = Object.entries(SKINS).map(([id, skin]) => {
-                const owned = ownedSkins.includes(id);
-                const active = activeSkin === id;
-                return `
-                    <div class="skin-card ${active ? 'active' : ''} ${owned ? 'owned' : ''}" onclick="selectSkin('${id}')">
-                        <div class="skin-preview" style="background: linear-gradient(135deg, ${skin.colors[0]}, ${skin.colors[1]}); color: ${skin.colors[0]};"></div>
-                        <div class="skin-name">${skin.name}</div>
-                        ${owned
-                            ? `<div class="skin-status">${active ? '✓ АКТИВЕН' : 'НАЖМИ ДЛЯ ВЫБОРА'}</div>`
-                            : `<div class="skin-price">${skin.price}💰</div>`}
-                    </div>
-                `;
+                const owned = ownedSkins.includes(id); const active = activeSkin === id;
+                return `<div class="skin-card ${active ? 'active' : ''} ${owned ? 'owned' : ''}" onclick="selectSkin('${id}')"><div class="skin-preview" style="background: linear-gradient(135deg, ${skin.colors[0]}, ${skin.colors[1]}); color: ${skin.colors[0]};"></div><div class="skin-name">${skin.name}</div>${owned ? `<div class="skin-status">${active ? '✓ АКТИВЕН' : 'НАЖМИ ДЛЯ ВЫБОРА'}</div>` : `<div class="skin-price">${skin.price}💰</div>`}</div>`;
             }).join('');
         }
 
         function selectSkin(id) {
-            const skin = SKINS[id];
-            if (!skin) return;
-
-            if (ownedSkins.includes(id)) {
-                activeSkin = id;
-                saveProgress();
-                renderSkins();
-                playBeep(1000, 0.1, 'sine', 0.12);
-                return;
-            }
-
-            if (coins < skin.price) {
-                playBeep(200, 0.2, 'sawtooth', 0.1);
-                alert('Недостаточно кредитов!');
-                return;
-            }
-
+            const skin = SKINS[id]; if (!skin) return;
+            if (ownedSkins.includes(id)) { activeSkin = id; saveProgress(); renderSkins(); playBeep(1000, 0.1, 'sine', 0.12); return; }
+            if (coins < skin.price) { playBeep(200, 0.2, 'sawtooth', 0.1); alert('Недостаточно кредитов!'); return; }
             if (!confirm(`Приобрести скин "${skin.name}" за ${skin.price} кредитов?`)) return;
-            coins -= skin.price;
-            ownedSkins.push(id);
-            activeSkin = id;
-            saveProgress();
-            soundCoin();
-            updateUI();
-            renderSkins();
+            coins -= skin.price; ownedSkins.push(id); activeSkin = id; saveProgress(); soundCoin(); updateUI(); renderSkins();
         }
 
-        // ============================================================
-        //  12. УПРАВЛЕНИЕ И ЭФФЕКТЫ
-        // ============================================================
         function triggerGlitch() {
-            canvas.classList.remove('glitch-active');
-            void canvas.offsetWidth; // Триггер перерисовки (reflow)
-            canvas.classList.add('glitch-active');
-            setTimeout(() => {
-                canvas.classList.remove('glitch-active');
-            }, 250);
+            canvas.classList.remove('glitch-active'); void canvas.offsetWidth; canvas.classList.add('glitch-active');
+            setTimeout(() => { canvas.classList.remove('glitch-active'); }, 250);
         }
 
         let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
-
         canvas.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            initAudio();
-            if (!gameRunning) return;
-            const touch = e.changedTouches[0];
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
-            touchStartTime = Date.now();
+            e.preventDefault(); initAudio(); if (!gameRunning) return;
+            const touch = e.changedTouches[0]; touchStartX = touch.clientX; touchStartY = touch.clientY; touchStartTime = Date.now();
         }, { passive: false });
 
         canvas.addEventListener('touchend', function(e) {
-            e.preventDefault();
-            if (!gameRunning || gamePaused) return;
-            const touch = e.changedTouches[0];
-            const dx = touch.clientX - touchStartX;
-            const dy = touch.clientY - touchStartY;
-            const dt = Date.now() - touchStartTime;
-
-            if (Math.abs(dx) < 30 && Math.abs(dy) < 30 && dt < 300) {
-                jump();
-                return;
-            }
-            if (Math.abs(dy) > Math.abs(dx)) {
-                if (dy < -40) jump();
-            } else {
-                if (dx > 40) boost();
-                if (dx < -40) useShield();
-            }
+            e.preventDefault(); if (!gameRunning || gamePaused) return;
+            const touch = e.changedTouches[0]; const dx = touch.clientX - touchStartX; const dy = touch.clientY - touchStartY; const dt = Date.now() - touchStartTime;
+            if (Math.abs(dx) < 30 && Math.abs(dy) < 30 && dt < 300) { jump(); return; }
+            if (Math.abs(dy) > Math.abs(dx)) { if (dy < -40) jump(); } 
+            else { if (dx > 40) boost(); if (dx < -40) useShield(); }
         }, { passive: false });
 
-        canvas.addEventListener('click', function(e) {
-            initAudio();
-            if (!gameRunning) return;
-            jump();
-        });
+        canvas.addEventListener('click', function(e) { initAudio(); if (!gameRunning) return; jump(); });
 
         document.addEventListener('keydown', function(e) {
-            const gameActive = document.getElementById('screenGame').classList.contains('active');
-            if (!gameActive) return;
-
-            if (e.key === ' ' || e.key === 'Space') {
-                e.preventDefault();
-                if (!gameRunning) { restartGame(); return; }
-                jump();
-            }
+            const gameActive = document.getElementById('screenGame').classList.contains('active'); if (!gameActive) return;
+            if (e.key === ' ' || e.key === 'Space') { e.preventDefault(); if (!gameRunning) { restartGame(); return; } jump(); }
             if (e.key === 'Shift') { e.preventDefault(); boost(); }
             if (e.key === 'e' || e.key === 'E') useShield();
             if (e.key === 'p' || e.key === 'P') togglePause();
         });
 
-        // ============================================================
-        //  13. ЦИКЛ И ЗАПУСК
-        // ============================================================
-        function gameLoop() {
-            update();
-            draw();
-            requestAnimationFrame(gameLoop);
-        }
+        function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
 
         if (!CanvasRenderingContext2D.prototype.roundRect) {
             CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-                if (r > w / 2) r = w / 2;
-                if (r > h / 2) r = h / 2;
-                this.moveTo(x + r, y);
-                this.lineTo(x + w - r, y);
-                this.quadraticCurveTo(x + w, y, x + w, y + r);
-                this.lineTo(x + w, y + h - r);
-                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-                this.lineTo(x + r, y + h);
-                this.quadraticCurveTo(x, y + h, x, y + h - r);
-                this.lineTo(x, y + r);
-                this.quadraticCurveTo(x, y, x + r, y);
-                return this;
+                if (r > w / 2) r = w / 2; if (r > h / 2) r = h / 2;
+                this.moveTo(x + r, y); this.lineTo(x + w - r, y); this.quadraticCurveTo(x + w, y, x + w, y + r);
+                this.lineTo(x + w, y + h - r); this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                this.lineTo(x + r, y + h); this.quadraticCurveTo(x, y + h, x, y + h - r);
+                this.lineTo(x, y + r); this.quadraticCurveTo(x, y, x + r, y); return this;
             };
         }
 
-        // Инициализация при загрузке
-        checkOfflineEarnings(); // Проверка оффлайн-дохода
-        updateUI();
-        renderLeaderboard();
-        updateMenuStats();
-        updateContinueButton();
-        updateTaskBadge();
-        gameLoop();
+        checkOfflineEarnings(); updateUI(); renderLeaderboard(); updateMenuStats(); updateContinueButton(); updateTaskBadge(); gameLoop();
+        console.log('🏃 CYBER RUNNER 2077 v3.0 (PWA Ready) загружен.');
+    </script>
 
-        console.log('🏃 CYBER RUNNER 2077 v3.0 (Pro) загружен. Голосовой ИИ и оффлайн-доход активны.');
+    <!-- Регистрация Service Worker для оффлайн-работы -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => { console.log('SW успешно зарегистрирован: ', registration.scope); })
+                    .catch(error => { console.log('Ошибка регистрации SW: ', error); });
+            });
+        }
     </script>
 </body>
 </html>

@@ -550,6 +550,40 @@
         }
         .offline-btn:hover { transform: scale(1.05); }
 
+        /* Подсказка о повороте экрана */
+        .rotate-hint {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+        .rotate-hint.active { display: flex; }
+        .rotate-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: rotatePhone 2s ease-in-out infinite;
+        }
+        @keyframes rotatePhone {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+        }
+        .rotate-text {
+            color: #00ffff;
+            font-size: 18px;
+            font-family: 'Orbitron', monospace;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        @media (max-width: 600px) and (orientation: portrait) {
+            .rotate-hint { display: flex; }
+        }
+
         @media (max-width: 600px) {
             .screen { padding: 15px; }
             .menu-content { padding: 30px 20px; border-radius: 20px; }
@@ -571,6 +605,12 @@
     </style>
 </head>
 <body>
+
+    <!-- Подсказка о повороте экрана -->
+    <div class="rotate-hint" id="rotateHint">
+        <div class="rotate-icon">📱</div>
+        <div class="rotate-text">Поверни телефон горизонтально для лучшей игры</div>
+    </div>
 
     <div class="offline-modal" id="offlineModal">
         <div class="offline-content">
@@ -778,37 +818,56 @@
             if (navigator.vibrate) navigator.vibrate(ms);
         }
         
+        // Гопнический голос
         function speak(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'ru-RU';
-                utterance.rate = 1.3;
-                utterance.pitch = 0.7;
-                utterance.volume = 0.8;
+                utterance.rate = 1.4;
+                utterance.pitch = 0.6;
+                utterance.volume = 0.9;
                 window.speechSynthesis.speak(utterance);
             }
         }
         
-        function soundJump() { playBeep(600, 0.1, 'square', 0.1); setTimeout(()=>playBeep(800,0.1,'square',0.08),50); haptic(10); }
-        function soundCoin() { playBeep(1200, 0.08, 'sine', 0.12); setTimeout(()=>playBeep(1600,0.08,'sine',0.1),60); haptic(15); }
-        function soundHit() { playBeep(150, 0.3, 'sawtooth', 0.2); setTimeout(()=>playBeep(100,0.3,'sawtooth',0.15),100); haptic(30); }
+        function soundJump() { 
+            playBeep(600, 0.1, 'square', 0.1); 
+            setTimeout(()=>playBeep(800,0.1,'square',0.08),50); 
+            haptic(10);
+            if (Math.random() < 0.3) speak("Вжух!");
+        }
+        function soundCoin() { 
+            playBeep(1200, 0.08, 'sine', 0.12); 
+            setTimeout(()=>playBeep(1600,0.08,'sine',0.1),60); 
+            haptic(15); 
+        }
+        function soundHit() { 
+            playBeep(150, 0.3, 'sawtooth', 0.2); 
+            setTimeout(()=>playBeep(100,0.3,'sawtooth',0.15),100); 
+            haptic(30); 
+        }
         function soundShield() { 
-            playBeep(1200, 0.15, 'sine', 0.1); setTimeout(()=>playBeep(1600,0.15,'sine',0.1),100); 
+            playBeep(1200, 0.15, 'sine', 0.1); 
+            setTimeout(()=>playBeep(1600,0.15,'sine',0.1),100); 
             haptic(20); 
-            speak("Щит активирован");
+            const phrases = ["Чётко, братан, щит на чеку!", "Фартануло, щит активирован!", "Держи оборону, пацан!"];
+            speak(phrases[Math.floor(Math.random() * phrases.length)]);
         }
         function soundBonus() { 
-            playBeep(1500, 0.1, 'sine', 0.12); setTimeout(()=>playBeep(2000,0.15,'sine',0.1),80); 
+            playBeep(1500, 0.1, 'sine', 0.12); 
+            setTimeout(()=>playBeep(2000,0.15,'sine',0.1),80); 
             haptic(25); 
-            speak("Бонус получен");
+            const phrases = ["О, халява, братуха!", "Бонус в карман, красавчик!", "Фарт прёт, ёпта!"];
+            speak(phrases[Math.floor(Math.random() * phrases.length)]);
         }
         function soundGameOver() {
             playBeep(400, 0.2, 'sawtooth', 0.15);
             setTimeout(()=>playBeep(300,0.2,'sawtooth',0.12),200);
             setTimeout(()=>playBeep(150,0.4,'sawtooth',0.15),400);
             haptic(50);
-            speak("Система отказала");
+            const phrases = ["Всё, приехали, брат...", "Кирдык системе, ё-моё!", "Откинулся, пацан..."];
+            speak(phrases[Math.floor(Math.random() * phrases.length)]);
         }
 
         function spawnObstacle() {
@@ -1391,7 +1450,7 @@
         }
 
         checkOfflineEarnings(); updateUI(); renderLeaderboard(); updateMenuStats(); updateContinueButton(); updateTaskBadge(); gameLoop();
-        console.log('🏃 CYBER RUNNER 2077 v3.0 (PWA Ready) загружен.');
+        console.log('🏃 CYBER RUNNER 2077 v4.0 (Гопник Edition) загружен.');
     </script>
 
     <!-- Регистрация Service Worker для оффлайн-работы -->

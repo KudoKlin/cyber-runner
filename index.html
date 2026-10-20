@@ -26,7 +26,6 @@
             color: #e0e0e0;
         }
 
-        /* Фоновая сетка с параллаксом */
         body::before {
             content: '';
             position: fixed;
@@ -43,7 +42,6 @@
         }
         @keyframes gridPulse { 0%,100%{opacity:0.3} 50%{opacity:0.6} }
 
-        /* Эффект сканлайнов */
         body::after {
             content: '';
             position: fixed;
@@ -73,7 +71,6 @@
         .screen.active { display: flex; opacity: 1; transform: translateY(0); }
         .screen.fade-out { opacity: 0; transform: translateY(-10px); }
 
-        /* Glassmorphism меню */
         .menu-content {
             background: rgba(13, 13, 26, 0.7);
             backdrop-filter: blur(12px);
@@ -253,6 +250,19 @@
             border: 1px solid rgba(0, 255, 255, 0.15);
             cursor: pointer;
             touch-action: none;
+        }
+
+        /* Хроматическая аберрация (Glitch) при ударе */
+        @keyframes glitch-anim {
+            0% { transform: translate(0); filter: none; }
+            20% { transform: translate(-3px, 2px); filter: drop-shadow(3px 0px 0px rgba(255,0,0,0.7)) drop-shadow(-3px 0px 0px rgba(0,255,255,0.7)); }
+            40% { transform: translate(-2px, -2px); filter: drop-shadow(-3px 0px 0px rgba(255,0,0,0.7)) drop-shadow(3px 0px 0px rgba(0,255,255,0.7)); }
+            60% { transform: translate(2px, 2px); filter: drop-shadow(3px 0px 0px rgba(255,0,0,0.7)) drop-shadow(-3px 0px 0px rgba(0,255,255,0.7)); }
+            80% { transform: translate(2px, -2px); filter: drop-shadow(-3px 0px 0px rgba(255,0,0,0.7)) drop-shadow(3px 0px 0px rgba(0,255,255,0.7)); }
+            100% { transform: translate(0); filter: none; }
+        }
+        .glitch-active {
+            animation: glitch-anim 0.25s ease-out;
         }
 
         .mobile-controls {
@@ -491,6 +501,49 @@
         .skin-price { font-size: 11px; color: #ffdd00; font-weight: 700; }
         .skin-status { font-size: 10px; color: rgba(0, 255, 255, 0.6); margin-top: 6px; letter-spacing: 1px; }
 
+        /* Модальное окно оффлайн-дохода */
+        .offline-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .offline-modal.active { display: flex; }
+        .offline-content {
+            background: linear-gradient(145deg, #0d0d1a, #1a0a2e);
+            border: 2px solid #ffdd00;
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 0 50px rgba(255, 221, 0, 0.2);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { 0%{transform:scale(0.8);opacity:0} 100%{transform:scale(1);opacity:1} }
+        .offline-title { color: #ffdd00; font-size: 22px; margin-bottom: 15px; font-weight: 700; }
+        .offline-text { color: #e0e0e0; font-size: 15px; margin-bottom: 10px; font-family: 'Rajdhani', sans-serif; }
+        .offline-amount { color: #00ff66; font-size: 32px; font-weight: 900; margin: 15px 0; text-shadow: 0 0 20px rgba(0, 255, 100, 0.4); }
+        .offline-btn {
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: #ffdd00;
+            color: #0a0a0f;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .offline-btn:hover { transform: scale(1.05); }
+
         @media (max-width: 600px) {
             .screen { padding: 15px; }
             .menu-content { padding: 30px 20px; border-radius: 20px; }
@@ -512,6 +565,17 @@
     </style>
 </head>
 <body>
+
+    <!-- Модальное окно оффлайн-дохода -->
+    <div class="offline-modal" id="offlineModal">
+        <div class="offline-content">
+            <div class="offline-title">📡 СВЯЗЬ ВОССТАНОВЛЕНА</div>
+            <div class="offline-text">Пока вас не было, кибер-имплант продолжал сбор данных.</div>
+            <div class="offline-text">Время в оффлайне: <span id="offlineTime">0</span> мин.</div>
+            <div class="offline-amount">+<span id="offlineCoins">0</span> 💰</div>
+            <button class="offline-btn" onclick="closeOfflineModal()">ЗАБРАТЬ НАЧИСЛЕНИЯ</button>
+        </div>
+    </div>
 
     <div class="screen screen-menu active" id="screenMenu">
         <div class="menu-content">
@@ -685,14 +749,12 @@
         let legTimer = 0;
         let trail = [];
         let particles = [];
-        
-        // Новые фичи: тряска экрана и параллакс
         let screenShake = 0;
         let bgOffset1 = 0;
         let bgOffset2 = 0;
 
         // ============================================================
-        //  2. ЗВУКИ И HAPTICS
+        //  2. ЗВУКИ, ГОЛОС И HAPTICS
         // ============================================================
         let audioCtx = null;
         function initAudio() {
@@ -717,16 +779,38 @@
             if (navigator.vibrate) navigator.vibrate(ms);
         }
         
+        // Голосовой синтез (Web Speech API)
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Прерываем предыдущую фразу, чтобы не было очереди
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ru-RU';
+                utterance.rate = 1.3; // Быстрее, как у ИИ
+                utterance.pitch = 0.7; // Ниже, более роботизированно
+                utterance.volume = 0.8;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+        
         function soundJump() { playBeep(600, 0.1, 'square', 0.1); setTimeout(()=>playBeep(800,0.1,'square',0.08),50); haptic(10); }
         function soundCoin() { playBeep(1200, 0.08, 'sine', 0.12); setTimeout(()=>playBeep(1600,0.08,'sine',0.1),60); haptic(15); }
         function soundHit() { playBeep(150, 0.3, 'sawtooth', 0.2); setTimeout(()=>playBeep(100,0.3,'sawtooth',0.15),100); haptic(30); }
-        function soundShield() { playBeep(1200, 0.15, 'sine', 0.1); setTimeout(()=>playBeep(1600,0.15,'sine',0.1),100); haptic(20); }
-        function soundBonus() { playBeep(1500, 0.1, 'sine', 0.12); setTimeout(()=>playBeep(2000,0.15,'sine',0.1),80); haptic(25); }
+        function soundShield() { 
+            playBeep(1200, 0.15, 'sine', 0.1); setTimeout(()=>playBeep(1600,0.15,'sine',0.1),100); 
+            haptic(20); 
+            speak("Щит активирован");
+        }
+        function soundBonus() { 
+            playBeep(1500, 0.1, 'sine', 0.12); setTimeout(()=>playBeep(2000,0.15,'sine',0.1),80); 
+            haptic(25); 
+            speak("Бонус получен");
+        }
         function soundGameOver() {
             playBeep(400, 0.2, 'sawtooth', 0.15);
             setTimeout(()=>playBeep(300,0.2,'sawtooth',0.12),200);
             setTimeout(()=>playBeep(150,0.4,'sawtooth',0.15),400);
             haptic(50);
+            speak("Система отказала");
         }
 
         // ============================================================
@@ -738,7 +822,6 @@
             const height = type === 'spike' ? 25 + Math.random() * 20 : 30 + Math.random() * 25;
             const width = type === 'spike' ? 20 : 25 + Math.random() * 15;
             
-            // Умный спавн: иногда спавним двойные препятствия на высоких скоростях
             const isDouble = score > 300 && Math.random() < 0.2;
             
             obstacles.push({
@@ -755,12 +838,10 @@
         }
         
         function spawnCoin() {
-            // Монеты теперь могут спавниться дугами
             const pattern = Math.random();
             if (pattern < 0.6) {
                 coinsList.push({ x: W + 50 + Math.random() * 100, y: GROUND_Y - 30 - Math.random() * 80, r: 10, collected: false });
             } else {
-                // Дуга из 3 монет
                 for(let i=0; i<3; i++) {
                     coinsList.push({ 
                         x: W + 50 + i * 35, 
@@ -788,7 +869,6 @@
             if (!gameRunning || gamePaused) return;
             frameCount++;
 
-            // Смена биома
             const newBiome = Math.floor(score / 300) % BIOMES.length;
             if (newBiome !== currentBiome) {
                 currentBiome = newBiome;
@@ -801,7 +881,6 @@
                 }
             }
 
-            // Плавное ускорение
             const baseSpeed = 5 + (upgrades.speed - 1) * 1.2;
             const scoreBonus = Math.floor(score / 100) * 0.3;
             if (boostCooldown > 45) {
@@ -810,7 +889,6 @@
                 speed = Math.min(16, baseSpeed + scoreBonus);
             }
 
-            // Физика игрока
             player.vy += gravity;
             player.y += player.vy;
 
@@ -821,14 +899,12 @@
                 jumpsLeft = getMaxJumps();
             }
 
-            // Анимация бега
             legTimer++;
             if (legTimer > (speed > 10 ? 3 : 5)) { 
                 legTimer = 0; 
                 legFrame = (legFrame + 1) % 2; 
             }
 
-            // Трейл
             if (frameCount % 2 === 0) {
                 trail.push({ x: player.x + player.w / 2, y: player.y + player.h / 2, life: 15, maxLife: 15 });
                 if (trail.length > 25) trail.shift();
@@ -838,15 +914,13 @@
                 if (trail[i].life <= 0) trail.splice(i, 1);
             }
 
-            // Таймеры
             if (shieldActive) { shieldTimer--; if (shieldTimer <= 0) shieldActive = false; }
             if (shieldCooldown > 0) shieldCooldown--;
             if (boostCooldown > 0) boostCooldown--;
             if (magnetTimer > 0) magnetTimer--;
             if (doubleCoinTimer > 0) doubleCoinTimer--;
-            if (screenShake > 0) screenShake *= 0.9; // Затухание тряски
+            if (screenShake > 0) screenShake *= 0.9;
 
-            // Спавн препятствий (адаптивный)
             spawnTimer++;
             let interval = Math.max(35, 75 - Math.floor(score / 30));
             if (spawnTimer >= interval) {
@@ -854,26 +928,22 @@
                 if (Math.random() < 0.75) spawnObstacle();
             }
 
-            // Спавн монет
             coinSpawnTimer++;
             if (coinSpawnTimer >= 30 + Math.random() * 40) {
                 coinSpawnTimer = 0;
                 if (Math.random() < 0.6) spawnCoin();
             }
 
-            // Спавн бонусов
             powerupSpawnTimer++;
             if (powerupSpawnTimer >= 400 + Math.random() * 300) {
                 powerupSpawnTimer = 0;
                 spawnPowerup();
             }
 
-            // Обновление препятствий
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 const obs = obstacles[i];
                 obs.x -= speed;
 
-                // Улучшенный хитбокс (прощающий)
                 const hitX = player.x + 6;
                 const hitY = player.y + 6;
                 const hitW = player.w - 12;
@@ -883,10 +953,11 @@
                     obs.y < hitY + hitH && obs.y + obs.h > hitY) {
 
                     if (shieldActive) {
-                        obs.y = -100; // Убираем препятствие
+                        obs.y = -100;
                         shieldActive = false;
                         soundShield();
-                        screenShake = 5;
+                        screenShake = 8;
+                        triggerGlitch(); // Хроматическая аберрация
                         for (let j = 0; j < 20; j++) {
                             particles.push({
                                 x: obs.x + obs.w / 2, y: obs.y + obs.h / 2,
@@ -899,7 +970,8 @@
 
                     lives--;
                     soundHit();
-                    screenShake = 10;
+                    screenShake = 12;
+                    triggerGlitch(); // Хроматическая аберрация
                     score = Math.max(0, score - 15);
                     updateUI();
                     saveGameState();
@@ -939,11 +1011,10 @@
                     updateUI();
                     saveGameState();
                     trackTask('score_total', 0);
-                    updateNoHitStreak(5); // +5 очков за каждое пройденное препятствие
+                    updateNoHitStreak(5);
                 }
             }
 
-            // Обновление монет
             for (let i = coinsList.length - 1; i >= 0; i--) {
                 const coin = coinsList[i];
 
@@ -983,7 +1054,6 @@
                 if (coin.x + coin.r < -20 || coin.collected) coinsList.splice(i, 1);
             }
 
-            // Обновление бонусов
             for (let i = powerups.length - 1; i >= 0; i--) {
                 const pu = powerups[i];
                 pu.x -= speed;
@@ -1010,13 +1080,12 @@
                 if (pu.x + pu.r < -20 || pu.collected) powerups.splice(i, 1);
             }
 
-            // Обновление частиц с ограничением
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
                 p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--;
                 if (p.life <= 0) particles.splice(i, 1);
             }
-            if (particles.length > 200) particles.splice(0, particles.length - 200); // Оптимизация
+            if (particles.length > 200) particles.splice(0, particles.length - 200);
 
             document.getElementById('scoreDisplay').textContent = score;
         }
@@ -1027,7 +1096,6 @@
         function draw() {
             ctx.clearRect(0, 0, W, H);
 
-            // Тряска экрана
             let shakeX = 0, shakeY = 0;
             if (screenShake > 0.5) {
                 shakeX = (Math.random() - 0.5) * screenShake;
@@ -1038,7 +1106,6 @@
 
             const b = BIOMES[currentBiome];
             
-            // Параллакс фон 1 (далекие здания)
             bgOffset1 = (bgOffset1 - speed * 0.2) % W;
             ctx.fillStyle = b.building;
             for (let i = 0; i < W + 100; i += 60) {
@@ -1046,7 +1113,6 @@
                 ctx.fillRect(i + bgOffset1, GROUND_Y - h, 65, h);
             }
             
-            // Параллакс фон 2 (сетка)
             bgOffset2 = (bgOffset2 - speed * 0.5) % 40;
             ctx.strokeStyle = b.accent + '22';
             ctx.lineWidth = 1;
@@ -1058,7 +1124,6 @@
                 ctx.stroke();
             }
 
-            // Градиент неба
             const grad = ctx.createLinearGradient(0, 0, 0, H);
             grad.addColorStop(0, b.top);
             grad.addColorStop(0.6, b.mid);
@@ -1066,7 +1131,6 @@
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
-            // Звезды/пыль
             ctx.fillStyle = 'rgba(255,255,255,0.2)';
             for (let i = 0; i < 30; i++) {
                 const sx = (i * 37 + 13 + frameCount * 0.05) % W;
@@ -1076,14 +1140,12 @@
                 ctx.fill();
             }
 
-            // Земля
             ctx.shadowBlur = 15;
             ctx.shadowColor = b.accent;
             ctx.fillStyle = b.ground;
             ctx.fillRect(0, GROUND_Y, W, 4);
             ctx.shadowBlur = 0;
 
-            // Трейл игрока
             for (const t of trail) {
                 const alpha = t.life / t.maxLife;
                 ctx.fillStyle = `rgba(0, 255, 255, ${alpha * 0.3})`;
@@ -1092,7 +1154,6 @@
                 ctx.fill();
             }
 
-            // Монеты
             for (const coin of coinsList) {
                 if (coin.collected) continue;
                 const glow = Math.sin(frameCount * 0.15) * 0.5 + 0.5;
@@ -1110,7 +1171,6 @@
                 ctx.fillText('$', coin.x, coin.y + 1);
             }
 
-            // Бонусы
             for (const pu of powerups) {
                 if (pu.collected) continue;
                 const pulse = Math.sin(frameCount * 0.2) * 3;
@@ -1129,7 +1189,6 @@
                 ctx.fillText(pu.kind === 'magnet' ? '🧲' : '×2', pu.x, pu.y + 1);
             }
 
-            // Препятствия
             for (const obs of obstacles) {
                 ctx.shadowColor = obs.color;
                 ctx.shadowBlur = 15;
@@ -1160,7 +1219,6 @@
                 ctx.shadowBlur = 0;
             }
 
-            // Игрок
             const dx = player.x;
             const dy = player.y;
             const skin = SKINS[activeSkin] || SKINS['default'];
@@ -1168,13 +1226,11 @@
             const skinDark = skin.colors[1];
             const skinLeg = skin.colors[2];
 
-            // Тень под игроком
             ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
             ctx.beginPath();
             ctx.ellipse(dx + player.w / 2, GROUND_Y + 2, 15, 4, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Щит
             if (shieldActive) {
                 ctx.shadowColor = '#00ffff';
                 ctx.shadowBlur = 30;
@@ -1186,7 +1242,6 @@
                 ctx.shadowBlur = 0;
             }
 
-            // Магнитное поле
             if (magnetTimer > 0) {
                 ctx.strokeStyle = `rgba(0, 170, 255, ${0.15 + Math.sin(frameCount * 0.2) * 0.1})`;
                 ctx.lineWidth = 2;
@@ -1197,7 +1252,6 @@
                 ctx.setLineDash([]);
             }
 
-            // Тело
             ctx.shadowColor = skinMain;
             ctx.shadowBlur = 20;
             const bodyGrad = ctx.createLinearGradient(dx, dy, dx + player.w, dy + player.h);
@@ -1205,7 +1259,6 @@
             bodyGrad.addColorStop(1, skinDark);
             ctx.fillStyle = bodyGrad;
 
-            // Современный roundRect
             if (ctx.roundRect) {
                 ctx.beginPath();
                 ctx.roundRect(dx + 5, dy + 12, player.w - 10, player.h - 22, 6);
@@ -1214,13 +1267,11 @@
                 ctx.fillRect(dx + 5, dy + 12, player.w - 10, player.h - 22);
             }
 
-            // Голова/Визор
             ctx.fillStyle = skinMain;
             ctx.beginPath();
             ctx.arc(dx + player.w - 8, dy + 12, 11, 0, Math.PI * 2);
             ctx.fill();
 
-            // Светящийся визор
             ctx.shadowColor = '#ffffff';
             ctx.shadowBlur = 15;
             ctx.fillStyle = '#ffffff';
@@ -1229,13 +1280,11 @@
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // Глаз (деталь)
             ctx.fillStyle = '#0a0a0f';
             ctx.beginPath();
             ctx.arc(dx + player.w, dy + 8, 1.5, 0, Math.PI * 2);
             ctx.fill();
 
-            // Ноги (анимация)
             ctx.fillStyle = skinLeg;
             ctx.shadowBlur = 10;
             const legOff = player.jumping ? 0 : (legFrame === 0 ? 6 : -6);
@@ -1243,7 +1292,6 @@
             ctx.fillRect(dx + player.w - 15, dy + player.h - 8, 7, 8 - legOff);
             ctx.shadowBlur = 0;
 
-            // Шарф/шлейф (динамический)
             ctx.strokeStyle = skinMain;
             ctx.lineWidth = 3;
             ctx.shadowColor = skinMain;
@@ -1254,7 +1302,6 @@
             ctx.stroke();
             ctx.shadowBlur = 0;
 
-            // Частицы
             for (const p of particles) {
                 const alpha = p.life / 35;
                 ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
@@ -1266,7 +1313,6 @@
             }
             ctx.shadowBlur = 0;
 
-            // UI на канвасе (баффы)
             let badgeY = 35;
             ctx.textAlign = 'left';
             if (magnetTimer > 0) {
@@ -1281,14 +1327,12 @@
                 ctx.fillText(`×2 ${Math.ceil(doubleCoinTimer / 60)}с`, 15, badgeY);
             }
 
-            // Инфо о биоме
             ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
             ctx.font = '10px Rajdhani';
             ctx.fillText(`SECTOR: ${BIOMES[currentBiome].name.toUpperCase()}`, 15, H - 15);
 
-            ctx.restore(); // Конец тряски экрана
+            ctx.restore();
 
-            // Экраны паузы и Game Over (без тряски)
             if (!gameRunning && document.getElementById('screenGame').classList.contains('active')) {
                 ctx.fillStyle = 'rgba(5,5,10,0.8)';
                 ctx.fillRect(0, 0, W, H);
@@ -1355,7 +1399,7 @@
         }
 
         function startNewGame() {
-            coins = 0; // Сброс монет только при новой игре (можно убрать, если хочешь сохранять)
+            coins = 0;
             score = 0;
             lives = 3;
             clearGameState();
@@ -1410,7 +1454,7 @@
         }
 
         // ============================================================
-        //  7. СОХРАНЕНИЕ
+        //  7. СОХРАНЕНИЕ И ОФФЛАЙН-ДОХОД
         // ============================================================
         function saveProgress() {
             try {
@@ -1418,6 +1462,7 @@
                 localStorage.setItem('cyberRunnerUpgrades', JSON.stringify(upgrades));
                 localStorage.setItem('cyberRunnerOwnedSkins', JSON.stringify(ownedSkins));
                 localStorage.setItem('cyberRunnerSkin', activeSkin);
+                localStorage.setItem('cyberRunnerLastLogin', Date.now());
             } catch(e) {}
         }
 
@@ -1439,7 +1484,6 @@
                 if (!raw) return null;
                 const state = JSON.parse(raw);
                 if (!state || typeof state.score !== 'number') return null;
-                // Не даем загрузить слишком старый сейв (старше 24 часов)
                 if (Date.now() - state.timestamp > 86400000) {
                     clearGameState();
                     return null;
@@ -1462,6 +1506,36 @@
                 btn.style.display = 'none';
                 newBtn.classList.add('primary');
             }
+        }
+
+        // Оффлайн-доход
+        function checkOfflineEarnings() {
+            const now = Date.now();
+            const lastLogin = parseInt(localStorage.getItem('cyberRunnerLastLogin')) || now;
+            const diffMs = now - lastLogin;
+            const diffMins = Math.floor(diffMs / 60000);
+
+            if (diffMins > 30) { // Минимум 30 минут оффлайна
+                const earned = Math.min(500, Math.floor(diffMins * 0.5)); // 0.5 монет в минуту, макс 500
+                if (earned > 0) {
+                    coins += earned;
+                    saveProgress();
+                    showOfflineModal(earned, diffMins);
+                }
+            }
+            // Обновляем время входа в любом случае
+            localStorage.setItem('cyberRunnerLastLogin', now);
+        }
+
+        function showOfflineModal(earned, mins) {
+            document.getElementById('offlineTime').textContent = mins;
+            document.getElementById('offlineCoins').textContent = earned;
+            document.getElementById('offlineModal').classList.add('active');
+        }
+
+        function closeOfflineModal() {
+            document.getElementById('offlineModal').classList.remove('active');
+            updateMenuStats();
         }
 
         // ============================================================
@@ -1836,8 +1910,17 @@
         }
 
         // ============================================================
-        //  12. УПРАВЛЕНИЕ
+        //  12. УПРАВЛЕНИЕ И ЭФФЕКТЫ
         // ============================================================
+        function triggerGlitch() {
+            canvas.classList.remove('glitch-active');
+            void canvas.offsetWidth; // Триггер перерисовки (reflow)
+            canvas.classList.add('glitch-active');
+            setTimeout(() => {
+                canvas.classList.remove('glitch-active');
+            }, 250);
+        }
+
         let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
 
         canvas.addEventListener('touchstart', function(e) {
@@ -1899,7 +1982,6 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Polyfill для roundRect
         if (!CanvasRenderingContext2D.prototype.roundRect) {
             CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
                 if (r > w / 2) r = w / 2;
@@ -1917,7 +1999,8 @@
             };
         }
 
-        // Инициализация
+        // Инициализация при загрузке
+        checkOfflineEarnings(); // Проверка оффлайн-дохода
         updateUI();
         renderLeaderboard();
         updateMenuStats();
@@ -1925,7 +2008,7 @@
         updateTaskBadge();
         gameLoop();
 
-        console.log('🏃 CYBER RUNNER 2077 v2.0 загружен. Система оптимизирована.');
+        console.log('🏃 CYBER RUNNER 2077 v3.0 (Pro) загружен. Голосовой ИИ и оффлайн-доход активны.');
     </script>
 </body>
 </html>

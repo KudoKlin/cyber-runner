@@ -3,26 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="🏃 CYBER RUNNER 2077 — киберпанк-раннер. Прыгай, собирай монеты, покупай апгрейды и ставь рекорды!">
+    <meta name="description" content="🏃 CYBER RUNNER 2077 — киберпанк-раннер.">
     <meta name="theme-color" content="#0a0a0f">
-    <meta property="og:title" content="🏃 CYBER RUNNER 2077">
-    <meta property="og:description" content="Киберпанк-раннер. Прыгай, собирай монеты, ставь рекорды!">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kudoklin.github.io/cyber-runner/">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0a0f'/%3E%3Ctext y='.9em' font-size='80' x='10'%3E🏃%3C/text%3E%3C/svg%3E">
     <title>🏃 CYBER RUNNER 2077</title>
-    
-    <!-- PWA Поддержка -->
     <link rel="manifest" href="./manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Cyber Runner">
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
-
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-
         body {
             font-family: 'Orbitron', 'Rajdhani', monospace;
             background: #050508;
@@ -33,7 +24,6 @@
             overflow: hidden;
             color: #e0e0e0;
         }
-
         body::before {
             content: '';
             position: fixed;
@@ -45,11 +35,8 @@
             animation: gridPulse 6s ease-in-out infinite;
             z-index: 0;
             pointer-events: none;
-            transform: perspective(500px) rotateX(20deg) scale(1.2);
-            transform-origin: center top;
         }
         @keyframes gridPulse { 0%,100%{opacity:0.3} 50%{opacity:0.6} }
-
         body::after {
             content: '';
             position: fixed;
@@ -57,10 +44,7 @@
             background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,255,0.015) 2px, rgba(0,255,255,0.015) 4px);
             pointer-events: none;
             z-index: 999;
-            animation: scanLines 8s linear infinite;
         }
-        @keyframes scanLines { 0%{transform:translateY(-100%)} 100%{transform:translateY(100%)} }
-
         .screen {
             display: none;
             width: 100%;
@@ -73,27 +57,19 @@
             position: relative;
             z-index: 1;
             opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: opacity 0.3s ease;
         }
-        .screen.active { display: flex; opacity: 1; transform: translateY(0); }
-        .screen.fade-out { opacity: 0; transform: translateY(-10px); }
-
+        .screen.active { display: flex; opacity: 1; }
         .menu-content {
             background: rgba(13, 13, 26, 0.7);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border-radius: 24px;
             padding: 40px 30px;
             border: 1px solid rgba(0, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(0, 255, 255, 0.05);
             text-align: center;
             width: 100%;
             max-width: 480px;
-            animation: borderGlow 4s ease-in-out infinite;
         }
-        @keyframes borderGlow { 0%,100%{border-color:rgba(0,255,255,0.2)} 50%{border-color:rgba(255,0,255,0.3)} }
-
         .menu-title {
             font-size: 28px;
             background: linear-gradient(90deg, #00ffff, #ff00ff, #00ffff);
@@ -106,38 +82,11 @@
             font-weight: 900;
         }
         @keyframes rainbowText { 0%{background-position:0% center} 100%{background-position:200% center} }
-
-        .menu-subtitle {
-            color: rgba(0, 255, 255, 0.5);
-            font-size: 12px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 30px;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 500;
-        }
-
-        .menu-stats {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        .menu-stats span {
-            color: #00ffff;
-            font-size: 13px;
-            padding: 8px 16px;
-            border-radius: 12px;
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 255, 0.15);
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 700;
-        }
-        .menu-stats strong { color: #ffdd00; text-shadow: 0 0 10px rgba(255, 221, 0, 0.4); }
-
+        .menu-subtitle { color: rgba(0, 255, 255, 0.5); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 30px; }
+        .menu-stats { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .menu-stats span { color: #00ffff; font-size: 13px; padding: 8px 16px; border-radius: 12px; background: rgba(0, 255, 255, 0.05); border: 1px solid rgba(0, 255, 255, 0.15); }
+        .menu-stats strong { color: #ffdd00; }
         .menu-buttons { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-
         .menu-btn {
             padding: 16px 30px;
             font-family: 'Orbitron', monospace;
@@ -147,82 +96,23 @@
             background: rgba(0, 255, 255, 0.03);
             color: #00ffff;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             letter-spacing: 2px;
             text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
         }
-        .menu-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0,255,255,0.1), transparent);
-            transition: left 0.5s;
-        }
-        .menu-btn:hover::before { left: 100%; }
-        .menu-btn:hover {
-            background: rgba(0, 255, 255, 0.1);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.15);
-            transform: translateY(-2px);
-            border-color: rgba(0, 255, 255, 0.4);
-        }
-        .menu-btn:active { transform: translateY(0) scale(0.98); }
+        .menu-btn:hover { background: rgba(0, 255, 255, 0.1); }
         .menu-btn.primary {
             background: linear-gradient(90deg, rgba(0, 255, 255, 0.15), rgba(255, 0, 255, 0.15));
             border-color: rgba(0, 255, 255, 0.5);
             font-size: 16px;
-            padding: 18px 30px;
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.1);
-            font-weight: 700;
         }
-        .menu-btn.primary:hover {
-            background: linear-gradient(90deg, rgba(0, 255, 255, 0.25), rgba(255, 0, 255, 0.25));
-            box-shadow: 0 0 35px rgba(0, 255, 255, 0.25);
-        }
-
-        .menu-hint {
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 11px;
-            letter-spacing: 1px;
-            font-family: 'Rajdhani', sans-serif;
-        }
-        .menu-hint span { color: #ffdd00; font-weight: 700; }
-
-        .screen-game { justify-content: flex-start; padding-top: 15px; padding-bottom: 15px; }
-
-        .game-topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 12px;
-            gap: 8px;
-        }
-        .game-stats {
-            display: flex;
-            gap: 8px;
-            font-size: 13px;
-            color: #00ffff;
-            text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-            flex-wrap: wrap;
-            justify-content: center;
-            flex: 1;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 700;
-        }
-        .game-stats span {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .game-stats .coins { color: #ffdd00; border-color: rgba(255, 221, 0, 0.2); }
-        .game-stats .lives { color: #ff0055; border-color: rgba(255, 0, 85, 0.2); }
-
+        .menu-hint { color: rgba(255, 255, 255, 0.3); font-size: 11px; letter-spacing: 1px; }
+        .menu-hint span { color: #ffdd00; }
+        .screen-game { justify-content: flex-start; padding-top: 15px; }
+        .game-topbar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px; gap: 8px; }
+        .game-stats { display: flex; gap: 8px; font-size: 13px; color: #00ffff; flex-wrap: wrap; justify-content: center; flex: 1; }
+        .game-stats span { background: rgba(0, 0, 0, 0.3); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(0, 255, 255, 0.15); }
+        .game-stats .coins { color: #ffdd00; }
+        .game-stats .lives { color: #ff0055; }
         .back-btn, .pause-btn {
             width: 42px; height: 42px;
             border-radius: 12px;
@@ -231,57 +121,29 @@
             color: #00ffff;
             font-size: 18px;
             cursor: pointer;
-            transition: all 0.2s;
-            flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
         }
-        .back-btn:hover, .pause-btn:hover { background: rgba(0, 255, 255, 0.15); transform: scale(1.05); }
         .pause-btn { border-color: rgba(255, 0, 255, 0.3); color: #ff00ff; }
-        .pause-btn:hover { background: rgba(255, 0, 255, 0.15); }
         .back-btn.top-left { position: absolute; top: 20px; left: 20px; z-index: 10; }
-
-        .canvas-wrapper { 
-            width: 100%; 
-            position: relative; 
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.05);
-        }
-
+        .canvas-wrapper { width: 100%; position: relative; border-radius: 16px; overflow: hidden; }
         #gameCanvas {
             display: block;
             width: 100%;
             height: auto;
             max-height: 55vh;
-            object-fit: contain;
             background: #05050f;
             border: 1px solid rgba(0, 255, 255, 0.15);
             cursor: pointer;
             touch-action: none;
         }
-
         @keyframes glitch-anim {
             0% { transform: translate(0); filter: none; }
             20% { transform: translate(-3px, 2px); filter: drop-shadow(3px 0px 0px rgba(255,0,0,0.7)) drop-shadow(-3px 0px 0px rgba(0,255,255,0.7)); }
-            40% { transform: translate(-2px, -2px); filter: drop-shadow(-3px 0px 0px rgba(255,0,0,0.7)) drop-shadow(3px 0px 0px rgba(0,255,255,0.7)); }
             60% { transform: translate(2px, 2px); filter: drop-shadow(3px 0px 0px rgba(255,0,0,0.7)) drop-shadow(-3px 0px 0px rgba(0,255,255,0.7)); }
-            80% { transform: translate(2px, -2px); filter: drop-shadow(-3px 0px 0px rgba(255,0,0,0.7)) drop-shadow(3px 0px 0px rgba(0,255,255,0.7)); }
             100% { transform: translate(0); filter: none; }
         }
-        .glitch-active {
-            animation: glitch-anim 0.25s ease-out;
-        }
-
-        .mobile-controls {
-            display: none;
-            margin-top: 15px;
-            padding: 0 10px;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
+        .glitch-active { animation: glitch-anim 0.25s ease-out; }
+        .mobile-controls { display: none; margin-top: 15px; padding: 0 10px; justify-content: space-between; align-items: center; width: 100%; }
         .mobile-controls .mobile-right { display: flex; gap: 15px; align-items: center; }
-
         .mobile-btn {
             width: 64px; height: 64px;
             border-radius: 50%;
@@ -291,24 +153,12 @@
             font-size: 26px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer;
-            user-select: none;
-            transition: transform 0.1s, background 0.2s;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
         }
         .mobile-btn:active { transform: scale(0.92); background: rgba(0, 255, 255, 0.25); }
-        .mobile-btn.shield-btn-m { border-color: rgba(0, 200, 255, 0.5); color: #00ddff; width: 56px; height: 56px; font-size: 20px; }
-        .mobile-btn.boost-btn { border-color: rgba(255, 0, 255, 0.5); color: #ff00ff; width: 56px; height: 56px; font-size: 20px; text-shadow: 0 0 10px rgba(255, 0, 255, 0.8); }
-
+        .mobile-btn.shield-btn-m { width: 56px; height: 56px; font-size: 20px; }
+        .mobile-btn.boost-btn { width: 56px; height: 56px; font-size: 20px; border-color: rgba(255, 0, 255, 0.5); color: #ff00ff; }
         @media (hover: none) and (pointer: coarse) { .mobile-controls { display: flex; } }
-
-        .game-controls {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
+        .game-controls { display: flex; justify-content: center; gap: 12px; margin-top: 15px; flex-wrap: wrap; }
         .game-controls button {
             padding: 10px 24px;
             font-family: 'Orbitron', monospace;
@@ -318,42 +168,29 @@
             background: rgba(0, 255, 255, 0.05);
             color: #00ffff;
             cursor: pointer;
-            transition: all 0.2s;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
-        .game-controls button:hover { background: rgba(0, 255, 255, 0.15); transform: translateY(-1px); }
         .game-controls .btn-restart { border-color: rgba(255, 0, 255, 0.3); color: #ff00ff; }
-        .game-controls .btn-restart:hover { background: rgba(255, 0, 255, 0.15); }
-
         .records-content, .upgrades-content, .tasks-content, .skins-content {
             background: rgba(13, 13, 26, 0.7);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border-radius: 24px;
             padding: 35px 25px;
             width: 100%;
             max-width: 500px;
             margin-top: 20px;
         }
-        .records-content { border: 1px solid rgba(255, 221, 0, 0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-        .upgrades-content { border: 1px solid rgba(255, 0, 255, 0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-        .tasks-content { border: 1px solid rgba(0, 255, 200, 0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-        .skins-content { border: 1px solid rgba(255, 150, 0, 0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-
-        .records-title, .upgrades-title, .tasks-title, .skins-title {
-            font-size: 20px;
-            text-align: center;
-            letter-spacing: 3px;
-            margin-bottom: 25px;
-            font-weight: 700;
-        }
-        .records-title { color: #ffdd00; text-shadow: 0 0 20px rgba(255, 221, 0, 0.3); }
-        .upgrades-title { color: #ff00ff; text-shadow: 0 0 20px rgba(255, 0, 255, 0.3); }
-        .tasks-title { color: #00ffc8; text-shadow: 0 0 20px rgba(0, 255, 200, 0.3); }
-        .skins-title { color: #ff9600; text-shadow: 0 0 20px rgba(255, 150, 0, 0.3); }
-
-        .leaderboard-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+        .records-content { border: 1px solid rgba(255, 221, 0, 0.2); }
+        .upgrades-content { border: 1px solid rgba(255, 0, 255, 0.2); }
+        .tasks-content { border: 1px solid rgba(0, 255, 200, 0.2); }
+        .skins-content { border: 1px solid rgba(255, 150, 0, 0.2); }
+        .records-title, .upgrades-title, .tasks-title, .skins-title { font-size: 20px; text-align: center; letter-spacing: 3px; margin-bottom: 25px; }
+        .records-title { color: #ffdd00; }
+        .upgrades-title { color: #ff00ff; }
+        .tasks-title { color: #00ffc8; }
+        .skins-title { color: #ff9600; }
+        .leaderboard-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
         .leaderboard-list li {
             display: flex;
             justify-content: space-between;
@@ -362,21 +199,13 @@
             background: rgba(0, 255, 255, 0.03);
             border-radius: 12px;
             border: 1px solid rgba(0, 255, 255, 0.08);
-            font-size: 14px;
             color: #00ffff;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 600;
-            transition: transform 0.2s;
         }
-        .leaderboard-list li:hover { transform: translateX(5px); }
         .leaderboard-list li:nth-child(1) { border-color: rgba(255, 221, 0, 0.4); background: rgba(255, 221, 0, 0.08); color: #ffdd00; }
-        .leaderboard-list li:nth-child(2) { border-color: rgba(192, 192, 192, 0.3); background: rgba(192, 192, 192, 0.05); color: #e0e0e0; }
-        .leaderboard-list li:nth-child(3) { border-color: rgba(205, 127, 50, 0.3); background: rgba(205, 127, 50, 0.05); color: #cd7f32; }
-        .leaderboard-list .rank { font-weight: 700; min-width: 35px; font-family: 'Orbitron', monospace; }
+        .leaderboard-list .rank { font-weight: 700; min-width: 35px; }
         .leaderboard-list .score-val { flex: 1; text-align: center; letter-spacing: 2px; }
-        .leaderboard-list .date-val { font-size: 11px; opacity: 0.5; font-family: 'Rajdhani', sans-serif; }
-        .leaderboard-list .leaderboard-empty { justify-content: center; color: rgba(0, 255, 255, 0.3); font-size: 12px; font-style: italic; border-style: dashed; }
-
+        .leaderboard-list .date-val { font-size: 11px; opacity: 0.5; }
+        .leaderboard-list .leaderboard-empty { justify-content: center; color: rgba(0, 255, 255, 0.3); font-style: italic; border-style: dashed; }
         .clear-btn {
             display: block;
             margin: 25px auto 0;
@@ -388,21 +217,9 @@
             background: rgba(255, 0, 85, 0.05);
             color: #ff0055;
             cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 1px;
         }
-        .clear-btn:hover { background: rgba(255, 0, 85, 0.15); transform: translateY(-1px); }
-
-        .upgrades-coins {
-            text-align: center;
-            color: rgba(0, 255, 255, 0.6);
-            font-size: 14px;
-            margin-bottom: 25px;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 600;
-        }
+        .upgrades-coins { text-align: center; color: rgba(0, 255, 255, 0.6); font-size: 14px; margin-bottom: 25px; }
         .upgrades-coins strong { color: #ffdd00; font-size: 18px; }
-
         .upgrade-panel { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
         .upgrade-panel .upgrade-item {
             display: flex;
@@ -414,11 +231,9 @@
             border-radius: 16px;
             border: 1px solid rgba(0, 255, 255, 0.1);
             min-width: 110px;
-            transition: transform 0.2s;
         }
-        .upgrade-panel .upgrade-item:hover { transform: translateY(-3px); border-color: rgba(0, 255, 255, 0.3); }
-        .upgrade-panel .upgrade-item .label { font-size: 11px; color: rgba(0, 255, 255, 0.6); letter-spacing: 2px; font-family: 'Rajdhani', sans-serif; font-weight: 700; }
-        .upgrade-panel .upgrade-item .value { font-size: 24px; color: #00ffff; text-shadow: 0 0 20px rgba(0, 255, 255, 0.4); font-weight: 700; }
+        .upgrade-panel .upgrade-item .label { font-size: 11px; color: rgba(0, 255, 255, 0.6); letter-spacing: 2px; }
+        .upgrade-panel .upgrade-item .value { font-size: 24px; color: #00ffff; }
         .upgrade-panel .upgrade-item button {
             font-size: 11px;
             padding: 8px 16px;
@@ -427,14 +242,10 @@
             background: rgba(255, 221, 0, 0.08);
             color: #ffdd00;
             cursor: pointer;
-            transition: all 0.2s;
             font-family: 'Orbitron', monospace;
-            letter-spacing: 1px;
             width: 100%;
         }
-        .upgrade-panel .upgrade-item button:hover:not(:disabled) { background: rgba(255, 221, 0, 0.2); transform: scale(1.05); }
-        .upgrade-panel .upgrade-item button:disabled { opacity: 0.3; cursor: not-allowed; border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); }
-
+        .upgrade-panel .upgrade-item button:disabled { opacity: 0.3; cursor: not-allowed; }
         .task-item {
             display: flex;
             justify-content: space-between;
@@ -446,14 +257,11 @@
             border: 1px solid rgba(0, 255, 200, 0.1);
             color: #00ffc8;
             font-size: 13px;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 600;
-            transition: all 0.3s;
         }
         .task-item.done { border-color: rgba(0, 255, 100, 0.4); background: rgba(0, 255, 100, 0.08); color: #00ff66; }
         .task-item .task-info { flex: 1; }
-        .task-item .task-progress { font-size: 11px; opacity: 0.6; margin-top: 4px; font-weight: 500; }
-        .task-item .task-reward { font-size: 12px; color: #ffdd00; margin-left: 12px; font-weight: 700; }
+        .task-item .task-progress { font-size: 11px; opacity: 0.6; margin-top: 4px; }
+        .task-item .task-reward { font-size: 12px; color: #ffdd00; margin-left: 12px; }
         .task-item .task-claim {
             padding: 6px 12px;
             font-size: 10px;
@@ -464,16 +272,9 @@
             cursor: pointer;
             margin-left: 10px;
             font-family: 'Orbitron', monospace;
-            transition: all 0.2s;
         }
-        .task-item .task-claim:hover:not(:disabled) { background: rgba(255, 221, 0, 0.3); transform: scale(1.05); }
-        .task-item .task-claim:disabled { opacity: 0.3; cursor: not-allowed; border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); }
-
-        .skins-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 15px;
-        }
+        .task-item .task-claim:disabled { opacity: 0.3; cursor: not-allowed; }
+        .skins-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
         .skin-card {
             background: rgba(0, 255, 255, 0.03);
             border-radius: 16px;
@@ -481,38 +282,17 @@
             padding: 15px 10px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
         }
-        .skin-card:hover { background: rgba(0, 255, 255, 0.08); transform: translateY(-3px); }
         .skin-card.owned { border-color: rgba(0, 255, 100, 0.3); }
-        .skin-card.active { border-color: #ffdd00; background: rgba(255, 221, 0, 0.1); box-shadow: 0 0 25px rgba(255, 221, 0, 0.15); }
-        .skin-preview {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            margin: 0 auto 10px;
-            box-shadow: 0 0 20px currentColor;
-            position: relative;
-            overflow: hidden;
-        }
-        .skin-preview::after {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: rotate(45deg);
-            transition: all 0.5s;
-        }
-        .skin-card:hover .skin-preview::after { left: 100%; }
-        .skin-name { font-size: 12px; color: #00ffff; margin-bottom: 6px; font-family: 'Rajdhani', sans-serif; font-weight: 700; }
-        .skin-price { font-size: 11px; color: #ffdd00; font-weight: 700; }
-        .skin-status { font-size: 10px; color: rgba(0, 255, 255, 0.6); margin-top: 6px; letter-spacing: 1px; }
-
+        .skin-card.active { border-color: #ffdd00; background: rgba(255, 221, 0, 0.1); }
+        .skin-preview { width: 50px; height: 50px; border-radius: 12px; margin: 0 auto 10px; }
+        .skin-name { font-size: 12px; color: #00ffff; margin-bottom: 6px; }
+        .skin-price { font-size: 11px; color: #ffdd00; }
+        .skin-status { font-size: 10px; color: rgba(0, 255, 255, 0.6); margin-top: 6px; }
         .offline-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
             z-index: 1000;
             display: none;
             justify-content: center;
@@ -528,13 +308,10 @@
             text-align: center;
             max-width: 400px;
             width: 100%;
-            box-shadow: 0 0 50px rgba(255, 221, 0, 0.2);
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        @keyframes popIn { 0%{transform:scale(0.8);opacity:0} 100%{transform:scale(1);opacity:1} }
-        .offline-title { color: #ffdd00; font-size: 22px; margin-bottom: 15px; font-weight: 700; }
-        .offline-text { color: #e0e0e0; font-size: 15px; margin-bottom: 10px; font-family: 'Rajdhani', sans-serif; }
-        .offline-amount { color: #00ff66; font-size: 32px; font-weight: 900; margin: 15px 0; text-shadow: 0 0 20px rgba(0, 255, 100, 0.4); }
+        .offline-title { color: #ffdd00; font-size: 22px; margin-bottom: 15px; }
+        .offline-text { color: #e0e0e0; font-size: 15px; margin-bottom: 10px; }
+        .offline-amount { color: #00ff66; font-size: 32px; font-weight: 900; margin: 15px 0; }
         .offline-btn {
             margin-top: 15px;
             padding: 12px 30px;
@@ -546,27 +323,25 @@
             font-weight: 700;
             font-size: 14px;
             cursor: pointer;
-            transition: transform 0.2s;
         }
-        .offline-btn:hover { transform: scale(1.05); }
 
-        /* Подсказка о повороте экрана */
+        /* === ПОДСКАЗКА О ПОВОРОТЕ ЭКРАНА === */
         .rotate-hint {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 10000;
+            background: rgba(5, 5, 15, 0.98);
+            z-index: 99999;
             justify-content: center;
             align-items: center;
             flex-direction: column;
             text-align: center;
             padding: 20px;
         }
-        .rotate-hint.active { display: flex; }
+        .rotate-hint.show { display: flex !important; }
         .rotate-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
+            font-size: 100px;
+            margin-bottom: 30px;
             animation: rotatePhone 2s ease-in-out infinite;
         }
         @keyframes rotatePhone {
@@ -575,41 +350,44 @@
         }
         .rotate-text {
             color: #00ffff;
-            font-size: 18px;
+            font-size: 20px;
             font-family: 'Orbitron', monospace;
             text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            margin-bottom: 30px;
+            max-width: 400px;
         }
-
-        @media (max-width: 600px) and (orientation: portrait) {
-            .rotate-hint { display: flex; }
+        .rotate-close {
+            padding: 12px 30px;
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            border-radius: 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            letter-spacing: 2px;
         }
+        .rotate-close:active { background: rgba(0, 255, 255, 0.3); }
 
         @media (max-width: 600px) {
             .screen { padding: 15px; }
-            .menu-content { padding: 30px 20px; border-radius: 20px; }
+            .menu-content { padding: 30px 20px; }
             .menu-title { font-size: 22px; }
-            .menu-subtitle { font-size: 11px; letter-spacing: 3px; margin-bottom: 25px; }
-            .menu-stats span { font-size: 12px; padding: 6px 12px; }
             .menu-btn { padding: 14px 20px; font-size: 13px; }
-            .menu-btn.primary { padding: 16px 20px; font-size: 15px; }
             .game-stats { font-size: 11px; gap: 6px; }
-            .game-stats span { padding: 4px 8px; }
             .back-btn, .pause-btn { width: 38px; height: 38px; font-size: 16px; }
             #gameCanvas { max-height: 50vh; }
             .mobile-btn { width: 60px; height: 60px; font-size: 24px; }
-            .mobile-btn.shield-btn-m, .mobile-btn.boost-btn { width: 52px; height: 52px; font-size: 18px; }
-            .game-controls button { padding: 10px 18px; font-size: 11px; }
-            .records-content, .upgrades-content, .tasks-content, .skins-content { padding: 25px 20px; border-radius: 20px; }
-            .records-title, .upgrades-title, .tasks-title, .skins-title { font-size: 18px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Подсказка о повороте экрана -->
+    <!-- ПОДСКАЗКА О ПОВОРОТЕ -->
     <div class="rotate-hint" id="rotateHint">
         <div class="rotate-icon">📱</div>
         <div class="rotate-text">Поверни телефон горизонтально для лучшей игры</div>
+        <button class="rotate-close" onclick="closeRotateHint()">ИГРАТЬ ТАК</button>
     </div>
 
     <div class="offline-modal" id="offlineModal">
@@ -626,51 +404,45 @@
         <div class="menu-content">
             <h1 class="menu-title">🏃 CYBER RUNNER 2077</h1>
             <p class="menu-subtitle">Неоновый раннер будущего</p>
-
             <div class="menu-stats">
                 <span>🏆 Рекорд: <strong id="menuBest">0</strong></span>
                 <span>💰 Кредиты: <strong id="menuCoins">0</strong></span>
             </div>
-
             <div class="menu-buttons">
                 <button class="menu-btn primary" id="continueBtn" onclick="continueGame()" style="display:none;">▶ ПРОДОЛЖИТЬ</button>
                 <button class="menu-btn" id="newGameBtn" onclick="startNewGame()">✨ НОВАЯ ИГРА</button>
-                <button class="menu-btn" onclick="showScreen('screenTasks')">🎯 ЗАДАНИЯ <span id="taskBadge" style="color:#ffdd00; margin-left:5px;"></span></button>
+                <button class="menu-btn" onclick="showScreen('screenTasks')">🎯 ЗАДАНИЯ <span id="taskBadge" style="color:#ffdd00;"></span></button>
                 <button class="menu-btn" onclick="showScreen('screenSkins')">👕 СКИНЫ</button>
                 <button class="menu-btn" onclick="showScreen('screenRecords')">🏆 РЕКОРДЫ</button>
                 <button class="menu-btn" onclick="showScreen('screenUpgrades')">⚙ АПГРЕЙДЫ</button>
             </div>
-
             <div class="menu-hint">
-                <span>ПРОБЕЛ</span> — прыжок &nbsp;|&nbsp; <span>SHIFT</span> — рывок &nbsp;|&nbsp; <span>E</span> — щит
+                <span>ПРОБЕЛ</span> — прыжок | <span>SHIFT</span> — рывок | <span>E</span> — щит
             </div>
         </div>
     </div>
 
     <div class="screen screen-game" id="screenGame">
         <div class="game-topbar">
-            <button class="back-btn" onclick="goHome()" title="В меню">←</button>
+            <button class="back-btn" onclick="goHome()">←</button>
             <div class="game-stats">
                 <span>⚡ <span id="scoreDisplay">0</span></span>
                 <span class="coins">💰 <span id="coinsDisplay">0</span></span>
                 <span class="lives">❤️ <span id="livesDisplay">3</span></span>
                 <span>🏆 <span id="bestDisplay">0</span></span>
             </div>
-            <button class="pause-btn" onclick="togglePause()" id="pauseBtn" title="Пауза">⏸</button>
+            <button class="pause-btn" onclick="togglePause()" id="pauseBtn">⏸</button>
         </div>
-
         <div class="canvas-wrapper">
             <canvas id="gameCanvas" width="750" height="400"></canvas>
         </div>
-
         <div class="mobile-controls">
-            <button class="mobile-btn jump-btn" onpointerdown="jump()">⬆</button>
+            <button class="mobile-btn" onpointerdown="jump()">⬆</button>
             <div class="mobile-right">
                 <button class="mobile-btn shield-btn-m" onpointerdown="useShield()">🛡️</button>
                 <button class="mobile-btn boost-btn" onpointerdown="boost()">⚡</button>
             </div>
         </div>
-
         <div class="game-controls">
             <button onclick="restartGame()" class="btn-restart">🔄 Заново</button>
             <button onclick="useShield()" id="shieldBtn">🛡️ Щит (0)</button>
@@ -693,7 +465,6 @@
         <div class="upgrades-content">
             <h2 class="upgrades-title">⚙ АПГРЕЙДЫ</h2>
             <p class="upgrades-coins">💰 Доступно: <strong id="upgradeCoins">0</strong></p>
-
             <div class="upgrade-panel">
                 <div class="upgrade-item">
                     <span class="label">СКОРОСТЬ</span>
@@ -733,6 +504,9 @@
     </div>
 
     <script>
+        // ============================================================
+        //  ОСНОВНЫЕ ПЕРЕМЕННЫЕ
+        // ============================================================
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const W = canvas.width;
@@ -786,7 +560,6 @@
         let spawnTimer = 0;
         let coinSpawnTimer = 0;
         let powerupSpawnTimer = 0;
-
         let legFrame = 0;
         let legTimer = 0;
         let trail = [];
@@ -795,13 +568,24 @@
         let bgOffset1 = 0;
         let bgOffset2 = 0;
 
+        // ============================================================
+        //  ЗВУКИ И ГОЛОС (ГОПНИЧЕСКИЙ)
+        // ============================================================
         let audioCtx = null;
         function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch(e) {}
+            }
+            // Разблокируем голос на мобильных устройствах
+            initVoice();
         }
+
         function playBeep(freq, duration, type = 'square', volume = 0.15) {
             try {
                 initAudio();
+                if (!audioCtx) return;
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = type;
@@ -814,62 +598,136 @@
                 osc.stop(audioCtx.currentTime + duration);
             } catch (e) {}
         }
+
         function haptic(ms) {
-            if (navigator.vibrate) navigator.vibrate(ms);
-        }
-        
-        // Гопнический голос
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ru-RU';
-                utterance.rate = 1.4;
-                utterance.pitch = 0.6;
-                utterance.volume = 0.9;
-                window.speechSynthesis.speak(utterance);
+            if (navigator.vibrate) {
+                try { navigator.vibrate(ms); } catch(e) {}
             }
         }
-        
+
+        // === ГОЛОСОВОЙ ДВИЖОК ===
+        let voiceReady = false;
+        let russianVoice = null;
+
+        function initVoice() {
+            if (voiceReady) return;
+            if (!('speechSynthesis' in window)) return;
+            
+            // Пытаемся найти русский голос
+            const voices = window.speechSynthesis.getVoices();
+            russianVoice = voices.find(v => v.lang === 'ru-RU') || 
+                          voices.find(v => v.lang.startsWith('ru')) || 
+                          null;
+            voiceReady = true;
+        }
+
+        // Загружаем голоса при загрузке страницы
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = function() {
+                initVoice();
+            };
+        }
+
+        function speak(text) {
+            try {
+                if (!('speechSynthesis' in window)) return;
+                
+                // Отменяем предыдущее, если оно слишком старое
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ru-RU';
+                utterance.rate = 1.3;
+                utterance.pitch = 0.7;
+                utterance.volume = 1.0;
+                
+                if (russianVoice) {
+                    utterance.voice = russianVoice;
+                }
+                
+                window.speechSynthesis.speak(utterance);
+            } catch (e) {
+                console.log('Voice error:', e);
+            }
+        }
+
+        // === ГОПНИЧЕСКИЕ ФРАЗЫ ===
+        const SHIELD_PHRASES = [
+            "Чётко, братан, щит на чеку!",
+            "Фартануло, щит активирован!",
+            "Держи оборону, пацан!"
+        ];
+
+        const BONUS_PHRASES = [
+            "О, халява, братуха!",
+            "Бонус в карман, красавчик!",
+            "Фарт прёт, ёпта!"
+        ];
+
+        const GAMEOVER_PHRASES = [
+            "Всё, приехали, брат...",
+            "Кирдык системе, ё-моё!",
+            "Откинулся, пацан..."
+        ];
+
+        const JUMP_PHRASES = [
+            "Вжух!",
+            "Полетели!",
+            "Ё-моё!"
+        ];
+
+        function randomFrom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
         function soundJump() { 
             playBeep(600, 0.1, 'square', 0.1); 
             setTimeout(()=>playBeep(800,0.1,'square',0.08),50); 
             haptic(10);
-            if (Math.random() < 0.3) speak("Вжух!");
+            if (Math.random() < 0.25) {
+                setTimeout(() => speak(randomFrom(JUMP_PHRASES)), 100);
+            }
         }
+
         function soundCoin() { 
             playBeep(1200, 0.08, 'sine', 0.12); 
             setTimeout(()=>playBeep(1600,0.08,'sine',0.1),60); 
             haptic(15); 
         }
+
         function soundHit() { 
             playBeep(150, 0.3, 'sawtooth', 0.2); 
             setTimeout(()=>playBeep(100,0.3,'sawtooth',0.15),100); 
             haptic(30); 
         }
+
         function soundShield() { 
             playBeep(1200, 0.15, 'sine', 0.1); 
             setTimeout(()=>playBeep(1600,0.15,'sine',0.1),100); 
-            haptic(20); 
-            const phrases = ["Чётко, братан, щит на чеку!", "Фартануло, щит активирован!", "Держи оборону, пацан!"];
-            speak(phrases[Math.floor(Math.random() * phrases.length)]);
+            haptic(20);
+            setTimeout(() => speak(randomFrom(SHIELD_PHRASES)), 150);
         }
+
         function soundBonus() { 
             playBeep(1500, 0.1, 'sine', 0.12); 
             setTimeout(()=>playBeep(2000,0.15,'sine',0.1),80); 
-            haptic(25); 
-            const phrases = ["О, халява, братуха!", "Бонус в карман, красавчик!", "Фарт прёт, ёпта!"];
-            speak(phrases[Math.floor(Math.random() * phrases.length)]);
+            haptic(25);
+            setTimeout(() => speak(randomFrom(BONUS_PHRASES)), 150);
         }
+
         function soundGameOver() {
             playBeep(400, 0.2, 'sawtooth', 0.15);
             setTimeout(()=>playBeep(300,0.2,'sawtooth',0.12),200);
             setTimeout(()=>playBeep(150,0.4,'sawtooth',0.15),400);
             haptic(50);
-            const phrases = ["Всё, приехали, брат...", "Кирдык системе, ё-моё!", "Откинулся, пацан..."];
-            speak(phrases[Math.floor(Math.random() * phrases.length)]);
+            setTimeout(() => speak(randomFrom(GAMEOVER_PHRASES)), 500);
         }
 
+        // ============================================================
+        //  СПАВН
+        // ============================================================
         function spawnObstacle() {
             const types = ['box', 'spike', 'crate'];
             const type = types[Math.floor(Math.random() * types.length)];
@@ -900,6 +758,9 @@
             powerups.push({ x: W + 50 + Math.random() * 100, y: GROUND_Y - 60 - Math.random() * 60, r: 14, kind: kind, collected: false });
         }
 
+        // ============================================================
+        //  UPDATE
+        // ============================================================
         function update() {
             if (!gameRunning || gamePaused) return;
             frameCount++;
@@ -1017,6 +878,9 @@
             document.getElementById('scoreDisplay').textContent = score;
         }
 
+        // ============================================================
+        //  DRAW
+        // ============================================================
         function draw() {
             ctx.clearRect(0, 0, W, H);
             let shakeX = 0, shakeY = 0;
@@ -1055,17 +919,16 @@
 
             for (const coin of coinsList) {
                 if (coin.collected) continue;
-                const glow = Math.sin(frameCount * 0.15) * 0.5 + 0.5;
-                ctx.shadowColor = '#ffdd00'; ctx.shadowBlur = 15 + glow * 10; ctx.fillStyle = '#ffdd00';
+                ctx.shadowColor = '#ffdd00'; ctx.shadowBlur = 15; ctx.fillStyle = '#ffdd00';
                 ctx.beginPath(); ctx.arc(coin.x, coin.y, coin.r, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
                 ctx.fillStyle = '#0a0a0f'; ctx.font = 'bold 10px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('$', coin.x, coin.y + 1);
             }
 
             for (const pu of powerups) {
                 if (pu.collected) continue;
-                const pulse = Math.sin(frameCount * 0.2) * 3; const color = pu.kind === 'magnet' ? '#00aaff' : '#ffdd00';
+                const color = pu.kind === 'magnet' ? '#00aaff' : '#ffdd00';
                 ctx.shadowColor = color; ctx.shadowBlur = 20; ctx.fillStyle = color;
-                ctx.beginPath(); ctx.arc(pu.x, pu.y, pu.r + pulse * 0.3, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+                ctx.beginPath(); ctx.arc(pu.x, pu.y, pu.r, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
                 ctx.fillStyle = '#0a0a0f'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(pu.kind === 'magnet' ? '🧲' : '×2', pu.x, pu.y + 1);
             }
 
@@ -1074,8 +937,7 @@
                 if (obs.type === 'spike') {
                     ctx.fillStyle = obs.color; ctx.beginPath(); ctx.moveTo(obs.x, obs.y + obs.h); ctx.lineTo(obs.x + obs.w / 2, obs.y); ctx.lineTo(obs.x + obs.w, obs.y + obs.h); ctx.closePath(); ctx.fill();
                 } else if (obs.type === 'crate') {
-                    const grd = ctx.createLinearGradient(obs.x, obs.y, obs.x + obs.w, obs.y + obs.h); grd.addColorStop(0, obs.color); grd.addColorStop(1, '#8800ff');
-                    ctx.fillStyle = grd; ctx.fillRect(obs.x, obs.y, obs.w, obs.h); ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1; ctx.strokeRect(obs.x + 3, obs.y + 3, obs.w - 6, obs.h - 6);
+                    ctx.fillStyle = obs.color; ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
                 } else {
                     const grd = ctx.createLinearGradient(obs.x, obs.y, obs.x + obs.w, obs.y + obs.h); grd.addColorStop(0, obs.color); grd.addColorStop(1, '#ff0055');
                     ctx.fillStyle = grd; ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
@@ -1088,48 +950,37 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'; ctx.beginPath(); ctx.ellipse(dx + player.w / 2, GROUND_Y + 2, 15, 4, 0, 0, Math.PI * 2); ctx.fill();
 
             if (shieldActive) {
-                ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 30; ctx.strokeStyle = `rgba(0, 255, 255, ${0.4 + Math.sin(frameCount * 0.3) * 0.2})`; ctx.lineWidth = 3;
+                ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 30; ctx.strokeStyle = `rgba(0, 255, 255, 0.5)`; ctx.lineWidth = 3;
                 ctx.beginPath(); ctx.arc(dx + player.w / 2, dy + player.h / 2, 32, 0, Math.PI * 2); ctx.stroke(); ctx.shadowBlur = 0;
-            }
-            if (magnetTimer > 0) {
-                ctx.strokeStyle = `rgba(0, 170, 255, ${0.15 + Math.sin(frameCount * 0.2) * 0.1})`; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
-                ctx.beginPath(); ctx.arc(dx + player.w / 2, dy + player.h / 2, 70 + Math.sin(frameCount * 0.1) * 5, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
             }
 
             ctx.shadowColor = skin.colors[0]; ctx.shadowBlur = 20;
             const bodyGrad = ctx.createLinearGradient(dx, dy, dx + player.w, dy + player.h);
             bodyGrad.addColorStop(0, skin.colors[0]); bodyGrad.addColorStop(1, skin.colors[1]); ctx.fillStyle = bodyGrad;
-            if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(dx + 5, dy + 12, player.w - 10, player.h - 22, 6); ctx.fill(); } 
-            else { ctx.fillRect(dx + 5, dy + 12, player.w - 10, player.h - 22); }
+            ctx.fillRect(dx + 5, dy + 12, player.w - 10, player.h - 22);
 
             ctx.fillStyle = skin.colors[0]; ctx.beginPath(); ctx.arc(dx + player.w - 8, dy + 12, 11, 0, Math.PI * 2); ctx.fill();
             ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 15; ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.ellipse(dx + player.w - 2, dy + 9, 5, 3, 0, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
-            ctx.fillStyle = '#0a0a0f'; ctx.beginPath(); ctx.arc(dx + player.w, dy + 8, 1.5, 0, Math.PI * 2); ctx.fill();
 
             ctx.fillStyle = skin.colors[2]; ctx.shadowBlur = 10;
             const legOff = player.jumping ? 0 : (legFrame === 0 ? 6 : -6);
             ctx.fillRect(dx + 8, dy + player.h - 8, 7, 8 + legOff); ctx.fillRect(dx + player.w - 15, dy + player.h - 8, 7, 8 - legOff); ctx.shadowBlur = 0;
 
-            ctx.strokeStyle = skin.colors[0]; ctx.lineWidth = 3; ctx.shadowColor = skin.colors[0]; ctx.shadowBlur = 10;
-            ctx.beginPath(); ctx.moveTo(dx + 8, dy + 18); ctx.quadraticCurveTo(dx - 15 - (speed * 2), dy + 15 + Math.sin(frameCount * 0.5) * 5, dx - 10 - (speed * 3), dy + 25); ctx.stroke(); ctx.shadowBlur = 0;
-
             for (const p of particles) {
                 const alpha = p.life / 35; ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
-                ctx.shadowColor = p.color; ctx.shadowBlur = 10; ctx.beginPath(); ctx.arc(p.x, p.y, (p.size || 3) * alpha, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(p.x, p.y, (p.size || 3) * alpha, 0, Math.PI * 2); ctx.fill();
             }
-            ctx.shadowBlur = 0;
 
             let badgeY = 35; ctx.textAlign = 'left';
             if (magnetTimer > 0) { ctx.fillStyle = 'rgba(0, 170, 255, 0.9)'; ctx.font = 'bold 12px Orbitron'; ctx.fillText(`🧲 ${Math.ceil(magnetTimer / 60)}с`, 15, badgeY); badgeY += 22; }
             if (doubleCoinTimer > 0) { ctx.fillStyle = 'rgba(255, 221, 0, 0.9)'; ctx.font = 'bold 12px Orbitron'; ctx.fillText(`×2 ${Math.ceil(doubleCoinTimer / 60)}с`, 15, badgeY); }
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; ctx.font = '10px Rajdhani'; ctx.fillText(`SECTOR: ${BIOMES[currentBiome].name.toUpperCase()}`, 15, H - 15);
             ctx.restore();
 
             if (!gameRunning && document.getElementById('screenGame').classList.contains('active')) {
                 ctx.fillStyle = 'rgba(5,5,10,0.8)'; ctx.fillRect(0, 0, W, H); ctx.textAlign = 'center'; ctx.shadowColor = '#ff0055'; ctx.shadowBlur = 40;
                 ctx.fillStyle = '#ff0055'; ctx.font = 'bold 40px Orbitron'; ctx.fillText('☠ СИСТЕМА ОТКАЗАЛА', W / 2, H / 2 - 20); ctx.shadowBlur = 0;
                 ctx.fillStyle = '#00ffff'; ctx.font = '18px Rajdhani'; ctx.fillText(`Финальный счёт: ${score}`, W / 2, H / 2 + 20);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; ctx.font = '14px Rajdhani'; ctx.fillText('Нажми "Заново" или вернись в меню', W / 2, H / 2 + 50); ctx.textAlign = 'left';
+                ctx.textAlign = 'left';
             }
             if (gamePaused && gameRunning) {
                 ctx.fillStyle = 'rgba(5,5,10,0.7)'; ctx.fillRect(0, 0, W, H); ctx.textAlign = 'center'; ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 30;
@@ -1137,19 +988,21 @@
             }
         }
 
+        // ============================================================
+        //  НАВИГАЦИЯ
+        // ============================================================
         function showScreen(id) {
             const current = document.querySelector('.screen.active');
             const next = document.getElementById(id);
             if (!next || current === next) return;
             if (current) {
-                current.classList.add('fade-out');
                 setTimeout(() => {
-                    current.classList.remove('active', 'fade-out'); next.classList.add('active');
+                    current.classList.remove('active'); next.classList.add('active');
                     if (id === 'screenRecords') renderLeaderboard();
                     if (id === 'screenTasks') renderTasks();
                     if (id === 'screenSkins') renderSkins();
                     if (id === 'screenUpgrades') updateUpgradeUI();
-                }, 250);
+                }, 100);
             } else { next.classList.add('active'); }
         }
 
@@ -1184,10 +1037,13 @@
         }
 
         function clearRecords() {
-            if (!confirm('Удалить все рекорды из системы?')) return;
+            if (!confirm('Удалить все рекорды?')) return;
             leaderboard = []; localStorage.removeItem('cyberRunnerLeaderboard'); renderLeaderboard();
         }
 
+        // ============================================================
+        //  СОХРАНЕНИЕ
+        // ============================================================
         function saveProgress() {
             try {
                 localStorage.setItem('cyberRunnerCoins', coins); localStorage.setItem('cyberRunnerUpgrades', JSON.stringify(upgrades));
@@ -1242,6 +1098,9 @@
             document.getElementById('offlineModal').classList.remove('active'); updateMenuStats();
         }
 
+        // ============================================================
+        //  UI
+        // ============================================================
         function updateUI() {
             document.getElementById('scoreDisplay').textContent = score; document.getElementById('coinsDisplay').textContent = coins;
             document.getElementById('livesDisplay').textContent = lives; document.getElementById('bestDisplay').textContent = best;
@@ -1278,7 +1137,11 @@
 
         function getMaxJumps() { return upgrades.jump >= 3 ? 2 : 1; }
 
+        // ============================================================
+        //  ДЕЙСТВИЯ
+        // ============================================================
         function jump() {
+            initAudio(); // Важно для разблокировки звука на мобильных
             if (!gameRunning || gamePaused) return;
             if (jumpsLeft > 0) {
                 player.vy = jumpPower - (upgrades.jump - 1) * 1.5; player.jumping = true; jumpsLeft--; soundJump();
@@ -1289,6 +1152,7 @@
         }
 
         function boost() {
+            initAudio();
             if (!gameRunning || gamePaused) return; if (boostCooldown > 0) return;
             speed = Math.min(22, speed + 5); boostCooldown = 90;
             playBeep(800, 0.1, 'sawtooth', 0.1); setTimeout(() => playBeep(1000, 0.1, 'sawtooth', 0.1), 50); haptic(20);
@@ -1296,6 +1160,7 @@
         }
 
         function useShield() {
+            initAudio();
             if (!gameRunning || gamePaused) return; if (shieldActive || shieldCooldown > 0) return;
             if (upgrades.shield > 0) {
                 shieldActive = true; shieldTimer = 480; shieldCooldown = 180; upgrades.shield--;
@@ -1309,6 +1174,7 @@
         }
 
         function restartGame() {
+            initAudio();
             gameRunning = true; gamePaused = false; const pauseBtn = document.getElementById('pauseBtn'); if (pauseBtn) pauseBtn.textContent = '⏸';
             score = 0; lives = 3; obstacles = []; coinsList = []; powerups = []; particles = []; trail = [];
             spawnTimer = 0; coinSpawnTimer = 0; powerupSpawnTimer = 0; frameCount = 0;
@@ -1318,14 +1184,17 @@
         }
 
         function buyUpgrade(type) {
+            initAudio();
             const costs = { speed: 50, jump: 30, shield: 40 }; const maxLevels = { speed: 10, jump: 5, shield: 5 };
             if (coins < costs[type]) { playBeep(200, 0.2, 'sawtooth', 0.1); return; }
             if (upgrades[type] >= maxLevels[type]) { return; }
             coins -= costs[type]; upgrades[type]++; soundCoin(); saveProgress(); saveGameState(); updateUpgradeUI();
             if (type === 'jump') jumpsLeft = Math.max(jumpsLeft, getMaxJumps());
-            for (let i = 0; i < 25; i++) particles.push({ x: W / 2 + (Math.random() - 0.5) * 100, y: H / 2 + (Math.random() - 0.5) * 100, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 0.5) * 12 - 5, life: 35, color: '#00ffff', size: 3 });
         }
 
+        // ============================================================
+        //  ЗАДАНИЯ
+        // ============================================================
         const TASK_TEMPLATES = [
             { id: 'coins', text: 'Собери {n} монет', goal: 50, reward: 60 },
             { id: 'score', text: 'Набери {n} очков за забег', goal: 200, reward: 80 },
@@ -1392,15 +1261,19 @@
             t.claimed = true; coins += t.reward; soundCoin(); saveProgress(); saveDailyTasks(); updateUI(); renderTasks(); updateTaskBadge();
         }
 
+        // ============================================================
+        //  СКИНЫ
+        // ============================================================
         function renderSkins() {
             const grid = document.getElementById('skinsGrid'); if (!grid) return; document.getElementById('skinsCoins').textContent = coins;
             grid.innerHTML = Object.entries(SKINS).map(([id, skin]) => {
                 const owned = ownedSkins.includes(id); const active = activeSkin === id;
-                return `<div class="skin-card ${active ? 'active' : ''} ${owned ? 'owned' : ''}" onclick="selectSkin('${id}')"><div class="skin-preview" style="background: linear-gradient(135deg, ${skin.colors[0]}, ${skin.colors[1]}); color: ${skin.colors[0]};"></div><div class="skin-name">${skin.name}</div>${owned ? `<div class="skin-status">${active ? '✓ АКТИВЕН' : 'НАЖМИ ДЛЯ ВЫБОРА'}</div>` : `<div class="skin-price">${skin.price}💰</div>`}</div>`;
+                return `<div class="skin-card ${active ? 'active' : ''} ${owned ? 'owned' : ''}" onclick="selectSkin('${id}')"><div class="skin-preview" style="background: linear-gradient(135deg, ${skin.colors[0]}, ${skin.colors[1]});"></div><div class="skin-name">${skin.name}</div>${owned ? `<div class="skin-status">${active ? '✓ АКТИВЕН' : 'НАЖМИ'}</div>` : `<div class="skin-price">${skin.price}💰</div>`}</div>`;
             }).join('');
         }
 
         function selectSkin(id) {
+            initAudio();
             const skin = SKINS[id]; if (!skin) return;
             if (ownedSkins.includes(id)) { activeSkin = id; saveProgress(); renderSkins(); playBeep(1000, 0.1, 'sine', 0.12); return; }
             if (coins < skin.price) { playBeep(200, 0.2, 'sawtooth', 0.1); alert('Недостаточно кредитов!'); return; }
@@ -1413,6 +1286,9 @@
             setTimeout(() => { canvas.classList.remove('glitch-active'); }, 250);
         }
 
+        // ============================================================
+        //  УПРАВЛЕНИЕ
+        // ============================================================
         let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
         canvas.addEventListener('touchstart', function(e) {
             e.preventDefault(); initAudio(); if (!gameRunning) return;
@@ -1437,29 +1313,69 @@
             if (e.key === 'p' || e.key === 'P') togglePause();
         });
 
-        function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
-
-        if (!CanvasRenderingContext2D.prototype.roundRect) {
-            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-                if (r > w / 2) r = w / 2; if (r > h / 2) r = h / 2;
-                this.moveTo(x + r, y); this.lineTo(x + w - r, y); this.quadraticCurveTo(x + w, y, x + w, y + r);
-                this.lineTo(x + w, y + h - r); this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-                this.lineTo(x + r, y + h); this.quadraticCurveTo(x, y + h, x, y + h - r);
-                this.lineTo(x, y + r); this.quadraticCurveTo(x, y, x + r, y); return this;
-            };
+        // ============================================================
+        //  ПОДСКАЗКА О ПОВОРОТЕ ЭКРАНА
+        // ============================================================
+        function checkOrientation() {
+            const hint = document.getElementById('rotateHint');
+            if (!hint) return;
+            
+            // Проверяем, мобильное ли устройство
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (!isMobile) {
+                hint.classList.remove('show');
+                return;
+            }
+            
+            // Проверяем, скрыл ли пользователь подсказку вручную
+            if (localStorage.getItem('rotateHintDismissed') === 'true') {
+                hint.classList.remove('show');
+                return;
+            }
+            
+            // Проверяем ориентацию
+            const isPortrait = window.innerHeight > window.innerWidth;
+            
+            if (isPortrait) {
+                hint.classList.add('show');
+            } else {
+                hint.classList.remove('show');
+            }
         }
 
-        checkOfflineEarnings(); updateUI(); renderLeaderboard(); updateMenuStats(); updateContinueButton(); updateTaskBadge(); gameLoop();
-        console.log('🏃 CYBER RUNNER 2077 v4.0 (Гопник Edition) загружен.');
+        function closeRotateHint() {
+            const hint = document.getElementById('rotateHint');
+            if (hint) hint.classList.remove('show');
+            // Запоминаем, что пользователь скрыл подсказку
+            localStorage.setItem('rotateHintDismissed', 'true');
+        }
+
+        // Слушаем изменение ориентации
+        window.addEventListener('orientationchange', function() {
+            setTimeout(checkOrientation, 300);
+        });
+        window.addEventListener('resize', checkOrientation);
+
+        // ============================================================
+        //  ЗАПУСК
+        // ============================================================
+        function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
+
+        checkOfflineEarnings(); updateUI(); renderLeaderboard(); updateMenuStats(); updateContinueButton(); updateTaskBadge();
+        
+        // Проверяем ориентацию при загрузке
+        setTimeout(checkOrientation, 500);
+        
+        gameLoop();
+        console.log('🏃 CYBER RUNNER 2077 v5.0 (Гопник + Landscape) загружен.');
     </script>
 
-    <!-- Регистрация Service Worker для оффлайн-работы -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(registration => { console.log('SW успешно зарегистрирован: ', registration.scope); })
-                    .catch(error => { console.log('Ошибка регистрации SW: ', error); });
+                    .then(registration => { console.log('SW: ', registration.scope); })
+                    .catch(error => { console.log('SW error: ', error); });
             });
         }
     </script>

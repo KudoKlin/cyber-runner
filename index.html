@@ -142,7 +142,16 @@
             100% { transform: translate(0); filter: none; }
         }
         .glitch-active { animation: glitch-anim 0.25s ease-out; }
-        .mobile-controls { display: none; margin-top: 15px; padding: 0 10px; justify-content: space-between; align-items: center; width: 100%; }
+        
+        /* Мобильные контролы — только справа (щит и буст) */
+        .mobile-controls { 
+            display: none; 
+            margin-top: 15px; 
+            padding: 0 10px; 
+            justify-content: flex-end; 
+            align-items: center; 
+            width: 100%; 
+        }
         .mobile-controls .mobile-right { display: flex; gap: 15px; align-items: center; }
         .mobile-btn {
             width: 64px; height: 64px;
@@ -158,6 +167,7 @@
         .mobile-btn.shield-btn-m { width: 56px; height: 56px; font-size: 20px; }
         .mobile-btn.boost-btn { width: 56px; height: 56px; font-size: 20px; border-color: rgba(255, 0, 255, 0.5); color: #ff00ff; }
         @media (hover: none) and (pointer: coarse) { .mobile-controls { display: flex; } }
+        
         .game-controls { display: flex; justify-content: center; gap: 12px; margin-top: 15px; flex-wrap: wrap; }
         .game-controls button {
             padding: 10px 24px;
@@ -371,177 +381,41 @@
 
         /* === АДАПТАЦИЯ ДЛЯ ГОРИЗОНТАЛЬНОГО РЕЖИМА === */
         @media screen and (orientation: landscape) and (max-height: 500px) {
-            body {
-                overflow-y: auto;
-            }
-            
-            .screen {
-                min-height: auto;
-                padding: 10px;
-                justify-content: flex-start;
-            }
-            
-            .menu-content {
-                padding: 15px 20px;
-                max-width: 90vw;
-                margin: 10px auto;
-            }
-            
-            .menu-title {
-                font-size: 22px;
-                margin-bottom: 4px;
-            }
-            
-            .menu-subtitle {
-                font-size: 10px;
-                margin-bottom: 10px;
-                letter-spacing: 2px;
-            }
-            
-            .menu-stats {
-                margin-bottom: 10px;
-                gap: 10px;
-            }
-            
-            .menu-stats span {
-                font-size: 11px;
-                padding: 5px 12px;
-            }
-            
-            .menu-buttons {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
-                margin-bottom: 10px;
-            }
-            
-            .menu-btn {
-                padding: 10px 15px;
-                font-size: 11px;
-                letter-spacing: 1px;
-            }
-            
-            .menu-btn.primary {
-                grid-column: 1 / -1;
-                padding: 12px 20px;
-                font-size: 13px;
-            }
-            
-            .menu-hint {
-                font-size: 9px;
-            }
-            
-            .screen-game {
-                padding: 5px;
-            }
-            
-            .game-topbar {
-                margin-bottom: 5px;
-            }
-            
-            .canvas-wrapper {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                width: 100%;
-                max-width: 100vw;
-                margin: 0 auto;
-            }
-            
-            #gameCanvas {
-                max-width: min(90vw, calc(60vh * 1.875));
-                max-height: 60vh;
-                width: auto;
-                height: auto;
-                object-fit: contain;
-                margin: 0 auto;
-                display: block;
-            }
-            
-            .game-stats span {
-                font-size: 10px;
-                padding: 4px 8px;
-            }
-            
-            .mobile-controls {
-                margin-top: 8px;
-            }
-            
-            .mobile-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-            }
-            
-            .game-controls {
-                margin-top: 8px;
-                gap: 8px;
-            }
-            
-            .game-controls button {
-                padding: 8px 16px;
-                font-size: 10px;
-            }
-            
-            .records-content, .upgrades-content, .tasks-content, .skins-content {
-                padding: 15px 20px;
-                margin-top: 10px;
-                max-height: 80vh;
-                overflow-y: auto;
-            }
-            
-            .records-title, .upgrades-title, .tasks-title, .skins-title {
-                font-size: 16px;
-                margin-bottom: 15px;
-            }
-            
-            .upgrade-panel {
-                gap: 10px;
-            }
-            
-            .upgrade-panel .upgrade-item {
-                padding: 10px 15px;
-                min-width: 90px;
-            }
-            
-            .upgrade-panel .upgrade-item .value {
-                font-size: 18px;
-            }
-            
-            .skins-grid {
-                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-                gap: 10px;
-            }
-            
-            .task-item {
-                padding: 10px 14px;
-                margin-bottom: 8px;
-                font-size: 12px;
-            }
-            
-            .leaderboard-list li {
-                padding: 10px 14px;
-                font-size: 12px;
-            }
+            body { overflow-y: auto; }
+            .screen { min-height: auto; padding: 10px; justify-content: flex-start; }
+            .menu-content { padding: 15px 20px; max-width: 90vw; margin: 10px auto; }
+            .menu-title { font-size: 22px; margin-bottom: 4px; }
+            .menu-subtitle { font-size: 10px; margin-bottom: 10px; letter-spacing: 2px; }
+            .menu-stats { margin-bottom: 10px; gap: 10px; }
+            .menu-stats span { font-size: 11px; padding: 5px 12px; }
+            .menu-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+            .menu-btn { padding: 10px 15px; font-size: 11px; letter-spacing: 1px; }
+            .menu-btn.primary { grid-column: 1 / -1; padding: 12px 20px; font-size: 13px; }
+            .menu-hint { font-size: 9px; }
+            .screen-game { padding: 5px; }
+            .game-topbar { margin-bottom: 5px; }
+            .canvas-wrapper { display: flex; justify-content: center; align-items: center; width: 100%; max-width: 100vw; margin: 0 auto; }
+            #gameCanvas { max-width: min(90vw, calc(60vh * 1.875)); max-height: 60vh; width: auto; height: auto; object-fit: contain; margin: 0 auto; display: block; }
+            .game-stats span { font-size: 10px; padding: 4px 8px; }
+            .mobile-controls { margin-top: 8px; }
+            .mobile-btn { width: 50px; height: 50px; font-size: 20px; }
+            .game-controls { margin-top: 8px; gap: 8px; }
+            .game-controls button { padding: 8px 16px; font-size: 10px; }
+            .records-content, .upgrades-content, .tasks-content, .skins-content { padding: 15px 20px; margin-top: 10px; max-height: 80vh; overflow-y: auto; }
+            .records-title, .upgrades-title, .tasks-title, .skins-title { font-size: 16px; margin-bottom: 15px; }
+            .upgrade-panel { gap: 10px; }
+            .upgrade-panel .upgrade-item { padding: 10px 15px; min-width: 90px; }
+            .upgrade-panel .upgrade-item .value { font-size: 18px; }
+            .skins-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
+            .task-item { padding: 10px 14px; margin-bottom: 8px; font-size: 12px; }
+            .leaderboard-list li { padding: 10px 14px; font-size: 12px; }
         }
 
         @media screen and (orientation: landscape) and (max-height: 380px) {
-            .menu-content {
-                padding: 10px 15px;
-            }
-            
-            .menu-title {
-                font-size: 18px;
-            }
-            
-            .menu-btn {
-                padding: 8px 12px;
-                font-size: 10px;
-            }
-            
-            #gameCanvas {
-                max-height: 55vh;
-            }
+            .menu-content { padding: 10px 15px; }
+            .menu-title { font-size: 18px; }
+            .menu-btn { padding: 8px 12px; font-size: 10px; }
+            #gameCanvas { max-height: 55vh; }
         }
 
         @media (max-width: 600px) {
@@ -591,7 +465,7 @@
                 <button class="menu-btn" onclick="showScreen('screenUpgrades')">⚙ АПГРЕЙДЫ</button>
             </div>
             <div class="menu-hint">
-                <span>ПРОБЕЛ</span> — прыжок | <span>SHIFT</span> — рывок | <span>E</span> — щит
+                <span>ТАП</span> — прыжок | <span>СВАЙП →</span> — рывок | <span>СВАЙП ←</span> — щит
             </div>
         </div>
     </div>
@@ -610,8 +484,8 @@
         <div class="canvas-wrapper">
             <canvas id="gameCanvas" width="750" height="400"></canvas>
         </div>
+        <!-- УБРАНА КНОПКА ПРЫЖКА — прыжок теперь по касанию в любом месте экрана -->
         <div class="mobile-controls">
-            <button class="mobile-btn" onpointerdown="jump()">⬆</button>
             <div class="mobile-right">
                 <button class="mobile-btn shield-btn-m" onpointerdown="useShield()">🛡️</button>
                 <button class="mobile-btn boost-btn" onpointerdown="boost()">⚡</button>
@@ -1134,6 +1008,7 @@
                 ctx.fillStyle = 'rgba(5,5,10,0.8)'; ctx.fillRect(0, 0, W, H); ctx.textAlign = 'center'; ctx.shadowColor = '#ff0055'; ctx.shadowBlur = 40;
                 ctx.fillStyle = '#ff0055'; ctx.font = 'bold 40px Orbitron'; ctx.fillText('☠ СИСТЕМА ОТКАЗАЛА', W / 2, H / 2 - 20); ctx.shadowBlur = 0;
                 ctx.fillStyle = '#00ffff'; ctx.font = '18px Rajdhani'; ctx.fillText(`Финальный счёт: ${score}`, W / 2, H / 2 + 20);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; ctx.font = '14px Rajdhani'; ctx.fillText('Тапни для рестарта', W / 2, H / 2 + 50);
                 ctx.textAlign = 'left';
             }
             if (gamePaused && gameRunning) {
@@ -1422,24 +1297,89 @@
             setTimeout(() => { canvas.classList.remove('glitch-active'); }, 250);
         }
 
+        // ============================================================
+        //  УПРАВЛЕНИЕ (ГЛОБАЛЬНОЕ — прыжок по всему экрану)
+        // ============================================================
         let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
-        canvas.addEventListener('touchstart', function(e) {
-            e.preventDefault(); initAudio(); if (!gameRunning) return;
-            const touch = e.changedTouches[0]; touchStartX = touch.clientX; touchStartY = touch.clientY; touchStartTime = Date.now();
-        }, { passive: false });
 
-        canvas.addEventListener('touchend', function(e) {
-            e.preventDefault(); if (!gameRunning || gamePaused) return;
-            const touch = e.changedTouches[0]; const dx = touch.clientX - touchStartX; const dy = touch.clientY - touchStartY; const dt = Date.now() - touchStartTime;
-            if (Math.abs(dx) < 30 && Math.abs(dy) < 30 && dt < 300) { jump(); return; }
-            if (Math.abs(dy) > Math.abs(dx)) { if (dy < -40) jump(); } 
-            else { if (dx > 40) boost(); if (dx < -40) useShield(); }
-        }, { passive: false });
+        // Глобальный обработчик касаний — работает на ВСЁМ экране
+        document.addEventListener('touchstart', function(e) {
+            // Не перехватываем касания на кнопках и меню
+            if (e.target.closest('button') || e.target.closest('.menu-btn') || e.target.closest('.skin-card') || e.target.closest('.task-item') || e.target.closest('.upgrade-item') || e.target.closest('.leaderboard-list') || e.target.closest('.offline-modal') || e.target.closest('.rotate-hint')) {
+                return;
+            }
+            
+            initAudio();
+            
+            // Если игра не идёт — тап по экрану игры запускает рестарт
+            const gameScreen = document.getElementById('screenGame');
+            if (!gameScreen.classList.contains('active')) return;
+            
+            if (!gameRunning) {
+                restartGame();
+                return;
+            }
+            if (gamePaused) return;
+            
+            const touch = e.changedTouches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            touchStartTime = Date.now();
+        }, { passive: true });
 
-        canvas.addEventListener('click', function(e) { initAudio(); if (!gameRunning) return; jump(); });
+        document.addEventListener('touchend', function(e) {
+            // Игнорируем, если касание началось на кнопке
+            if (e.target.closest('button') || e.target.closest('.menu-btn') || e.target.closest('.skin-card') || e.target.closest('.task-item') || e.target.closest('.upgrade-item') || e.target.closest('.leaderboard-list') || e.target.closest('.offline-modal') || e.target.closest('.rotate-hint')) return;
+            
+            const gameScreen = document.getElementById('screenGame');
+            if (!gameScreen.classList.contains('active')) return;
+            if (!gameRunning || gamePaused) return;
+            
+            const touch = e.changedTouches[0];
+            const dx = touch.clientX - touchStartX;
+            const dy = touch.clientY - touchStartY;
+            const dt = Date.now() - touchStartTime;
 
+            // Быстрое касание без движения = прыжок
+            if (Math.abs(dx) < 30 && Math.abs(dy) < 30 && dt < 300) {
+                jump();
+                return;
+            }
+            
+            // Свайпы
+            if (Math.abs(dy) > Math.abs(dx)) {
+                if (dy < -40) jump();       // Свайп вверх = прыжок
+            } else {
+                if (dx > 40) boost();       // Свайп вправо = буст
+                if (dx < -40) useShield();  // Свайп влево = щит
+            }
+        }, { passive: true });
+
+        // Клик мышкой тоже работает как прыжок (на ПК)
+        document.addEventListener('click', function(e) {
+            // Игнорируем клики по кнопкам и меню
+            if (e.target.closest('button') || e.target.closest('.menu-btn') || e.target.closest('.skin-card') || e.target.closest('.task-item') || e.target.closest('.upgrade-item') || e.target.closest('.leaderboard-list') || e.target.closest('.offline-modal') || e.target.closest('.rotate-hint')) {
+                return;
+            }
+            
+            initAudio();
+            
+            const gameScreen = document.getElementById('screenGame');
+            if (!gameScreen.classList.contains('active')) return;
+            
+            if (!gameRunning) {
+                restartGame();
+                return;
+            }
+            if (gamePaused) return;
+            
+            jump();
+        });
+
+        // Обработчик клавиатуры (для ПК)
         document.addEventListener('keydown', function(e) {
-            const gameActive = document.getElementById('screenGame').classList.contains('active'); if (!gameActive) return;
+            const gameActive = document.getElementById('screenGame').classList.contains('active');
+            if (!gameActive) return;
             if (e.key === ' ' || e.key === 'Space') { e.preventDefault(); if (!gameRunning) { restartGame(); return; } jump(); }
             if (e.key === 'Shift') { e.preventDefault(); boost(); }
             if (e.key === 'e' || e.key === 'E') useShield();
@@ -1488,7 +1428,7 @@
         setTimeout(checkOrientation, 500);
         
         gameLoop();
-        console.log('🏃 CYBER RUNNER 2077 v6.0 (Landscape Fixed) загружен.');
+        console.log('🏃 CYBER RUNNER 2077 v7.0 (Global Touch Jump) загружен.');
     </script>
 
     <script>
@@ -1511,7 +1451,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=6')
+                navigator.serviceWorker.register('./sw.js?v=7')
                     .then(registration => { console.log('SW OK'); })
                     .catch(error => { console.log('SW Error:', error); });
             });

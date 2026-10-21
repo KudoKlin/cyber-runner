@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.kudoklin.twa",
+        "sha256_cert_fingerprints": ["2F:56:4E:58:F8:72:DB:CE:B7:08:68:0D:F6:16:1F:B4:52:EB:0B:69:A6:38:6B:EB:3A:DA:6C:DD:2F:1E:A5:50"]
+      }
+    }]

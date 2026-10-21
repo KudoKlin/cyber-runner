@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="🏃 CYBER RUNNER 2077 — киберпанк-раннер нового поколения">
+    <meta name="description" content="CYBER RUNNER 2077 — киберпанк-раннер">
     <meta name="theme-color" content="#050508">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23050508'/%3E%3Ctext y='.9em' font-size='80' x='10'%3E🏃%3C/text%3E%3C/svg%3E">
-    <title>🏃 CYBER RUNNER 2077</title>
+    <link rel="icon" href="./icon-192.png">
+    <title>CYBER RUNNER 2077</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,9 +19,8 @@
             --neon-magenta: #ff00ff;
             --neon-yellow: #ffdd00;
             --neon-red: #ff0055;
-            --glass-bg: rgba(15, 15, 30, 0.55);
+            --glass-bg: rgba(15, 15, 30, 0.65);
             --glass-border: rgba(255, 255, 255, 0.12);
-            --glass-highlight: rgba(255, 255, 255, 0.08);
             --spring-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
             --smooth-ease: cubic-bezier(0.22, 1, 0.36, 1);
         }
@@ -37,7 +36,6 @@
             position: relative;
         }
 
-        /* === MESH-ГРАДИЕНТНЫЙ ФОН (стиль iOS 26) === */
         .mesh-bg {
             position: fixed;
             top: 0; left: 0;
@@ -55,8 +53,7 @@
             background: 
                 radial-gradient(circle at 20% 30%, rgba(0, 255, 255, 0.15) 0%, transparent 40%),
                 radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 60% 80%, rgba(255, 221, 0, 0.1) 0%, transparent 40%),
-                radial-gradient(circle at 30% 70%, rgba(0, 255, 150, 0.08) 0%, transparent 40%);
+                radial-gradient(circle at 60% 80%, rgba(255, 221, 0, 0.1) 0%, transparent 40%);
             animation: meshMove 20s ease-in-out infinite;
             filter: blur(40px);
         }
@@ -67,7 +64,6 @@
             66% { transform: translate(-5%, 5%) rotate(240deg); }
         }
 
-        /* Сетка */
         .grid-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -82,7 +78,6 @@
             -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
         }
 
-        /* Живые частицы на фоне */
         #bgCanvas {
             position: fixed;
             top: 0; left: 0;
@@ -91,39 +86,22 @@
             pointer-events: none;
         }
 
-        /* Scanlines эффект */
         .scanlines {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 3;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 255, 255, 0.015) 2px,
-                rgba(0, 255, 255, 0.015) 4px
-            );
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 255, 0.015) 2px, rgba(0, 255, 255, 0.015) 4px);
             pointer-events: none;
-            animation: scanMove 10s linear infinite;
         }
 
-        @keyframes scanMove {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 100px; }
-        }
-
-        /* === LIQUID GLASS (стиль Apple Vision Pro) === */
         .glass {
             background: var(--glass-bg);
             backdrop-filter: blur(24px) saturate(180%);
             -webkit-backdrop-filter: blur(24px) saturate(180%);
             border: 1px solid var(--glass-border);
             border-radius: 28px;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 var(--glass-highlight),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
             position: relative;
             overflow: hidden;
         }
@@ -133,17 +111,11 @@
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.1) 0%,
-                transparent 50%,
-                transparent 100%
-            );
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
             pointer-events: none;
             border-radius: inherit;
         }
 
-        /* === ЭКРАНЫ === */
         .screen {
             display: none;
             width: 100%;
@@ -159,13 +131,8 @@
             transform: translateY(20px) scale(0.98);
             transition: opacity 0.4s var(--smooth-ease), transform 0.4s var(--spring-ease);
         }
-        .screen.active { 
-            display: flex; 
-            opacity: 1; 
-            transform: translateY(0) scale(1);
-        }
+        .screen.active { display: flex; opacity: 1; transform: translateY(0) scale(1); }
 
-        /* === КИНЕТИЧЕСКИЙ ЗАГОЛОВОК === */
         .kinetic-title {
             font-family: 'Orbitron', monospace;
             font-size: 36px;
@@ -190,97 +157,44 @@
             transition: transform 0.3s var(--spring-ease);
         }
 
-        .kinetic-title .letter:hover {
-            transform: translateY(-8px) scale(1.2) rotate(-5deg);
-        }
-
+        .kinetic-title .letter:hover { transform: translateY(-8px) scale(1.2); }
         .kinetic-title .letter:nth-child(1) { animation-delay: 0s; }
         .kinetic-title .letter:nth-child(2) { animation-delay: 0.1s; }
         .kinetic-title .letter:nth-child(3) { animation-delay: 0.2s; }
         .kinetic-title .letter:nth-child(4) { animation-delay: 0.3s; }
         .kinetic-title .letter:nth-child(5) { animation-delay: 0.4s; }
-        .kinetic-title .letter:nth-child(6) { animation-delay: 0.5s; }
-        .kinetic-title .letter:nth-child(7) { animation-delay: 0.6s; }
-        .kinetic-title .letter:nth-child(8) { animation-delay: 0.7s; }
-        .kinetic-title .letter:nth-child(9) { animation-delay: 0.8s; }
-        .kinetic-title .letter:nth-child(10) { animation-delay: 0.9s; }
-        .kinetic-title .letter:nth-child(11) { animation-delay: 1.0s; }
-        .kinetic-title .letter:nth-child(12) { animation-delay: 1.1s; }
-        .kinetic-title .letter:nth-child(13) { animation-delay: 1.2s; }
+        .kinetic-title .letter:nth-child(7) { animation-delay: 0.5s; }
+        .kinetic-title .letter:nth-child(8) { animation-delay: 0.6s; }
+        .kinetic-title .letter:nth-child(9) { animation-delay: 0.7s; }
+        .kinetic-title .letter:nth-child(10) { animation-delay: 0.8s; }
+        .kinetic-title .letter:nth-child(11) { animation-delay: 0.9s; }
 
-        @keyframes letterFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
+        @keyframes letterFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
+        .menu-content { padding: 40px 35px; text-align: center; width: 100%; max-width: 500px; }
+        .menu-subtitle { color: rgba(0, 255, 255, 0.6); font-size: 12px; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 30px; font-weight: 500; }
 
-        .menu-content {
-            padding: 40px 35px;
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
-        }
-
-        .menu-subtitle {
-            color: rgba(0, 255, 255, 0.6);
-            font-size: 12px;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-
-        .menu-stats {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
+        .menu-stats { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
         .stat-pill {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            display: flex; align-items: center; gap: 8px;
             padding: 10px 18px;
             background: rgba(0, 255, 255, 0.05);
             border: 1px solid rgba(0, 255, 255, 0.15);
             border-radius: 100px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #00ffff;
+            font-size: 13px; font-weight: 600; color: #00ffff;
             backdrop-filter: blur(10px);
             transition: all 0.3s var(--spring-ease);
         }
+        .stat-pill:hover { transform: translateY(-2px); background: rgba(0, 255, 255, 0.1); }
+        .stat-pill strong { color: #ffdd00; font-size: 15px; text-shadow: 0 0 15px rgba(255, 221, 0, 0.5); }
 
-        .stat-pill:hover {
-            transform: translateY(-2px);
-            background: rgba(0, 255, 255, 0.1);
-            box-shadow: 0 8px 20px rgba(0, 255, 255, 0.2);
-        }
-
-        .stat-pill strong {
-            color: #ffdd00;
-            font-size: 15px;
-            text-shadow: 0 0 15px rgba(255, 221, 0, 0.5);
-        }
-
-        .menu-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
+        .menu-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
 
         .menu-btn {
             padding: 16px 30px;
             font-family: 'Orbitron', monospace;
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 14px; font-weight: 700;
             border-radius: 16px;
             border: 1px solid rgba(0, 255, 255, 0.2);
             background: rgba(0, 255, 255, 0.03);
@@ -293,138 +207,126 @@
             overflow: hidden;
             backdrop-filter: blur(10px);
         }
-
-        .menu-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0,255,255,0.15), transparent);
-            transition: left 0.6s;
-        }
-
-        .menu-btn:hover::before { left: 100%; }
-
-        .menu-btn:hover {
-            background: rgba(0, 255, 255, 0.1);
-            border-color: rgba(0, 255, 255, 0.5);
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.25);
-        }
-
+        .menu-btn:hover { background: rgba(0, 255, 255, 0.1); border-color: rgba(0, 255, 255, 0.5); transform: translateY(-3px) scale(1.02); }
         .menu-btn:active { transform: translateY(0) scale(0.98); }
-
         .menu-btn.primary {
             background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(255, 0, 255, 0.15));
             border-color: rgba(0, 255, 255, 0.5);
-            font-size: 16px;
-            padding: 18px 30px;
+            font-size: 16px; padding: 18px 30px;
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-            position: relative;
         }
 
-        .menu-btn.primary::after {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(135deg, #00ffff, #ff00ff, #ffdd00, #00ffff);
-            background-size: 300% 300%;
-            border-radius: inherit;
-            z-index: -1;
-            opacity: 0.5;
-            filter: blur(10px);
-            animation: borderGlow 4s ease-in-out infinite;
-        }
-
-        @keyframes borderGlow {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .menu-hint {
-            color: rgba(255, 255, 255, 0.35);
-            font-size: 11px;
-            letter-spacing: 1px;
-        }
+        .menu-hint { color: rgba(255, 255, 255, 0.35); font-size: 11px; letter-spacing: 1px; }
         .menu-hint span { color: #ffdd00; font-weight: 700; }
 
-        /* Переключатель языка */
-        .lang-switcher {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 5px;
-            z-index: 100;
-        }
-
-        .lang-btn {
-            padding: 6px 12px;
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 8px;
-            color: rgba(0, 255, 255, 0.5);
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .lang-btn.active {
-            background: rgba(0, 255, 255, 0.15);
-            color: #00ffff;
-            border-color: rgba(0, 255, 255, 0.5);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-        }
-
-        /* === ИГРОВОЙ ЭКРАН === */
-        .screen-game { justify-content: flex-start; padding-top: 15px; }
-
-        .game-topbar {
+        /* === НАСТРОЙКИ === */
+        .settings-content { padding: 35px 25px; width: 100%; max-width: 500px; margin-top: 20px; }
+        .settings-title { font-family: 'Orbitron', monospace; font-size: 20px; text-align: center; letter-spacing: 3px; margin-bottom: 25px; color: #00ffff; text-shadow: 0 0 20px rgba(0, 255, 255, 0.4); font-weight: 700; }
+        
+        .setting-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 100%;
+            padding: 16px 20px;
             margin-bottom: 12px;
-            gap: 8px;
-        }
-
-        .game-stats {
-            display: flex;
-            gap: 8px;
-            font-size: 13px;
-            color: #00ffff;
-            flex-wrap: wrap;
-            justify-content: center;
-            flex: 1;
-            font-weight: 700;
-        }
-
-        .game-stats span {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 255, 255, 0.03);
             backdrop-filter: blur(10px);
-            padding: 6px 12px;
-            border-radius: 100px;
-            border: 1px solid rgba(0, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+        }
+        .setting-label { color: #00ffff; font-size: 14px; font-weight: 600; }
+        .setting-value { color: #ffdd00; font-size: 14px; font-weight: 700; min-width: 50px; text-align: right; }
+
+        .lang-toggle { display: flex; gap: 8px; }
+        .lang-btn {
+            padding: 8px 16px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 10px;
+            color: rgba(0, 255, 255, 0.5);
+            font-size: 12px; font-weight: 700;
+            cursor: pointer;
             transition: all 0.3s;
+            font-family: 'Orbitron', monospace;
+        }
+        .lang-btn.active { background: rgba(0, 255, 255, 0.15); color: #00ffff; border-color: rgba(0, 255, 255, 0.5); box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); }
+
+        .speed-slider {
+            -webkit-appearance: none;
+            width: 150px;
+            height: 6px;
+            background: rgba(0, 255, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px; height: 20px;
+            background: #00ffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        .speed-slider::-moz-range-thumb {
+            width: 20px; height: 20px;
+            background: #00ffff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 150px;
+            height: 6px;
+            background: rgba(255, 0, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px; height: 20px;
+            background: #ff00ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px; height: 26px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .toggle-switch.active { background: rgba(0, 255, 255, 0.4); }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px; left: 3px;
+            width: 20px; height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s var(--spring-ease);
+        }
+        .toggle-switch.active::after { transform: translateX(24px); }
+
+        /* === ИГРОВОЙ ЭКРАН === */
+        .screen-game { justify-content: flex-start; padding-top: 15px; }
+        .game-topbar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px; gap: 8px; }
+        .game-stats { display: flex; gap: 8px; font-size: 13px; color: #00ffff; flex-wrap: wrap; justify-content: center; flex: 1; font-weight: 700; }
+        .game-stats span { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px); padding: 6px 12px; border-radius: 100px; border: 1px solid rgba(0, 255, 255, 0.15); display: flex; align-items: center; gap: 5px; }
         .game-stats .coins { color: #ffdd00; border-color: rgba(255, 221, 0, 0.2); }
         .game-stats .lives { color: #ff0055; border-color: rgba(255, 0, 85, 0.2); }
 
-        /* Комбо-индикатор */
         .combo-indicator {
             position: absolute;
-            top: 80px;
-            left: 50%;
+            top: 80px; left: 50%;
             transform: translateX(-50%) scale(0);
             font-family: 'Orbitron', monospace;
-            font-size: 32px;
-            font-weight: 900;
+            font-size: 32px; font-weight: 900;
             color: #ffdd00;
             text-shadow: 0 0 30px rgba(255, 221, 0, 0.8);
             z-index: 100;
@@ -432,18 +334,8 @@
             opacity: 0;
             transition: all 0.3s var(--spring-ease);
         }
-
-        .combo-indicator.show {
-            transform: translateX(-50%) scale(1);
-            opacity: 1;
-            animation: comboPulse 0.5s ease-out;
-        }
-
-        @keyframes comboPulse {
-            0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
-            50% { transform: translateX(-50%) scale(1.3); opacity: 1; }
-            100% { transform: translateX(-50%) scale(1); opacity: 1; }
-        }
+        .combo-indicator.show { transform: translateX(-50%) scale(1); opacity: 1; animation: comboPulse 0.5s ease-out; }
+        @keyframes comboPulse { 0% { transform: translateX(-50%) scale(0.5); opacity: 0; } 50% { transform: translateX(-50%) scale(1.3); opacity: 1; } 100% { transform: translateX(-50%) scale(1); opacity: 1; } }
 
         .back-btn, .pause-btn {
             width: 44px; height: 44px;
@@ -457,33 +349,12 @@
             transition: all 0.3s var(--spring-ease);
             display: flex; align-items: center; justify-content: center;
         }
-        .back-btn:hover, .pause-btn:hover { 
-            background: rgba(0, 255, 255, 0.15); 
-            transform: scale(1.1); 
-        }
+        .back-btn:hover, .pause-btn:hover { background: rgba(0, 255, 255, 0.15); transform: scale(1.1); }
         .pause-btn { border-color: rgba(255, 0, 255, 0.3); color: #ff00ff; }
         .back-btn.top-left { position: absolute; top: 20px; left: 20px; z-index: 10; }
 
-        .canvas-wrapper { 
-            width: 100%; 
-            position: relative; 
-            border-radius: 20px; 
-            overflow: hidden;
-            box-shadow: 
-                0 0 40px rgba(0, 255, 255, 0.1),
-                inset 0 0 20px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 255, 255, 0.15);
-        }
-
-        #gameCanvas {
-            display: block;
-            width: 100%;
-            height: auto;
-            max-height: 55vh;
-            background: #05050f;
-            cursor: pointer;
-            touch-action: none;
-        }
+        .canvas-wrapper { width: 100%; position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 0 40px rgba(0, 255, 255, 0.1), inset 0 0 20px rgba(0, 0, 0, 0.5); border: 1px solid rgba(0, 255, 255, 0.15); }
+        #gameCanvas { display: block; width: 100%; height: auto; max-height: 55vh; background: #05050f; cursor: pointer; touch-action: none; }
 
         @keyframes glitch-anim {
             0% { transform: translate(0); filter: none; }
@@ -493,25 +364,8 @@
         }
         .glitch-active { animation: glitch-anim 0.3s ease-out; }
 
-        /* Slow-motion эффект */
-        .slow-motion {
-            animation: slowMo 0.5s ease-out;
-        }
-        @keyframes slowMo {
-            0% { filter: brightness(1.5) contrast(1.2); }
-            100% { filter: brightness(1) contrast(1); }
-        }
-
-        .mobile-controls { 
-            display: none; 
-            margin-top: 15px; 
-            padding: 0 10px; 
-            justify-content: flex-end; 
-            align-items: center; 
-            width: 100%; 
-        }
+        .mobile-controls { display: none; margin-top: 15px; padding: 0 10px; justify-content: flex-end; align-items: center; width: 100%; }
         .mobile-controls .mobile-right { display: flex; gap: 15px; align-items: center; }
-        
         .mobile-btn {
             width: 64px; height: 64px;
             border-radius: 50%;
@@ -527,12 +381,7 @@
         }
         .mobile-btn:active { transform: scale(0.9); background: rgba(0, 255, 255, 0.25); }
         .mobile-btn.shield-btn-m { width: 56px; height: 56px; font-size: 20px; }
-        .mobile-btn.boost-btn { 
-            width: 56px; height: 56px; font-size: 20px; 
-            border-color: rgba(255, 0, 255, 0.5); 
-            color: #ff00ff;
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
-        }
+        .mobile-btn.boost-btn { width: 56px; height: 56px; font-size: 20px; border-color: rgba(255, 0, 255, 0.5); color: #ff00ff; box-shadow: 0 0 20px rgba(255, 0, 255, 0.2); }
         @media (hover: none) and (pointer: coarse) { .mobile-controls { display: flex; } }
 
         .game-controls { display: flex; justify-content: center; gap: 12px; margin-top: 15px; flex-wrap: wrap; }
@@ -553,40 +402,20 @@
         .game-controls button:hover { background: rgba(0, 255, 255, 0.15); transform: translateY(-2px); }
         .game-controls .btn-restart { border-color: rgba(255, 0, 255, 0.3); color: #ff00ff; }
 
-        /* === ДРУГИЕ ЭКРАНЫ === */
-        .records-content, .upgrades-content, .tasks-content, .skins-content {
-            padding: 35px 25px;
-            width: 100%;
-            max-width: 500px;
-            margin-top: 20px;
-        }
+        .records-content, .upgrades-content, .tasks-content, .skins-content { padding: 35px 25px; width: 100%; max-width: 500px; margin-top: 20px; }
+        .records-content { border: 1px solid rgba(255, 221, 0, 0.2); }
+        .upgrades-content { border: 1px solid rgba(255, 0, 255, 0.2); }
+        .tasks-content { border: 1px solid rgba(0, 255, 200, 0.2); }
+        .skins-content { border: 1px solid rgba(255, 150, 0, 0.2); }
 
-        .records-title, .upgrades-title, .tasks-title, .skins-title { 
-            font-family: 'Orbitron', monospace;
-            font-size: 20px; 
-            text-align: center; 
-            letter-spacing: 3px; 
-            margin-bottom: 25px;
-            font-weight: 700;
-        }
+        .records-title, .upgrades-title, .tasks-title, .skins-title { font-family: 'Orbitron', monospace; font-size: 20px; text-align: center; letter-spacing: 3px; margin-bottom: 25px; font-weight: 700; }
         .records-title { color: #ffdd00; text-shadow: 0 0 20px rgba(255, 221, 0, 0.4); }
         .upgrades-title { color: #ff00ff; text-shadow: 0 0 20px rgba(255, 0, 255, 0.4); }
         .tasks-title { color: #00ffc8; text-shadow: 0 0 20px rgba(0, 255, 200, 0.4); }
         .skins-title { color: #ff9600; text-shadow: 0 0 20px rgba(255, 150, 0, 0.4); }
 
         .leaderboard-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .leaderboard-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 18px;
-            background: rgba(0, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-radius: 14px;
-            border: 1px solid rgba(0, 255, 255, 0.08);
-            color: #00ffff;
-            transition: all 0.3s var(--spring-ease);
-        }
+        .leaderboard-list li { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: rgba(0, 255, 255, 0.03); backdrop-filter: blur(10px); border-radius: 14px; border: 1px solid rgba(0, 255, 255, 0.08); color: #00ffff; transition: all 0.3s var(--spring-ease); }
         .leaderboard-list li:hover { transform: translateX(5px); background: rgba(0, 255, 255, 0.08); }
         .leaderboard-list li:nth-child(1) { border-color: rgba(255, 221, 0, 0.4); background: rgba(255, 221, 0, 0.08); color: #ffdd00; }
         .leaderboard-list .rank { font-weight: 700; min-width: 35px; font-family: 'Orbitron', monospace; }
@@ -594,100 +423,32 @@
         .leaderboard-list .date-val { font-size: 11px; opacity: 0.5; }
         .leaderboard-list .leaderboard-empty { justify-content: center; color: rgba(0, 255, 255, 0.3); font-style: italic; border-style: dashed; }
 
-        .clear-btn {
-            display: block;
-            margin: 25px auto 0;
-            padding: 10px 20px;
-            font-family: 'Orbitron', monospace;
-            font-size: 11px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 0, 85, 0.3);
-            background: rgba(255, 0, 85, 0.05);
-            color: #ff0055;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+        .clear-btn { display: block; margin: 25px auto 0; padding: 10px 20px; font-family: 'Orbitron', monospace; font-size: 11px; border-radius: 10px; border: 1px solid rgba(255, 0, 85, 0.3); background: rgba(255, 0, 85, 0.05); color: #ff0055; cursor: pointer; transition: all 0.3s; }
         .clear-btn:hover { background: rgba(255, 0, 85, 0.15); }
 
         .upgrades-coins { text-align: center; color: rgba(0, 255, 255, 0.6); font-size: 14px; margin-bottom: 25px; font-weight: 600; }
         .upgrades-coins strong { color: #ffdd00; font-size: 18px; }
 
         .upgrade-panel { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
-        .upgrade-panel .upgrade-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            padding: 16px 20px;
-            background: rgba(0, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-radius: 18px;
-            border: 1px solid rgba(0, 255, 255, 0.1);
-            min-width: 110px;
-            transition: all 0.3s var(--spring-ease);
-        }
+        .upgrade-panel .upgrade-item { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 20px; background: rgba(0, 255, 255, 0.03); backdrop-filter: blur(10px); border-radius: 18px; border: 1px solid rgba(0, 255, 255, 0.1); min-width: 110px; transition: all 0.3s var(--spring-ease); }
         .upgrade-panel .upgrade-item:hover { transform: translateY(-5px); border-color: rgba(0, 255, 255, 0.4); }
         .upgrade-panel .upgrade-item .label { font-size: 11px; color: rgba(0, 255, 255, 0.6); letter-spacing: 2px; }
         .upgrade-panel .upgrade-item .value { font-size: 24px; color: #00ffff; font-weight: 700; text-shadow: 0 0 20px rgba(0, 255, 255, 0.4); }
-        .upgrade-panel .upgrade-item button {
-            font-size: 11px;
-            padding: 8px 16px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 221, 0, 0.3);
-            background: rgba(255, 221, 0, 0.08);
-            color: #ffdd00;
-            cursor: pointer;
-            font-family: 'Orbitron', monospace;
-            width: 100%;
-            transition: all 0.3s var(--spring-ease);
-        }
+        .upgrade-panel .upgrade-item button { font-size: 11px; padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255, 221, 0, 0.3); background: rgba(255, 221, 0, 0.08); color: #ffdd00; cursor: pointer; font-family: 'Orbitron', monospace; width: 100%; transition: all 0.3s var(--spring-ease); }
         .upgrade-panel .upgrade-item button:hover:not(:disabled) { background: rgba(255, 221, 0, 0.2); transform: scale(1.05); }
         .upgrade-panel .upgrade-item button:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        .task-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 18px;
-            margin-bottom: 12px;
-            background: rgba(0, 255, 200, 0.03);
-            backdrop-filter: blur(10px);
-            border-radius: 14px;
-            border: 1px solid rgba(0, 255, 200, 0.1);
-            color: #00ffc8;
-            font-size: 13px;
-            transition: all 0.3s;
-        }
+        .task-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; margin-bottom: 12px; background: rgba(0, 255, 200, 0.03); backdrop-filter: blur(10px); border-radius: 14px; border: 1px solid rgba(0, 255, 200, 0.1); color: #00ffc8; font-size: 13px; transition: all 0.3s; }
         .task-item.done { border-color: rgba(0, 255, 100, 0.4); background: rgba(0, 255, 100, 0.08); color: #00ff66; }
         .task-item .task-info { flex: 1; }
         .task-item .task-progress { font-size: 11px; opacity: 0.6; margin-top: 4px; }
         .task-item .task-reward { font-size: 12px; color: #ffdd00; margin-left: 12px; font-weight: 700; }
-        .task-item .task-claim {
-            padding: 6px 12px;
-            font-size: 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 221, 0, 0.4);
-            background: rgba(255, 221, 0, 0.15);
-            color: #ffdd00;
-            cursor: pointer;
-            margin-left: 10px;
-            font-family: 'Orbitron', monospace;
-            transition: all 0.3s;
-        }
+        .task-item .task-claim { padding: 6px 12px; font-size: 10px; border-radius: 8px; border: 1px solid rgba(255, 221, 0, 0.4); background: rgba(255, 221, 0, 0.15); color: #ffdd00; cursor: pointer; margin-left: 10px; font-family: 'Orbitron', monospace; transition: all 0.3s; }
         .task-item .task-claim:hover:not(:disabled) { background: rgba(255, 221, 0, 0.3); transform: scale(1.05); }
         .task-item .task-claim:disabled { opacity: 0.3; cursor: not-allowed; }
 
         .skins-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
-        .skin-card {
-            background: rgba(0, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-radius: 18px;
-            border: 1px solid rgba(0, 255, 255, 0.1);
-            padding: 15px 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s var(--spring-ease);
-        }
+        .skin-card { background: rgba(0, 255, 255, 0.03); backdrop-filter: blur(10px); border-radius: 18px; border: 1px solid rgba(0, 255, 255, 0.1); padding: 15px 10px; text-align: center; cursor: pointer; transition: all 0.3s var(--spring-ease); }
         .skin-card:hover { background: rgba(0, 255, 255, 0.08); transform: translateY(-5px); }
         .skin-card.owned { border-color: rgba(0, 255, 100, 0.3); }
         .skin-card.active { border-color: #ffdd00; background: rgba(255, 221, 0, 0.1); box-shadow: 0 0 25px rgba(255, 221, 0, 0.2); }
@@ -696,120 +457,31 @@
         .skin-price { font-size: 11px; color: #ffdd00; font-weight: 700; }
         .skin-status { font-size: 10px; color: rgba(0, 255, 255, 0.6); margin-top: 6px; }
 
-        /* === МОДАЛЬНЫЕ ОКНА === */
-        .offline-modal, .achievement-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+        .offline-modal, .achievement-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; }
         .offline-modal.active, .achievement-modal.active { display: flex; }
-
-        .offline-content, .achievement-content {
-            padding: 30px;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            animation: popIn 0.5s var(--spring-ease);
-        }
-
-        .achievement-content {
-            border: 2px solid #ffdd00;
-            box-shadow: 0 0 50px rgba(255, 221, 0, 0.3);
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .offline-title, .achievement-title { 
-            font-family: 'Orbitron', monospace;
-            font-size: 22px; 
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
+        .offline-content, .achievement-content { padding: 30px; text-align: center; max-width: 400px; width: 100%; animation: popIn 0.5s var(--spring-ease); }
+        .achievement-content { border: 2px solid #ffdd00; box-shadow: 0 0 50px rgba(255, 221, 0, 0.3); }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .offline-title, .achievement-title { font-family: 'Orbitron', monospace; font-size: 22px; margin-bottom: 15px; font-weight: 700; }
         .offline-title { color: #ffdd00; }
         .achievement-title { color: #ffdd00; text-shadow: 0 0 20px rgba(255, 221, 0, 0.5); }
         .offline-text { color: #e0e0e0; font-size: 15px; margin-bottom: 10px; }
         .offline-amount { color: #00ff66; font-size: 32px; font-weight: 900; margin: 15px 0; text-shadow: 0 0 20px rgba(0, 255, 100, 0.5); }
         .achievement-icon { font-size: 60px; margin-bottom: 15px; animation: achievementBounce 0.8s var(--spring-ease); }
-        @keyframes achievementBounce {
-            0% { transform: scale(0) rotate(-180deg); }
-            60% { transform: scale(1.2) rotate(10deg); }
-            100% { transform: scale(1) rotate(0); }
-        }
+        @keyframes achievementBounce { 0% { transform: scale(0) rotate(-180deg); } 60% { transform: scale(1.2) rotate(10deg); } 100% { transform: scale(1) rotate(0); } }
         .achievement-desc { color: #e0e0e0; font-size: 14px; margin-bottom: 20px; }
         .achievement-reward { color: #ffdd00; font-size: 16px; font-weight: 700; }
-
-        .offline-btn, .achievement-btn {
-            margin-top: 15px;
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #ffdd00, #ffaa00);
-            color: #0a0a0f;
-            border: none;
-            border-radius: 12px;
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s var(--spring-ease);
-            box-shadow: 0 5px 20px rgba(255, 221, 0, 0.3);
-        }
+        .offline-btn, .achievement-btn { margin-top: 15px; padding: 12px 30px; background: linear-gradient(135deg, #ffdd00, #ffaa00); color: #0a0a0f; border: none; border-radius: 12px; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.3s var(--spring-ease); box-shadow: 0 5px 20px rgba(255, 221, 0, 0.3); }
         .offline-btn:hover, .achievement-btn:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 8px 30px rgba(255, 221, 0, 0.5); }
 
-        /* === ПОДСКАЗКА ПОВОРОТА === */
-        .rotate-hint {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 5, 15, 0.98);
-            backdrop-filter: blur(20px);
-            z-index: 99999;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            text-align: center;
-            padding: 20px;
-        }
+        .rotate-hint { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 15, 0.98); backdrop-filter: blur(20px); z-index: 99999; justify-content: center; align-items: center; flex-direction: column; text-align: center; padding: 20px; }
         .rotate-hint.show { display: flex !important; }
-        .rotate-icon {
-            font-size: 100px;
-            margin-bottom: 30px;
-            animation: rotatePhone 2s ease-in-out infinite;
-        }
-        @keyframes rotatePhone {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(90deg); }
-        }
-        .rotate-text {
-            color: #00ffff;
-            font-size: 20px;
-            font-family: 'Orbitron', monospace;
-            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-            margin-bottom: 30px;
-            max-width: 400px;
-        }
-        .rotate-close {
-            padding: 12px 30px;
-            background: rgba(0, 255, 255, 0.1);
-            color: #00ffff;
-            border: 1px solid rgba(0, 255, 255, 0.4);
-            border-radius: 12px;
-            font-family: 'Orbitron', monospace;
-            font-size: 14px;
-            cursor: pointer;
-            letter-spacing: 2px;
-            transition: all 0.3s;
-        }
+        .rotate-icon { font-size: 100px; margin-bottom: 30px; animation: rotatePhone 2s ease-in-out infinite; }
+        @keyframes rotatePhone { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } }
+        .rotate-text { color: #00ffff; font-size: 20px; font-family: 'Orbitron', monospace; text-shadow: 0 0 20px rgba(0, 255, 255, 0.5); margin-bottom: 30px; max-width: 400px; }
+        .rotate-close { padding: 12px 30px; background: rgba(0, 255, 255, 0.1); color: #00ffff; border: 1px solid rgba(0, 255, 255, 0.4); border-radius: 12px; font-family: 'Orbitron', monospace; font-size: 14px; cursor: pointer; letter-spacing: 2px; transition: all 0.3s; }
         .rotate-close:active { background: rgba(0, 255, 255, 0.3); }
 
-        /* === АДАПТИВ ДЛЯ LANDSCAPE === */
         @media screen and (orientation: landscape) and (max-height: 500px) {
             body { overflow-y: auto; }
             .screen { min-height: auto; padding: 10px; justify-content: flex-start; }
@@ -831,8 +503,8 @@
             .mobile-btn { width: 50px; height: 50px; font-size: 20px; }
             .game-controls { margin-top: 8px; gap: 8px; }
             .game-controls button { padding: 8px 16px; font-size: 10px; }
-            .records-content, .upgrades-content, .tasks-content, .skins-content { padding: 15px 20px; margin-top: 10px; max-height: 80vh; overflow-y: auto; }
-            .records-title, .upgrades-title, .tasks-title, .skins-title { font-size: 16px; margin-bottom: 15px; }
+            .records-content, .upgrades-content, .tasks-content, .skins-content, .settings-content { padding: 15px 20px; margin-top: 10px; max-height: 80vh; overflow-y: auto; }
+            .records-title, .upgrades-title, .tasks-title, .skins-title, .settings-title { font-size: 16px; margin-bottom: 15px; }
             .upgrade-panel { gap: 10px; }
             .upgrade-panel .upgrade-item { padding: 10px 15px; min-width: 90px; }
             .upgrade-panel .upgrade-item .value { font-size: 18px; }
@@ -862,26 +534,17 @@
 </head>
 <body>
 
-    <!-- Mesh-градиентный фон -->
     <div class="mesh-bg"></div>
     <div class="grid-overlay"></div>
     <canvas id="bgCanvas"></canvas>
     <div class="scanlines"></div>
 
-    <!-- Переключатель языка -->
-    <div class="lang-switcher">
-        <button class="lang-btn active" onclick="setLang('ru')">RU</button>
-        <button class="lang-btn" onclick="setLang('en')">EN</button>
-    </div>
-
-    <!-- Подсказка поворота -->
     <div class="rotate-hint" id="rotateHint">
         <div class="rotate-icon">📱</div>
         <div class="rotate-text" data-i18n="rotate">Поверни телефон горизонтально</div>
         <button class="rotate-close" onclick="closeRotateHint()" data-i18n="play_like_this">ИГРАТЬ ТАК</button>
     </div>
 
-    <!-- Модальное окно оффлайн-дохода -->
     <div class="offline-modal" id="offlineModal">
         <div class="offline-content glass">
             <div class="offline-title" data-i18n="connection_restored">📡 СВЯЗЬ ВОССТАНОВЛЕНА</div>
@@ -892,7 +555,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно достижений -->
     <div class="achievement-modal" id="achievementModal">
         <div class="achievement-content glass">
             <div class="achievement-icon" id="achievementIcon">🏆</div>
@@ -903,7 +565,6 @@
         </div>
     </div>
 
-    <!-- ГЛАВНОЕ МЕНЮ -->
     <div class="screen screen-menu active" id="screenMenu">
         <div class="menu-content glass">
             <h1 class="kinetic-title" id="kineticTitle">
@@ -915,16 +576,17 @@
 
             <div class="menu-stats">
                 <div class="stat-pill">🏆 <span data-i18n="best">Рекорд:</span> <strong id="menuBest">0</strong></div>
-                <div class="stat-pill">💰 <span data-i18n="credits">Кредиты:</span> <strong id="menuCoins">0</strong></div>
+                <div class="stat-pill"> <span data-i18n="credits">Кредиты:</span> <strong id="menuCoins">0</strong></div>
             </div>
 
             <div class="menu-buttons">
                 <button class="menu-btn primary" id="continueBtn" onclick="continueGame()" style="display:none;" data-i18n="continue">▶ ПРОДОЛЖИТЬ</button>
                 <button class="menu-btn" id="newGameBtn" onclick="startNewGame()" data-i18n="new_game">✨ НОВАЯ ИГРА</button>
                 <button class="menu-btn" onclick="showScreen('screenTasks')">🎯 <span data-i18n="tasks">ЗАДАНИЯ</span> <span id="taskBadge" style="color:#ffdd00;"></span></button>
-                <button class="menu-btn" onclick="showScreen('screenSkins')">👕 <span data-i18n="skins">СКИНЫ</span></button>
+                <button class="menu-btn" onclick="showScreen('screenSkins')"> <span data-i18n="skins">СКИНЫ</span></button>
                 <button class="menu-btn" onclick="showScreen('screenRecords')">🏆 <span data-i18n="records">РЕКОРДЫ</span></button>
                 <button class="menu-btn" onclick="showScreen('screenUpgrades')">⚙ <span data-i18n="upgrades">АПГРЕЙДЫ</span></button>
+                <button class="menu-btn" onclick="showScreen('screenSettings')">⚙️ <span data-i18n="settings">НАСТРОЙКИ</span></button>
             </div>
 
             <div class="menu-hint">
@@ -935,43 +597,37 @@
         </div>
     </div>
 
-    <!-- ИГРОВОЙ ЭКРАН -->
     <div class="screen screen-game" id="screenGame">
         <div class="game-topbar">
             <button class="back-btn" onclick="goHome()">←</button>
             <div class="game-stats">
-                <span>⚡ <span id="scoreDisplay">0</span></span>
+                <span> <span id="scoreDisplay">0</span></span>
                 <span class="coins">💰 <span id="coinsDisplay">0</span></span>
                 <span class="lives">❤️ <span id="livesDisplay">3</span></span>
                 <span>🏆 <span id="bestDisplay">0</span></span>
             </div>
-            <button class="pause-btn" onclick="togglePause()" id="pauseBtn">⏸</button>
+            <button class="pause-btn" onclick="togglePause()" id="pauseBtn"></button>
         </div>
-        
         <div class="combo-indicator" id="comboIndicator">x2</div>
-        
         <div class="canvas-wrapper">
             <canvas id="gameCanvas" width="750" height="400"></canvas>
         </div>
-        
         <div class="mobile-controls">
             <div class="mobile-right">
                 <button class="mobile-btn shield-btn-m" onpointerdown="useShield()">🛡️</button>
                 <button class="mobile-btn boost-btn" onpointerdown="boost()">⚡</button>
             </div>
         </div>
-        
         <div class="game-controls">
             <button onclick="restartGame()" class="btn-restart" data-i18n="restart">🔄 Заново</button>
             <button onclick="useShield()" id="shieldBtn">🛡️ <span data-i18n="shield">Щит</span> (0)</button>
         </div>
     </div>
 
-    <!-- ЭКРАН РЕКОРДОВ -->
     <div class="screen screen-records" id="screenRecords">
         <button class="back-btn top-left" onclick="goHome()">←</button>
         <div class="records-content glass">
-            <h2 class="records-title" data-i18n="top_records">🏆 ТОП-5 РЕКОРДОВ</h2>
+            <h2 class="records-title" data-i18n="top_records"> ТОП-5 РЕКОРДОВ</h2>
             <ol class="leaderboard-list" id="leaderboardList">
                 <li class="leaderboard-empty" data-i18n="no_records">Пока нет рекордов — сыграй!</li>
             </ol>
@@ -979,7 +635,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН АПГРЕЙДОВ -->
     <div class="screen screen-upgrades" id="screenUpgrades">
         <button class="back-btn top-left" onclick="goHome()">←</button>
         <div class="upgrades-content glass">
@@ -989,7 +644,7 @@
                 <div class="upgrade-item">
                     <span class="label" data-i18n="speed">СКОРОСТЬ</span>
                     <span class="value" id="speedLevel">1</span>
-                    <button onclick="buyUpgrade('speed')" id="btnSpeed">⬆ 50💰</button>
+                    <button onclick="buyUpgrade('speed')" id="btnSpeed">⬆ 50</button>
                 </div>
                 <div class="upgrade-item">
                     <span class="label" data-i18n="jump">ПРЫЖОК</span>
@@ -1005,7 +660,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАН ЗАДАНИЙ -->
     <div class="screen screen-tasks" id="screenTasks">
         <button class="back-btn top-left" onclick="goHome()">←</button>
         <div class="tasks-content glass">
@@ -1015,17 +669,138 @@
         </div>
     </div>
 
-    <!-- ЭКРАН СКИНОВ -->
     <div class="screen screen-skins" id="screenSkins">
         <button class="back-btn top-left" onclick="goHome()">←</button>
         <div class="skins-content glass">
             <h2 class="skins-title" data-i18n="character_skins">👕 СКИНЫ</h2>
-            <p class="upgrades-coins">💰 <span data-i18n="available">Доступно:</span> <strong id="skinsCoins">0</strong></p>
+            <p class="upgrades-coins"> <span data-i18n="available">Доступно:</span> <strong id="skinsCoins">0</strong></p>
             <div class="skins-grid" id="skinsGrid"></div>
         </div>
     </div>
 
+    <div class="screen screen-settings" id="screenSettings">
+        <button class="back-btn top-left" onclick="goHome()">←</button>
+        <div class="settings-content glass">
+            <h2 class="settings-title" data-i18n="settings">⚙️ НАСТРОЙКИ</h2>
+            
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="language">Язык</span>
+                <div class="lang-toggle">
+                    <button class="lang-btn active" onclick="setLang('ru')">RU</button>
+                    <button class="lang-btn" onclick="setLang('en')">EN</button>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="game_speed">Скорость игры</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" class="speed-slider" id="speedSetting" min="0.5" max="2" step="0.1" value="1">
+                    <span class="setting-value" id="speedValue">1.0x</span>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="music_volume">Громкость музыки</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" class="volume-slider" id="musicVolume" min="0" max="1" step="0.1" value="0.3">
+                    <span class="setting-value" id="musicValue">30%</span>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="sfx_volume">Громкость эффектов</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" class="volume-slider" id="sfxVolume" min="0" max="1" step="0.1" value="0.5">
+                    <span class="setting-value" id="sfxValue">50%</span>
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="voice">Голос</span>
+                <div class="toggle-switch active" id="voiceToggle" onclick="toggleVoice()"></div>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="vibration">Вибрация</span>
+                <div class="toggle-switch active" id="vibrationToggle" onclick="toggleVibration()"></div>
+            </div>
+
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="music">Музыка</span>
+                <div class="toggle-switch active" id="musicToggle" onclick="toggleMusic()"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // ============================================================
+        //  НАСТРОЙКИ
+        // ============================================================
+        const gameSettings = {
+            lang: localStorage.getItem('cyberRunnerLang') || 'ru',
+            speed: parseFloat(localStorage.getItem('cyberRunnerSpeed')) || 1.0,
+            musicVolume: parseFloat(localStorage.getItem('cyberRunnerMusicVolume')) || 0.3,
+            sfxVolume: parseFloat(localStorage.getItem('cyberRunnerSfxVolume')) || 0.5,
+            voice: localStorage.getItem('cyberRunnerVoice') !== 'false',
+            vibration: localStorage.getItem('cyberRunnerVibration') !== 'false',
+            music: localStorage.getItem('cyberRunnerMusic') !== 'false'
+        };
+
+        function saveSettings() {
+            localStorage.setItem('cyberRunnerLang', gameSettings.lang);
+            localStorage.setItem('cyberRunnerSpeed', gameSettings.speed);
+            localStorage.setItem('cyberRunnerMusicVolume', gameSettings.musicVolume);
+            localStorage.setItem('cyberRunnerSfxVolume', gameSettings.sfxVolume);
+            localStorage.setItem('cyberRunnerVoice', gameSettings.voice);
+            localStorage.setItem('cyberRunnerVibration', gameSettings.vibration);
+            localStorage.setItem('cyberRunnerMusic', gameSettings.music);
+        }
+
+        function applySettingsUI() {
+            document.getElementById('speedSetting').value = gameSettings.speed;
+            document.getElementById('speedValue').textContent = gameSettings.speed.toFixed(1) + 'x';
+            document.getElementById('musicVolume').value = gameSettings.musicVolume;
+            document.getElementById('musicValue').textContent = Math.round(gameSettings.musicVolume * 100) + '%';
+            document.getElementById('sfxVolume').value = gameSettings.sfxVolume;
+            document.getElementById('sfxValue').textContent = Math.round(gameSettings.sfxVolume * 100) + '%';
+            
+            document.getElementById('voiceToggle').classList.toggle('active', gameSettings.voice);
+            document.getElementById('vibrationToggle').classList.toggle('active', gameSettings.vibration);
+            document.getElementById('musicToggle').classList.toggle('active', gameSettings.music);
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.lang-btn[onclick="setLang('${gameSettings.lang}')"]`)?.classList.add('active');
+        }
+
+        document.getElementById('speedSetting').addEventListener('input', (e) => {
+            gameSettings.speed = parseFloat(e.target.value);
+            document.getElementById('speedValue').textContent = gameSettings.speed.toFixed(1) + 'x';
+            saveSettings();
+        });
+
+        document.getElementById('musicVolume').addEventListener('input', (e) => {
+            gameSettings.musicVolume = parseFloat(e.target.value);
+            document.getElementById('musicValue').textContent = Math.round(gameSettings.musicVolume * 100) + '%';
+            saveSettings();
+            if (musicPlaying) updateMusicVolume();
+        });
+
+        document.getElementById('sfxVolume').addEventListener('input', (e) => {
+            gameSettings.sfxVolume = parseFloat(e.target.value);
+            document.getElementById('sfxValue').textContent = Math.round(gameSettings.sfxVolume * 100) + '%';
+            saveSettings();
+        });
+
+        function toggleVoice() { gameSettings.voice = !gameSettings.voice; saveSettings(); applySettingsUI(); }
+        function toggleVibration() { gameSettings.vibration = !gameSettings.vibration; saveSettings(); applySettingsUI(); }
+        function toggleMusic() { 
+            gameSettings.music = !gameSettings.music; 
+            saveSettings(); 
+            applySettingsUI();
+            if (gameSettings.music && !musicPlaying) startMusic();
+            if (!gameSettings.music && musicPlaying) stopMusic();
+        }
+
         // ============================================================
         //  МУЛЬТИЯЗЫЧНОСТЬ
         // ============================================================
@@ -1040,14 +815,11 @@
                 skins: 'СКИНЫ',
                 records: 'РЕКОРДЫ',
                 upgrades: 'АПГРЕЙДЫ',
-                tap: 'ТАП',
-                jump: 'прыжок',
-                swipe_right: 'СВАЙП →',
-                boost: 'рывок',
-                swipe_left: 'СВАЙП ←',
-                shield: 'щит',
-                shields: 'ЩИТЫ',
-                speed: 'СКОРОСТЬ',
+                settings: 'НАСТРОЙКИ',
+                tap: 'ТАП', jump: 'прыжок',
+                swipe_right: 'СВАЙП →', boost: 'рывок',
+                swipe_left: 'СВАЙП ←', shield: 'щит',
+                shields: 'ЩИТЫ', speed: 'СКОРОСТЬ',
                 restart: '🔄 Заново',
                 top_records: '🏆 ТОП-5 РЕКОРДОВ',
                 no_records: 'Пока нет рекордов — сыграй!',
@@ -1064,31 +836,29 @@
                 minutes: 'мин.',
                 claim: 'ЗАБРАТЬ',
                 achievement_unlocked: 'ДОСТИЖЕНИЕ!',
-                awesome: 'КРУТО!'
+                awesome: 'КРУТО!',
+                language: 'Язык',
+                game_speed: 'Скорость игры',
+                music_volume: 'Громкость музыки',
+                sfx_volume: 'Громкость эффектов',
+                voice: 'Голос',
+                vibration: 'Вибрация',
+                music: 'Музыка'
             },
             en: {
                 subtitle: 'NEON RUNNER OF THE FUTURE',
-                best: 'Best:',
-                credits: 'Credits:',
-                continue: '▶ CONTINUE',
-                new_game: '✨ NEW GAME',
-                tasks: 'TASKS',
-                skins: 'SKINS',
-                records: 'RECORDS',
-                upgrades: 'UPGRADES',
-                tap: 'TAP',
-                jump: 'jump',
-                swipe_right: 'SWIPE →',
-                boost: 'boost',
-                swipe_left: 'SWIPE ←',
-                shield: 'shield',
-                shields: 'SHIELDS',
-                speed: 'SPEED',
+                best: 'Best:', credits: 'Credits:',
+                continue: '▶ CONTINUE', new_game: '✨ NEW GAME',
+                tasks: 'TASKS', skins: 'SKINS', records: 'RECORDS',
+                upgrades: 'UPGRADES', settings: 'SETTINGS',
+                tap: 'TAP', jump: 'jump',
+                swipe_right: 'SWIPE →', boost: 'boost',
+                swipe_left: 'SWIPE ←', shield: 'shield',
+                shields: 'SHIELDS', speed: 'SPEED',
                 restart: '🔄 Restart',
                 top_records: '🏆 TOP 5 RECORDS',
                 no_records: 'No records yet — play!',
-                clear: '🗑 Clear',
-                available: 'Available:',
+                clear: '🗑 Clear', available: 'Available:',
                 daily_tasks: '🎯 DAILY TASKS',
                 update_in: 'Update in:',
                 character_skins: '👕 SKINS',
@@ -1096,35 +866,40 @@
                 play_like_this: 'PLAY LIKE THIS',
                 connection_restored: '📡 CONNECTION RESTORED',
                 while_away: 'While you were away, the cyber implant collected data.',
-                time_away: 'Time away:',
-                minutes: 'min.',
+                time_away: 'Time away:', minutes: 'min.',
                 claim: 'CLAIM',
                 achievement_unlocked: 'ACHIEVEMENT!',
-                awesome: 'AWESOME!'
+                awesome: 'AWESOME!',
+                language: 'Language',
+                game_speed: 'Game Speed',
+                music_volume: 'Music Volume',
+                sfx_volume: 'SFX Volume',
+                voice: 'Voice',
+                vibration: 'Vibration',
+                music: 'Music'
             }
         };
 
-        let currentLang = localStorage.getItem('cyberRunnerLang') || 'ru';
+        let currentLang = gameSettings.lang;
 
         function setLang(lang) {
             currentLang = lang;
-            localStorage.setItem('cyberRunnerLang', lang);
+            gameSettings.lang = lang;
+            saveSettings();
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+            document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`)?.classList.add('active');
             applyTranslations();
         }
 
         function applyTranslations() {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[currentLang][key]) {
-                    el.textContent = translations[currentLang][key];
-                }
+                if (translations[currentLang][key]) el.textContent = translations[currentLang][key];
             });
         }
 
         // ============================================================
-        //  ЖИВЫЕ ЧАСТИЦЫ НА ФОНЕ МЕНЮ
+        //  ЖИВЫЕ ЧАСТИЦЫ НА ФОНЕ
         // ============================================================
         const bgCanvas = document.getElementById('bgCanvas');
         const bgCtx = bgCanvas.getContext('2d');
@@ -1139,9 +914,7 @@
         window.addEventListener('resize', resizeBgCanvas);
 
         class BgParticle {
-            constructor() {
-                this.reset();
-            }
+            constructor() { this.reset(); }
             reset() {
                 this.x = Math.random() * bgCanvas.width;
                 this.y = Math.random() * bgCanvas.height;
@@ -1153,23 +926,12 @@
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
             update() {
-                // Притяжение к мыши
-                const dx = mouseX - this.x;
-                const dy = mouseY - this.y;
+                const dx = mouseX - this.x, dy = mouseY - this.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 150) {
-                    this.vx += dx / dist * 0.05;
-                    this.vy += dy / dist * 0.05;
-                }
-                
-                this.x += this.vx;
-                this.y += this.vy;
-                this.vx *= 0.98;
-                this.vy *= 0.98;
-                
-                if (this.x < 0 || this.x > bgCanvas.width || this.y < 0 || this.y > bgCanvas.height) {
-                    this.reset();
-                }
+                if (dist < 150) { this.vx += dx / dist * 0.05; this.vy += dy / dist * 0.05; }
+                this.x += this.vx; this.y += this.vy;
+                this.vx *= 0.98; this.vy *= 0.98;
+                if (this.x < 0 || this.x > bgCanvas.width || this.y < 0 || this.y > bgCanvas.height) this.reset();
             }
             draw() {
                 bgCtx.globalAlpha = this.alpha;
@@ -1182,27 +944,14 @@
             }
         }
 
-        // Создаём 80 частиц
-        for (let i = 0; i < 80; i++) {
-            bgParticles.push(new BgParticle());
-        }
+        for (let i = 0; i < 80; i++) bgParticles.push(new BgParticle());
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
-
-        document.addEventListener('touchmove', (e) => {
-            mouseX = e.touches[0].clientX;
-            mouseY = e.touches[0].clientY;
-        });
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+        document.addEventListener('touchmove', (e) => { mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; });
 
         function animateBg() {
             bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-            bgParticles.forEach(p => {
-                p.update();
-                p.draw();
-            });
+            bgParticles.forEach(p => { p.update(); p.draw(); });
             bgCtx.globalAlpha = 1;
             bgCtx.shadowBlur = 0;
             requestAnimationFrame(animateBg);
@@ -1210,7 +959,97 @@
         animateBg();
 
         // ============================================================
-        //  ИГРОВАЯ ЛОГИКА (сохранена вся предыдущая)
+        //  ФОНОВАЯ МУЗЫКА (процедурная)
+        // ============================================================
+        let musicCtx = null;
+        let musicPlaying = false;
+        let musicNodes = [];
+
+        function initMusic() {
+            if (musicCtx) return;
+            try {
+                musicCtx = new (window.AudioContext || window.webkitAudioContext)();
+            } catch(e) {}
+        }
+
+        function startMusic() {
+            if (musicPlaying || !gameSettings.music) return;
+            initMusic();
+            if (!musicCtx) return;
+            if (musicCtx.state === 'suspended') musicCtx.resume();
+            
+            musicPlaying = true;
+            
+            // Бас-линия
+            const bassOsc = musicCtx.createOscillator();
+            const bassGain = musicCtx.createGain();
+            bassOsc.type = 'sine';
+            bassOsc.frequency.value = 60;
+            bassGain.gain.value = gameSettings.musicVolume * 0.3;
+            bassOsc.connect(bassGain);
+            bassGain.connect(musicCtx.destination);
+            bassOsc.start();
+            musicNodes.push({ osc: bassOsc, gain: bassGain });
+
+            // Пэд (атмосфера)
+            const padOsc = musicCtx.createOscillator();
+            const padGain = musicCtx.createGain();
+            padOsc.type = 'sine';
+            padOsc.frequency.value = 220;
+            padGain.gain.value = gameSettings.musicVolume * 0.1;
+            padOsc.connect(padGain);
+            padGain.connect(musicCtx.destination);
+            padOsc.start();
+            musicNodes.push({ osc: padOsc, gain: padGain });
+
+            // Арпеджио
+            const arpOsc = musicCtx.createOscillator();
+            const arpGain = musicCtx.createGain();
+            arpOsc.type = 'square';
+            arpOsc.frequency.value = 440;
+            arpGain.gain.value = gameSettings.musicVolume * 0.05;
+            arpOsc.connect(arpGain);
+            arpGain.connect(musicCtx.destination);
+            arpOsc.start();
+            musicNodes.push({ osc: arpOsc, gain: arpGain });
+
+            // Модуляция арпеджио
+            setInterval(() => {
+                if (!musicPlaying) return;
+                const notes = [220, 330, 440, 550, 660, 440, 330, 220];
+                const note = notes[Math.floor(Math.random() * notes.length)];
+                arpOsc.frequency.setValueAtTime(note, musicCtx.currentTime);
+            }, 500);
+
+            // Модуляция баса
+            setInterval(() => {
+                if (!musicPlaying) return;
+                const bassNotes = [55, 65, 73, 82];
+                const note = bassNotes[Math.floor(Math.random() * bassNotes.length)];
+                bassOsc.frequency.setValueAtTime(note, musicCtx.currentTime);
+            }, 2000);
+        }
+
+        function stopMusic() {
+            musicPlaying = false;
+            musicNodes.forEach(n => {
+                try { n.osc.stop(); } catch(e) {}
+            });
+            musicNodes = [];
+        }
+
+        function updateMusicVolume() {
+            musicNodes.forEach(n => {
+                if (n.gain) n.gain.value = gameSettings.musicVolume * 0.3;
+            });
+        }
+
+        // Запуск музыки при первом взаимодействии
+        document.addEventListener('click', () => { if (gameSettings.music && !musicPlaying) startMusic(); }, { once: true });
+        document.addEventListener('touchstart', () => { if (gameSettings.music && !musicPlaying) startMusic(); }, { once: true });
+
+        // ============================================================
+        //  ИГРОВАЯ ЛОГИКА
         // ============================================================
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -1226,7 +1065,7 @@
         let best = parseInt(localStorage.getItem('cyberRunnerBest')) || 0;
         let leaderboard = JSON.parse(localStorage.getItem('cyberRunnerLeaderboard')) || [];
         let frameCount = 0;
-        let speed = 5;
+        let speed = 7; // УВЕЛИЧЕНА базовая скорость
         let gravity = 0.7;
         let jumpPower = -14;
 
@@ -1239,42 +1078,39 @@
         let magnetTimer = 0;
         let doubleCoinTimer = 0;
 
-        // КОМБО-СИСТЕМА
         let comboCount = 0;
         let comboTimer = 0;
         let comboMultiplier = 1;
         const COMBO_THRESHOLDS = [5, 10, 20, 50];
         const COMBO_MULTIPLIERS = [1, 2, 3, 5];
 
-        // SLOW-MOTION
         let slowMotionTimer = 0;
         let timeScale = 1;
 
         let currentBiome = 0;
         const BIOMES = [
-            { name: 'night',  top: '#05050f', mid: '#0a0a1a', bot: '#0a0a0f', ground: '#1a1a3a', accent: '#00ffff', building: '#0d0d20' },
-            { name: 'lab',    top: '#0a0010', mid: '#1a0a2e', bot: '#0a0515', ground: '#3a1a5a', accent: '#ff00ff', building: '#150520' },
-            { name: 'space',  top: '#000010', mid: '#050520', bot: '#000008', ground: '#2a2a5a', accent: '#00ffaa', building: '#051015' },
-            { name: 'acid',   top: '#0a1000', mid: '#1a2a0a', bot: '#051000', ground: '#3a5a1a', accent: '#aaff00', building: '#101a05' }
+            { name: 'night', top: '#05050f', mid: '#0a0a1a', bot: '#0a0a0f', ground: '#1a1a3a', accent: '#00ffff', building: '#0d0d20' },
+            { name: 'lab', top: '#0a0010', mid: '#1a0a2e', bot: '#0a0515', ground: '#3a1a5a', accent: '#ff00ff', building: '#150520' },
+            { name: 'space', top: '#000010', mid: '#050520', bot: '#000008', ground: '#2a2a5a', accent: '#00ffaa', building: '#051015' },
+            { name: 'acid', top: '#0a1000', mid: '#1a2a0a', bot: '#051000', ground: '#3a5a1a', accent: '#aaff00', building: '#101a05' }
         ];
 
         let activeSkin = localStorage.getItem('cyberRunnerSkin') || 'default';
         let ownedSkins = JSON.parse(localStorage.getItem('cyberRunnerOwnedSkins')) || ['default'];
 
         const SKINS = {
-            'default':  { name: 'Классика', colors: ['#00ddff', '#0066ff', '#0088cc'], price: 0 },
-            'magenta':  { name: 'Магента',  colors: ['#ff44ff', '#aa00aa', '#cc0088'], price: 100 },
-            'lime':     { name: 'Лайм',     colors: ['#66ff44', '#22aa00', '#44cc00'], price: 150 },
-            'gold':     { name: 'Золото',   colors: ['#ffdd00', '#aa8800', '#cc9900'], price: 250 },
-            'ghost':    { name: 'Призрак',  colors: ['#ffffff', '#888888', '#aaaaaa'], price: 500 }
+            'default': { name: 'Классика', colors: ['#00ddff', '#0066ff', '#0088cc'], price: 0 },
+            'magenta': { name: 'Магента', colors: ['#ff44ff', '#aa00aa', '#cc0088'], price: 100 },
+            'lime': { name: 'Лайм', colors: ['#66ff44', '#22aa00', '#44cc00'], price: 150 },
+            'gold': { name: 'Золото', colors: ['#ffdd00', '#aa8800', '#cc9900'], price: 250 },
+            'ghost': { name: 'Призрак', colors: ['#ffffff', '#888888', '#aaaaaa'], price: 500 }
         };
 
-        // ДОСТИЖЕНИЯ
         const ACHIEVEMENTS = {
-            first_km: { id: 'first_km', icon: '🏃', name: { ru: 'Первый километр', en: 'First Kilometer' }, desc: { ru: 'Набери 1000 очков', en: 'Score 1000 points' }, reward: 100, unlocked: false },
-            collector: { id: 'collector', icon: '💰', name: { ru: 'Коллекционер', en: 'Collector' }, desc: { ru: 'Собери 100 монет за забег', en: 'Collect 100 coins in one run' }, reward: 150, unlocked: false },
-            untouchable: { id: 'untouchable', icon: '🛡️', name: { ru: 'Неприкасаемый', en: 'Untouchable' }, desc: { ru: 'Пройди 300 очков без урона', en: 'Pass 300 points without damage' }, reward: 200, unlocked: false },
-            combo_master: { id: 'combo_master', icon: '⚡', name: { ru: 'Мастер комбо', en: 'Combo Master' }, desc: { ru: 'Достигни комбо x5', en: 'Reach x5 combo' }, reward: 250, unlocked: false }
+            first_km: { id: 'first_km', icon: '🏃', name: { ru: 'Первый километр', en: 'First Kilometer' }, desc: { ru: 'Набери 1000 очков', en: 'Score 1000 points' }, reward: 100 },
+            collector: { id: 'collector', icon: '💰', name: { ru: 'Коллекционер', en: 'Collector' }, desc: { ru: 'Собери 100 монет за забег', en: 'Collect 100 coins in one run' }, reward: 150 },
+            untouchable: { id: 'untouchable', icon: '🛡️', name: { ru: 'Неприкасаемый', en: 'Untouchable' }, desc: { ru: 'Пройди 300 очков без урона', en: 'Pass 300 points without damage' }, reward: 200 },
+            combo_master: { id: 'combo_master', icon: '⚡', name: { ru: 'Мастер комбо', en: 'Combo Master' }, desc: { ru: 'Достигни комбо x5', en: 'Reach x5 combo' }, reward: 250 }
         };
         let unlockedAchievements = JSON.parse(localStorage.getItem('cyberRunnerAchievements')) || [];
 
@@ -1295,26 +1131,25 @@
 
         let audioCtx = null;
         
+        // ГОЛОС БЕЗ МАТА
         const SHIELD_PHRASES = {
             ru: ["Чётко, братан, щит на чеку!", "Фартануло, щит активирован!", "Держи оборону, пацан!"],
             en: ["Nice, bro, shield is up!", "Lucky, shield activated!", "Hold the line, dude!"]
         };
         const BONUS_PHRASES = {
-            ru: ["О, халява, братуха!", "Бонус в карман, красавчик!", "Фарт прёт, ёпта!"],
+            ru: ["О, халява, братуха!", "Бонус в карман, красавчик!", "Фарт прёт, красава!"],
             en: ["Oh, free stuff, bro!", "Bonus in pocket, handsome!", "Luck is flowing!"]
         };
         const GAMEOVER_PHRASES = {
-            ru: ["Всё, приехали, брат...", "Кирдык системе, ё-моё!", "Откинулся, пацан..."],
+            ru: ["Всё, приехали, брат...", "Кирдык системе, блин!", "Откинулся, пацан..."],
             en: ["That's it, bro...", "System down, oh man!", "You're done, dude..."]
         };
         const JUMP_PHRASES = {
-            ru: ["Вжух!", "Полетели!", "Ё-моё!"],
+            ru: ["Вжух!", "Полетели!", "Опа!"],
             en: ["Whoosh!", "Let's go!", "Wow!"]
         };
 
-        function randomFrom(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
-        }
+        function randomFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
         function initAudio() {
             if (!audioCtx) {
@@ -1331,7 +1166,7 @@
                 const gain = audioCtx.createGain();
                 osc.type = type;
                 osc.frequency.value = freq;
-                gain.gain.value = volume;
+                gain.gain.value = volume * gameSettings.sfxVolume;
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -1341,7 +1176,9 @@
         }
 
         function haptic(ms) {
-            if (navigator.vibrate) { try { navigator.vibrate(ms); } catch(e) {} }
+            if (gameSettings.vibration && navigator.vibrate) {
+                try { navigator.vibrate(ms); } catch(e) {}
+            }
         }
 
         let voiceReady = false;
@@ -1360,6 +1197,7 @@
         }
 
         function speak(text) {
+            if (!gameSettings.voice) return;
             try {
                 if (!('speechSynthesis' in window)) return;
                 if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
@@ -1381,12 +1219,10 @@
         }
 
         function soundCoin() { 
-            const freq = 1200 + comboCount * 50; // Питч растёт с комбо
+            const freq = 1200 + comboCount * 50;
             playBeep(freq, 0.08, 'sine', 0.12); 
             setTimeout(()=>playBeep(freq + 400,0.08,'sine',0.1),60); 
             haptic(15);
-            
-            // Обновляем комбо
             comboCount++;
             comboTimer = 120;
             updateCombo();
@@ -1396,7 +1232,6 @@
             playBeep(150, 0.3, 'sawtooth', 0.2); 
             setTimeout(()=>playBeep(100,0.3,'sawtooth',0.15),100); 
             haptic(30);
-            // Сброс комбо
             comboCount = 0;
             comboMultiplier = 1;
             updateCombo();
@@ -1432,63 +1267,42 @@
 
         function updateCombo() {
             const indicator = document.getElementById('comboIndicator');
-            if (comboCount >= COMBO_THRESHOLDS[3]) {
-                comboMultiplier = COMBO_MULTIPLIERS[3];
-            } else if (comboCount >= COMBO_THRESHOLDS[2]) {
-                comboMultiplier = COMBO_MULTIPLIERS[2];
-            } else if (comboCount >= COMBO_THRESHOLDS[1]) {
-                comboMultiplier = COMBO_MULTIPLIERS[1];
-            } else {
-                comboMultiplier = 1;
-            }
+            if (comboCount >= COMBO_THRESHOLDS[3]) comboMultiplier = COMBO_MULTIPLIERS[3];
+            else if (comboCount >= COMBO_THRESHOLDS[2]) comboMultiplier = COMBO_MULTIPLIERS[2];
+            else if (comboCount >= COMBO_THRESHOLDS[1]) comboMultiplier = COMBO_MULTIPLIERS[1];
+            else comboMultiplier = 1;
             
             if (comboMultiplier > 1) {
                 indicator.textContent = `x${comboMultiplier}`;
                 indicator.classList.add('show');
                 setTimeout(() => indicator.classList.remove('show'), 1500);
                 soundCombo();
-                
-                // Проверка достижения combo_master
-                if (comboMultiplier >= 5 && !unlockedAchievements.includes('combo_master')) {
-                    unlockAchievement('combo_master');
-                }
+                if (comboMultiplier >= 5 && !unlockedAchievements.includes('combo_master')) unlockAchievement('combo_master');
             }
         }
 
-        // ============================================================
-        //  ДОСТИЖЕНИЯ
-        // ============================================================
         function unlockAchievement(id) {
             if (unlockedAchievements.includes(id)) return;
             unlockedAchievements.push(id);
             localStorage.setItem('cyberRunnerAchievements', JSON.stringify(unlockedAchievements));
-            
             const ach = ACHIEVEMENTS[id];
             coins += ach.reward;
             saveProgress();
             updateUI();
-            
-            // Показываем модалку
             document.getElementById('achievementIcon').textContent = ach.icon;
             document.getElementById('achievementDesc').textContent = ach.name[currentLang] + ' — ' + ach.desc[currentLang];
-            document.getElementById('achievementReward').textContent = `+${ach.reward} 💰`;
+            document.getElementById('achievementReward').textContent = `+${ach.reward} `;
             document.getElementById('achievementModal').classList.add('active');
-            
             speak(ach.name[currentLang]);
         }
 
-        function closeAchievement() {
-            document.getElementById('achievementModal').classList.remove('active');
-        }
+        function closeAchievement() { document.getElementById('achievementModal').classList.remove('active'); }
 
         function checkAchievements() {
             if (score >= 1000 && !unlockedAchievements.includes('first_km')) unlockAchievement('first_km');
             if (noHitStreak >= 300 && !unlockedAchievements.includes('untouchable')) unlockAchievement('untouchable');
         }
 
-        // ============================================================
-        //  SLOW-MOTION
-        // ============================================================
         function triggerSlowMotion(duration = 60) {
             slowMotionTimer = duration;
             timeScale = 0.3;
@@ -1496,20 +1310,14 @@
             setTimeout(() => canvas.classList.remove('slow-motion'), 500);
         }
 
-        // ============================================================
-        //  СПАВН
-        // ============================================================
         function spawnObstacle() {
             const types = ['box', 'spike', 'crate'];
             const type = types[Math.floor(Math.random() * types.length)];
             const height = type === 'spike' ? 25 + Math.random() * 20 : 30 + Math.random() * 25;
             const width = type === 'spike' ? 20 : 25 + Math.random() * 15;
             const isDouble = score > 300 && Math.random() < 0.2;
-            
             obstacles.push({ x: W + 50, y: GROUND_Y - height, w: width, h: height, type: type, color: BIOMES[currentBiome].accent });
-            if (isDouble) {
-                obstacles.push({ x: W + 50 + width + 15, y: GROUND_Y - (height * 0.7), w: width * 0.8, h: height * 0.7, type: 'box', color: BIOMES[currentBiome].accent });
-            }
+            if (isDouble) obstacles.push({ x: W + 50 + width + 15, y: GROUND_Y - (height * 0.7), w: width * 0.8, h: height * 0.7, type: 'box', color: BIOMES[currentBiome].accent });
         }
         
         function spawnCoin() {
@@ -1517,9 +1325,7 @@
             if (pattern < 0.6) {
                 coinsList.push({ x: W + 50 + Math.random() * 100, y: GROUND_Y - 30 - Math.random() * 80, r: 10, collected: false });
             } else {
-                for(let i=0; i<3; i++) {
-                    coinsList.push({ x: W + 50 + i * 35, y: GROUND_Y - 40 - Math.sin(i/2 * Math.PI) * 60, r: 10, collected: false });
-                }
+                for(let i=0; i<3; i++) coinsList.push({ x: W + 50 + i * 35, y: GROUND_Y - 40 - Math.sin(i/2 * Math.PI) * 60, r: 10, collected: false });
             }
         }
         
@@ -1529,42 +1335,25 @@
             powerups.push({ x: W + 50 + Math.random() * 100, y: GROUND_Y - 60 - Math.random() * 60, r: 14, kind: kind, collected: false });
         }
 
-        // ============================================================
-        //  UPDATE
-        // ============================================================
         function update() {
             if (!gameRunning || gamePaused) return;
-            
-            // Применяем slow-motion
-            if (slowMotionTimer > 0) {
-                slowMotionTimer--;
-                if (slowMotionTimer <= 0) timeScale = 1;
-            }
-            
-            // Обновляем комбо-таймер
-            if (comboTimer > 0) {
-                comboTimer -= timeScale;
-                if (comboTimer <= 0) {
-                    comboCount = 0;
-                    comboMultiplier = 1;
-                    updateCombo();
-                }
-            }
-            
+            if (slowMotionTimer > 0) { slowMotionTimer--; if (slowMotionTimer <= 0) timeScale = 1; }
+            if (comboTimer > 0) { comboTimer -= timeScale; if (comboTimer <= 0) { comboCount = 0; comboMultiplier = 1; updateCombo(); } }
             frameCount++;
 
             const newBiome = Math.floor(score / 300) % BIOMES.length;
             if (newBiome !== currentBiome) {
                 currentBiome = newBiome;
-                for (let i = 0; i < 40; i++) {
-                    particles.push({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8, life: 50, color: BIOMES[currentBiome].accent, size: 2 + Math.random() * 3 });
-                }
+                for (let i = 0; i < 40; i++) particles.push({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8, life: 50, color: BIOMES[currentBiome].accent, size: 2 + Math.random() * 3 });
             }
 
-            const baseSpeed = 5 + (upgrades.speed - 1) * 1.2;
-            const scoreBonus = Math.floor(score / 100) * 0.3;
-            if (boostCooldown > 45) { speed = Math.min(22, baseSpeed + scoreBonus + 5); } 
-            else { speed = Math.min(16, baseSpeed + scoreBonus); }
+            const baseSpeed = 7 + (upgrades.speed - 1) * 1.5; // УВЕЛИЧЕНА скорость
+            const scoreBonus = Math.floor(score / 100) * 0.4;
+            if (boostCooldown > 45) { speed = Math.min(25, baseSpeed + scoreBonus + 6); } 
+            else { speed = Math.min(18, baseSpeed + scoreBonus); }
+
+            // Применяем настройку скорости
+            speed *= gameSettings.speed;
 
             player.vy += gravity * timeScale;
             player.y += player.vy * timeScale;
@@ -1577,16 +1366,13 @@
             }
 
             legTimer++;
-            if (legTimer > (speed > 10 ? 3 : 5)) { legTimer = 0; legFrame = (legFrame + 1) % 2; }
+            if (legTimer > (speed > 12 ? 3 : 5)) { legTimer = 0; legFrame = (legFrame + 1) % 2; }
 
             if (frameCount % 2 === 0) {
                 trail.push({ x: player.x + player.w / 2, y: player.y + player.h / 2, life: 15, maxLife: 15 });
                 if (trail.length > 25) trail.shift();
             }
-            for (let i = trail.length - 1; i >= 0; i--) {
-                trail[i].life--;
-                if (trail[i].life <= 0) trail.splice(i, 1);
-            }
+            for (let i = trail.length - 1; i >= 0; i--) { trail[i].life--; if (trail[i].life <= 0) trail.splice(i, 1); }
 
             if (shieldActive) { shieldTimer -= timeScale; if (shieldTimer <= 0) shieldActive = false; }
             if (shieldCooldown > 0) shieldCooldown -= timeScale;
@@ -1621,10 +1407,7 @@
                     updateUI(); saveGameState(); resetNoHitStreak();
                     for (let j = 0; j < 25; j++) particles.push({ x: player.x + player.w / 2, y: player.y + player.h / 2, vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 0.5) * 15 - 5, life: 35, color: '#ff0055', size: 3 });
                     obstacles.splice(i, 1);
-                    
-                    // Slow-motion при последнем ударе
                     if (lives === 1) triggerSlowMotion(90);
-                    
                     if (lives <= 0) {
                         gameRunning = false; soundGameOver();
                         if (score > best) { best = score; localStorage.setItem('cyberRunnerBest', best); }
@@ -1634,7 +1417,7 @@
                 }
                 if (obs.x + obs.w < -20) {
                     obstacles.splice(i, 1); 
-                    score += 5 * comboMultiplier; // Бонус за комбо!
+                    score += 5 * comboMultiplier;
                     updateUI(); saveGameState(); trackTask('score_total', 0); updateNoHitStreak(5);
                     checkAchievements();
                 }
@@ -1650,14 +1433,11 @@
                 if (!coin.collected && coin.x + coin.r > player.x && coin.x - coin.r < player.x + player.w && coin.y + coin.r > player.y && coin.y - coin.r < player.y + player.h) {
                     coin.collected = true; 
                     const baseAdd = (doubleCoinTimer > 0 ? 20 : 10);
-                    const add = baseAdd * comboMultiplier; // Комбо-множитель!
+                    const add = baseAdd * comboMultiplier;
                     coins += add; 
                     soundCoin(); 
                     updateUI(); saveProgress(); saveGameState(); trackTask('coins', 1);
-                    
-                    // Проверка достижения collector
                     if (coins >= 100 && !unlockedAchievements.includes('collector')) unlockAchievement('collector');
-                    
                     for (let j = 0; j < 12; j++) particles.push({ x: coin.x, y: coin.y, vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8 - 3, life: 25, color: '#ffdd00', size: 2 });
                 }
                 if (coin.x + coin.r < -20 || coin.collected) coinsList.splice(i, 1);
@@ -1684,8 +1464,113 @@
         }
 
         // ============================================================
-        //  DRAW
+        //  ОТРИСОВКА РЕАЛИСТИЧНОГО БЕГУНА
         // ============================================================
+        function drawRealisticRunner(dx, dy, skin, frame) {
+            const skinMain = skin.colors[0];
+            const skinDark = skin.colors[1];
+            const skinLeg = skin.colors[2];
+            
+            // Тень
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.beginPath();
+            ctx.ellipse(dx + 15, GROUND_Y + 3, 18, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Наклон тела вперёд (бег)
+            ctx.save();
+            ctx.translate(dx + 15, dy + 25);
+            ctx.rotate(-0.15); // Наклон вперёд
+            ctx.translate(-(dx + 15), -(dy + 25));
+
+            // Задняя нога
+            ctx.fillStyle = skinDark;
+            ctx.shadowColor = skinDark;
+            ctx.shadowBlur = 8;
+            const backLegAngle = frame === 0 ? 0.4 : -0.3;
+            ctx.save();
+            ctx.translate(dx + 12, dy + 35);
+            ctx.rotate(backLegAngle);
+            ctx.fillRect(-4, 0, 8, 18);
+            ctx.fillRect(-5, 16, 10, 4); // Стопа
+            ctx.restore();
+
+            // Задняя рука
+            ctx.fillStyle = skinDark;
+            const backArmAngle = frame === 0 ? -0.5 : 0.4;
+            ctx.save();
+            ctx.translate(dx + 12, dy + 18);
+            ctx.rotate(backArmAngle);
+            ctx.fillRect(-3, 0, 6, 14);
+            ctx.restore();
+
+            // Торс (наклонённый)
+            ctx.fillStyle = skinMain;
+            ctx.shadowColor = skinMain;
+            ctx.shadowBlur = 15;
+            ctx.beginPath();
+            ctx.ellipse(dx + 15, dy + 25, 10, 14, -0.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Передняя нога
+            ctx.fillStyle = skinLeg;
+            ctx.shadowColor = skinLeg;
+            ctx.shadowBlur = 10;
+            const frontLegAngle = frame === 0 ? -0.3 : 0.4;
+            ctx.save();
+            ctx.translate(dx + 18, dy + 35);
+            ctx.rotate(frontLegAngle);
+            ctx.fillRect(-4, 0, 8, 18);
+            ctx.fillRect(-5, 16, 10, 4); // Стопа
+            ctx.restore();
+
+            // Передняя рука
+            ctx.fillStyle = skinMain;
+            const frontArmAngle = frame === 0 ? 0.4 : -0.5;
+            ctx.save();
+            ctx.translate(dx + 18, dy + 18);
+            ctx.rotate(frontArmAngle);
+            ctx.fillRect(-3, 0, 6, 14);
+            ctx.restore();
+
+            // Голова
+            ctx.fillStyle = skinMain;
+            ctx.shadowColor = skinMain;
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.arc(dx + 18, dy + 8, 9, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Визор/глаза (светящиеся)
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = '#ffffff';
+            ctx.shadowBlur = 15;
+            ctx.beginPath();
+            ctx.ellipse(dx + 22, dy + 7, 4, 2.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Зрачок
+            ctx.fillStyle = '#0a0a0f';
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            ctx.arc(dx + 23, dy + 7, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Шарф/шлейф (развевается)
+            ctx.strokeStyle = skinMain;
+            ctx.lineWidth = 3;
+            ctx.shadowColor = skinMain;
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(dx + 8, dy + 20);
+            const scarfWave = Math.sin(frameCount * 0.3) * 5;
+            ctx.quadraticCurveTo(dx - 10 - speed * 2, dy + 15 + scarfWave, dx - 15 - speed * 3, dy + 25 + scarfWave);
+            ctx.stroke();
+
+            ctx.restore();
+            ctx.shadowBlur = 0;
+        }
+
         function draw() {
             ctx.clearRect(0, 0, W, H);
             let shakeX = 0, shakeY = 0;
@@ -1752,24 +1637,14 @@
 
             const dx = player.x, dy = player.y;
             const skin = SKINS[activeSkin] || SKINS['default'];
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'; ctx.beginPath(); ctx.ellipse(dx + player.w / 2, GROUND_Y + 2, 15, 4, 0, 0, Math.PI * 2); ctx.fill();
 
             if (shieldActive) {
                 ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 30; ctx.strokeStyle = `rgba(0, 255, 255, 0.5)`; ctx.lineWidth = 3;
                 ctx.beginPath(); ctx.arc(dx + player.w / 2, dy + player.h / 2, 32, 0, Math.PI * 2); ctx.stroke(); ctx.shadowBlur = 0;
             }
 
-            ctx.shadowColor = skin.colors[0]; ctx.shadowBlur = 20;
-            const bodyGrad = ctx.createLinearGradient(dx, dy, dx + player.w, dy + player.h);
-            bodyGrad.addColorStop(0, skin.colors[0]); bodyGrad.addColorStop(1, skin.colors[1]); ctx.fillStyle = bodyGrad;
-            ctx.fillRect(dx + 5, dy + 12, player.w - 10, player.h - 22);
-
-            ctx.fillStyle = skin.colors[0]; ctx.beginPath(); ctx.arc(dx + player.w - 8, dy + 12, 11, 0, Math.PI * 2); ctx.fill();
-            ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 15; ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.ellipse(dx + player.w - 2, dy + 9, 5, 3, 0, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
-
-            ctx.fillStyle = skin.colors[2]; ctx.shadowBlur = 10;
-            const legOff = player.jumping ? 0 : (legFrame === 0 ? 6 : -6);
-            ctx.fillRect(dx + 8, dy + player.h - 8, 7, 8 + legOff); ctx.fillRect(dx + player.w - 15, dy + player.h - 8, 7, 8 - legOff); ctx.shadowBlur = 0;
+            // Рисуем реалистичного бегуна
+            drawRealisticRunner(dx, dy, skin, legFrame);
 
             for (const p of particles) {
                 const alpha = p.life / 35; ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
@@ -1795,7 +1670,7 @@
         }
 
         // ============================================================
-        //  НАВИГАЦИЯ И СОХРАНЕНИЕ (сокращено для экономии места)
+        //  НАВИГАЦИЯ И СОХРАНЕНИЕ
         // ============================================================
         function showScreen(id) {
             const current = document.querySelector('.screen.active');
@@ -1808,6 +1683,7 @@
                     if (id === 'screenTasks') renderTasks();
                     if (id === 'screenSkins') renderSkins();
                     if (id === 'screenUpgrades') updateUpgradeUI();
+                    if (id === 'screenSettings') applySettingsUI();
                 }, 100);
             } else { next.classList.add('active'); }
         }
@@ -1925,7 +1801,7 @@
             document.getElementById('btnSpeed').disabled = upgrades.speed >= maxLevels.speed || coins < costs.speed;
             document.getElementById('btnJump').disabled = upgrades.jump >= maxLevels.jump || coins < costs.jump;
             document.getElementById('btnShield').disabled = upgrades.shield >= maxLevels.shield || coins < costs.shield;
-            document.getElementById('btnSpeed').textContent = upgrades.speed >= maxLevels.speed ? 'MAX' : `⬆ ${costs.speed}💰`;
+            document.getElementById('btnSpeed').textContent = upgrades.speed >= maxLevels.speed ? 'MAX' : ` ${costs.speed}💰`;
             document.getElementById('btnJump').textContent = upgrades.jump >= maxLevels.jump ? 'MAX' : `⬆ ${costs.jump}💰`;
             document.getElementById('btnShield').textContent = upgrades.shield >= maxLevels.shield ? 'MAX' : `⬆ ${costs.shield}💰`;
         }
@@ -1940,10 +1816,7 @@
 
         function renderLeaderboard() {
             const list = document.getElementById('leaderboardList'); if (!list) return;
-            if (leaderboard.length === 0) { 
-                list.innerHTML = `<li class="leaderboard-empty">${translations[currentLang].no_records}</li>`; 
-                return; 
-            }
+            if (leaderboard.length === 0) { list.innerHTML = `<li class="leaderboard-empty">${translations[currentLang].no_records}</li>`; return; }
             list.innerHTML = leaderboard.map((entry, i) => `<li><span class="rank">#${i + 1}</span><span class="score-val">${entry.score}</span><span class="date-val">${entry.date}</span></li>`).join('');
         }
 
@@ -1963,7 +1836,7 @@
         function boost() {
             initAudio();
             if (!gameRunning || gamePaused) return; if (boostCooldown > 0) return;
-            speed = Math.min(22, speed + 5); boostCooldown = 90;
+            speed = Math.min(25, speed + 6); boostCooldown = 90;
             playBeep(800, 0.1, 'sawtooth', 0.1); setTimeout(() => playBeep(1000, 0.1, 'sawtooth', 0.1), 50); haptic(20);
             for (let i = 0; i < 20; i++) particles.push({ x: player.x, y: player.y + player.h / 2 + (Math.random() - 0.5) * 30, vx: -Math.random() * 10, vy: (Math.random() - 0.5) * 4, life: 25, color: '#ff00ff', size: 3 });
         }
@@ -2083,7 +1956,7 @@
             const skin = SKINS[id]; if (!skin) return;
             if (ownedSkins.includes(id)) { activeSkin = id; saveProgress(); renderSkins(); playBeep(1000, 0.1, 'sine', 0.12); return; }
             if (coins < skin.price) { playBeep(200, 0.2, 'sawtooth', 0.1); alert(currentLang === 'ru' ? 'Недостаточно кредитов!' : 'Not enough credits!'); return; }
-            if (!confirm(`${currentLang === 'ru' ? 'Приобрести' : 'Buy'} "${skin.name}" ${currentLang === 'ru' ? 'за' : 'for'} ${skin.price} 💰?`)) return;
+            if (!confirm(`${currentLang === 'ru' ? 'Приобрести' : 'Buy'} "${skin.name}" ${currentLang === 'ru' ? 'за' : 'for'} ${skin.price} ?`)) return;
             coins -= skin.price; ownedSkins.push(id); activeSkin = id; saveProgress(); soundCoin(); updateUI(); renderSkins();
         }
 
@@ -2098,42 +1971,31 @@
         let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
 
         document.addEventListener('touchstart', function(e) {
-            if (e.target.closest('button') || e.target.closest('.menu-btn') || e.target.closest('.skin-card') || e.target.closest('.task-item') || e.target.closest('.upgrade-item') || e.target.closest('.leaderboard-list') || e.target.closest('.offline-modal') || e.target.closest('.rotate-hint') || e.target.closest('.achievement-modal') || e.target.closest('.lang-switcher')) {
-                return;
-            }
+            if (e.target.closest('button') || e.target.closest('.menu-btn') || e.target.closest('.skin-card') || e.target.closest('.task-item') || e.target.closest('.upgrade-item') || e.target.closest('.leaderboard-list') || e.target.closest('.offline-modal') || e.target.closest('.rotate-hint') || e.target.closest('.achievement-modal') || e.target.closest('.lang-btn') || e.target.closest('.setting-row')) return;
             initAudio();
             const gameScreen = document.getElementById('screenGame');
             if (!gameScreen.classList.contains('active')) return;
             if (!gameRunning) { restartGame(); return; }
             if (gamePaused) return;
             const touch = e.changedTouches[0];
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
-            touchStartTime = Date.now();
+            touchStartX = touch.clientX; touchStartY = touch.clientY; touchStartTime = Date.now();
         }, { passive: true });
 
         document.addEventListener('touchend', function(e) {
-            if (e.target.closest('button') || e.target.closest('.menu-btn') || e.target.closest('.skin-card') || e.target.closest('.task-item') || e.target.closest('.upgrade-item') || e.target.closest('.leaderboard-list') || e.target.closest('.offline-modal') || e.target.closest('.rotate-hint') || e.target.closest('.achievement-modal') || e.target.closest('.lang-switcher')) return;
+            if (e.target.closest('button') || e.target.closest('.menu-btn') || e.target.closest('.skin-card') || e.target.closest('.task-item') || e.target.closest('.upgrade-item') || e.target.closest('.leaderboard-list') || e.target.closest('.offline-modal') || e.target.closest('.rotate-hint') || e.target.closest('.achievement-modal') || e.target.closest('.lang-btn') || e.target.closest('.setting-row')) return;
             const gameScreen = document.getElementById('screenGame');
             if (!gameScreen.classList.contains('active')) return;
             if (!gameRunning || gamePaused) return;
             const touch = e.changedTouches[0];
-            const dx = touch.clientX - touchStartX;
-            const dy = touch.clientY - touchStartY;
+            const dx = touch.clientX - touchStartX, dy = touch.clientY - touchStartY;
             const dt = Date.now() - touchStartTime;
             if (Math.abs(dx) < 30 && Math.abs(dy) < 30 && dt < 300) { jump(); return; }
-            if (Math.abs(dy) > Math.abs(dx)) {
-                if (dy < -40) jump();
-            } else {
-                if (dx > 40) boost();
-                if (dx < -40) useShield();
-            }
+            if (Math.abs(dy) > Math.abs(dx)) { if (dy < -40) jump(); } 
+            else { if (dx > 40) boost(); if (dx < -40) useShield(); }
         }, { passive: true });
 
         document.addEventListener('click', function(e) {
-            if (e.target.closest('button') || e.target.closest('.menu-btn') || e.target.closest('.skin-card') || e.target.closest('.task-item') || e.target.closest('.upgrade-item') || e.target.closest('.leaderboard-list') || e.target.closest('.offline-modal') || e.target.closest('.rotate-hint') || e.target.closest('.achievement-modal') || e.target.closest('.lang-switcher')) {
-                return;
-            }
+            if (e.target.closest('button') || e.target.closest('.menu-btn') || e.target.closest('.skin-card') || e.target.closest('.task-item') || e.target.closest('.upgrade-item') || e.target.closest('.leaderboard-list') || e.target.closest('.offline-modal') || e.target.closest('.rotate-hint') || e.target.closest('.achievement-modal') || e.target.closest('.lang-btn') || e.target.closest('.setting-row')) return;
             initAudio();
             const gameScreen = document.getElementById('screenGame');
             if (!gameScreen.classList.contains('active')) return;
@@ -2172,8 +2034,8 @@
 
         function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
 
-        // Инициализация
         applyTranslations();
+        applySettingsUI();
         checkOfflineEarnings(); 
         updateUI(); 
         renderLeaderboard(); 
@@ -2183,15 +2045,13 @@
         setTimeout(checkOrientation, 500);
         gameLoop();
         
-        console.log('🏃 CYBER RUNNER 2077 v8.0 (2026 Edition) загружен.');
+        console.log('🏃 CYBER RUNNER 2077 v9.0 (Pro 2026) загружен.');
     </script>
 
     <script>
         function forceLandscape() {
             if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(function(err) {
-                    console.log('Orientation lock:', err);
-                });
+                screen.orientation.lock('landscape').catch(function(err) { console.log('Orientation lock:', err); });
             }
         }
         document.addEventListener('click', forceLandscape, { once: true });
@@ -2202,7 +2062,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=8')
+                navigator.serviceWorker.register('./sw.js?v=9')
                     .then(registration => { console.log('SW OK'); })
                     .catch(error => { console.log('SW Error:', error); });
             });

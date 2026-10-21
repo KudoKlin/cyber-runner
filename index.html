@@ -369,6 +369,181 @@
         }
         .rotate-close:active { background: rgba(0, 255, 255, 0.3); }
 
+        /* === АДАПТАЦИЯ ДЛЯ ГОРИЗОНТАЛЬНОГО РЕЖИМА === */
+        @media screen and (orientation: landscape) and (max-height: 500px) {
+            body {
+                overflow-y: auto;
+            }
+            
+            .screen {
+                min-height: auto;
+                padding: 10px;
+                justify-content: flex-start;
+            }
+            
+            .menu-content {
+                padding: 15px 20px;
+                max-width: 90vw;
+                margin: 10px auto;
+            }
+            
+            .menu-title {
+                font-size: 22px;
+                margin-bottom: 4px;
+            }
+            
+            .menu-subtitle {
+                font-size: 10px;
+                margin-bottom: 10px;
+                letter-spacing: 2px;
+            }
+            
+            .menu-stats {
+                margin-bottom: 10px;
+                gap: 10px;
+            }
+            
+            .menu-stats span {
+                font-size: 11px;
+                padding: 5px 12px;
+            }
+            
+            .menu-buttons {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+            
+            .menu-btn {
+                padding: 10px 15px;
+                font-size: 11px;
+                letter-spacing: 1px;
+            }
+            
+            .menu-btn.primary {
+                grid-column: 1 / -1;
+                padding: 12px 20px;
+                font-size: 13px;
+            }
+            
+            .menu-hint {
+                font-size: 9px;
+            }
+            
+            .screen-game {
+                padding: 5px;
+            }
+            
+            .game-topbar {
+                margin-bottom: 5px;
+            }
+            
+            .canvas-wrapper {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                max-width: 100vw;
+                margin: 0 auto;
+            }
+            
+            #gameCanvas {
+                max-width: min(90vw, calc(60vh * 1.875));
+                max-height: 60vh;
+                width: auto;
+                height: auto;
+                object-fit: contain;
+                margin: 0 auto;
+                display: block;
+            }
+            
+            .game-stats span {
+                font-size: 10px;
+                padding: 4px 8px;
+            }
+            
+            .mobile-controls {
+                margin-top: 8px;
+            }
+            
+            .mobile-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .game-controls {
+                margin-top: 8px;
+                gap: 8px;
+            }
+            
+            .game-controls button {
+                padding: 8px 16px;
+                font-size: 10px;
+            }
+            
+            .records-content, .upgrades-content, .tasks-content, .skins-content {
+                padding: 15px 20px;
+                margin-top: 10px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+            
+            .records-title, .upgrades-title, .tasks-title, .skins-title {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+            
+            .upgrade-panel {
+                gap: 10px;
+            }
+            
+            .upgrade-panel .upgrade-item {
+                padding: 10px 15px;
+                min-width: 90px;
+            }
+            
+            .upgrade-panel .upgrade-item .value {
+                font-size: 18px;
+            }
+            
+            .skins-grid {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+                gap: 10px;
+            }
+            
+            .task-item {
+                padding: 10px 14px;
+                margin-bottom: 8px;
+                font-size: 12px;
+            }
+            
+            .leaderboard-list li {
+                padding: 10px 14px;
+                font-size: 12px;
+            }
+        }
+
+        @media screen and (orientation: landscape) and (max-height: 380px) {
+            .menu-content {
+                padding: 10px 15px;
+            }
+            
+            .menu-title {
+                font-size: 18px;
+            }
+            
+            .menu-btn {
+                padding: 8px 12px;
+                font-size: 10px;
+            }
+            
+            #gameCanvas {
+                max-height: 55vh;
+            }
+        }
+
         @media (max-width: 600px) {
             .screen { padding: 15px; }
             .menu-content { padding: 30px 20px; }
@@ -383,7 +558,6 @@
 </head>
 <body>
 
-    <!-- ПОДСКАЗКА О ПОВОРОТЕ -->
     <div class="rotate-hint" id="rotateHint">
         <div class="rotate-icon">📱</div>
         <div class="rotate-text">Поверни телефон горизонтально для лучшей игры</div>
@@ -504,9 +678,6 @@
     </div>
 
     <script>
-        // ============================================================
-        //  ОСНОВНЫЕ ПЕРЕМЕННЫЕ
-        // ============================================================
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const W = canvas.width;
@@ -568,92 +739,8 @@
         let bgOffset1 = 0;
         let bgOffset2 = 0;
 
-        // ============================================================
-        //  ЗВУКИ И ГОЛОС (ГОПНИЧЕСКИЙ)
-        // ============================================================
         let audioCtx = null;
-        function initAudio() {
-            if (!audioCtx) {
-                try {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                } catch(e) {}
-            }
-            // Разблокируем голос на мобильных устройствах
-            initVoice();
-        }
-
-        function playBeep(freq, duration, type = 'square', volume = 0.15) {
-            try {
-                initAudio();
-                if (!audioCtx) return;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                gain.gain.value = volume;
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch (e) {}
-        }
-
-        function haptic(ms) {
-            if (navigator.vibrate) {
-                try { navigator.vibrate(ms); } catch(e) {}
-            }
-        }
-
-        // === ГОЛОСОВОЙ ДВИЖОК ===
-        let voiceReady = false;
-        let russianVoice = null;
-
-        function initVoice() {
-            if (voiceReady) return;
-            if (!('speechSynthesis' in window)) return;
-            
-            // Пытаемся найти русский голос
-            const voices = window.speechSynthesis.getVoices();
-            russianVoice = voices.find(v => v.lang === 'ru-RU') || 
-                          voices.find(v => v.lang.startsWith('ru')) || 
-                          null;
-            voiceReady = true;
-        }
-
-        // Загружаем голоса при загрузке страницы
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.onvoiceschanged = function() {
-                initVoice();
-            };
-        }
-
-        function speak(text) {
-            try {
-                if (!('speechSynthesis' in window)) return;
-                
-                // Отменяем предыдущее, если оно слишком старое
-                if (window.speechSynthesis.speaking) {
-                    window.speechSynthesis.cancel();
-                }
-                
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ru-RU';
-                utterance.rate = 1.3;
-                utterance.pitch = 0.7;
-                utterance.volume = 1.0;
-                
-                if (russianVoice) {
-                    utterance.voice = russianVoice;
-                }
-                
-                window.speechSynthesis.speak(utterance);
-            } catch (e) {
-                console.log('Voice error:', e);
-            }
-        }
-
-        // === ГОПНИЧЕСКИЕ ФРАЗЫ ===
+        
         const SHIELD_PHRASES = [
             "Чётко, братан, щит на чеку!",
             "Фартануло, щит активирован!",
@@ -680,6 +767,82 @@
 
         function randomFrom(arr) {
             return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function initAudio() {
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch(e) {}
+            }
+            initVoice();
+        }
+
+        function playBeep(freq, duration, type = 'square', volume = 0.15) {
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.value = volume;
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+
+        function haptic(ms) {
+            if (navigator.vibrate) {
+                try { navigator.vibrate(ms); } catch(e) {}
+            }
+        }
+
+        let voiceReady = false;
+        let russianVoice = null;
+
+        function initVoice() {
+            if (voiceReady) return;
+            if (!('speechSynthesis' in window)) return;
+            
+            const voices = window.speechSynthesis.getVoices();
+            russianVoice = voices.find(v => v.lang === 'ru-RU') || 
+                          voices.find(v => v.lang.startsWith('ru')) || 
+                          null;
+            voiceReady = true;
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = function() {
+                initVoice();
+            };
+        }
+
+        function speak(text) {
+            try {
+                if (!('speechSynthesis' in window)) return;
+                
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ru-RU';
+                utterance.rate = 1.3;
+                utterance.pitch = 0.7;
+                utterance.volume = 1.0;
+                
+                if (russianVoice) {
+                    utterance.voice = russianVoice;
+                }
+                
+                window.speechSynthesis.speak(utterance);
+            } catch (e) {
+                console.log('Voice error:', e);
+            }
         }
 
         function soundJump() { 
@@ -725,9 +888,6 @@
             setTimeout(() => speak(randomFrom(GAMEOVER_PHRASES)), 500);
         }
 
-        // ============================================================
-        //  СПАВН
-        // ============================================================
         function spawnObstacle() {
             const types = ['box', 'spike', 'crate'];
             const type = types[Math.floor(Math.random() * types.length)];
@@ -758,9 +918,6 @@
             powerups.push({ x: W + 50 + Math.random() * 100, y: GROUND_Y - 60 - Math.random() * 60, r: 14, kind: kind, collected: false });
         }
 
-        // ============================================================
-        //  UPDATE
-        // ============================================================
         function update() {
             if (!gameRunning || gamePaused) return;
             frameCount++;
@@ -878,9 +1035,6 @@
             document.getElementById('scoreDisplay').textContent = score;
         }
 
-        // ============================================================
-        //  DRAW
-        // ============================================================
         function draw() {
             ctx.clearRect(0, 0, W, H);
             let shakeX = 0, shakeY = 0;
@@ -988,9 +1142,6 @@
             }
         }
 
-        // ============================================================
-        //  НАВИГАЦИЯ
-        // ============================================================
         function showScreen(id) {
             const current = document.querySelector('.screen.active');
             const next = document.getElementById(id);
@@ -1041,9 +1192,6 @@
             leaderboard = []; localStorage.removeItem('cyberRunnerLeaderboard'); renderLeaderboard();
         }
 
-        // ============================================================
-        //  СОХРАНЕНИЕ
-        // ============================================================
         function saveProgress() {
             try {
                 localStorage.setItem('cyberRunnerCoins', coins); localStorage.setItem('cyberRunnerUpgrades', JSON.stringify(upgrades));
@@ -1098,9 +1246,6 @@
             document.getElementById('offlineModal').classList.remove('active'); updateMenuStats();
         }
 
-        // ============================================================
-        //  UI
-        // ============================================================
         function updateUI() {
             document.getElementById('scoreDisplay').textContent = score; document.getElementById('coinsDisplay').textContent = coins;
             document.getElementById('livesDisplay').textContent = lives; document.getElementById('bestDisplay').textContent = best;
@@ -1137,11 +1282,8 @@
 
         function getMaxJumps() { return upgrades.jump >= 3 ? 2 : 1; }
 
-        // ============================================================
-        //  ДЕЙСТВИЯ
-        // ============================================================
         function jump() {
-            initAudio(); // Важно для разблокировки звука на мобильных
+            initAudio();
             if (!gameRunning || gamePaused) return;
             if (jumpsLeft > 0) {
                 player.vy = jumpPower - (upgrades.jump - 1) * 1.5; player.jumping = true; jumpsLeft--; soundJump();
@@ -1192,9 +1334,6 @@
             if (type === 'jump') jumpsLeft = Math.max(jumpsLeft, getMaxJumps());
         }
 
-        // ============================================================
-        //  ЗАДАНИЯ
-        // ============================================================
         const TASK_TEMPLATES = [
             { id: 'coins', text: 'Собери {n} монет', goal: 50, reward: 60 },
             { id: 'score', text: 'Набери {n} очков за забег', goal: 200, reward: 80 },
@@ -1261,9 +1400,6 @@
             t.claimed = true; coins += t.reward; soundCoin(); saveProgress(); saveDailyTasks(); updateUI(); renderTasks(); updateTaskBadge();
         }
 
-        // ============================================================
-        //  СКИНЫ
-        // ============================================================
         function renderSkins() {
             const grid = document.getElementById('skinsGrid'); if (!grid) return; document.getElementById('skinsCoins').textContent = coins;
             grid.innerHTML = Object.entries(SKINS).map(([id, skin]) => {
@@ -1286,9 +1422,6 @@
             setTimeout(() => { canvas.classList.remove('glitch-active'); }, 250);
         }
 
-        // ============================================================
-        //  УПРАВЛЕНИЕ
-        // ============================================================
         let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
         canvas.addEventListener('touchstart', function(e) {
             e.preventDefault(); initAudio(); if (!gameRunning) return;
@@ -1313,27 +1446,21 @@
             if (e.key === 'p' || e.key === 'P') togglePause();
         });
 
-        // ============================================================
-        //  ПОДСКАЗКА О ПОВОРОТЕ ЭКРАНА
-        // ============================================================
         function checkOrientation() {
             const hint = document.getElementById('rotateHint');
             if (!hint) return;
             
-            // Проверяем, мобильное ли устройство
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             if (!isMobile) {
                 hint.classList.remove('show');
                 return;
             }
             
-            // Проверяем, скрыл ли пользователь подсказку вручную
             if (localStorage.getItem('rotateHintDismissed') === 'true') {
                 hint.classList.remove('show');
                 return;
             }
             
-            // Проверяем ориентацию
             const isPortrait = window.innerHeight > window.innerWidth;
             
             if (isPortrait) {
@@ -1346,66 +1473,45 @@
         function closeRotateHint() {
             const hint = document.getElementById('rotateHint');
             if (hint) hint.classList.remove('show');
-            // Запоминаем, что пользователь скрыл подсказку
             localStorage.setItem('rotateHintDismissed', 'true');
         }
 
-        // Слушаем изменение ориентации
         window.addEventListener('orientationchange', function() {
             setTimeout(checkOrientation, 300);
         });
         window.addEventListener('resize', checkOrientation);
 
-        // ============================================================
-        //  ЗАПУСК
-        // ============================================================
         function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
 
         checkOfflineEarnings(); updateUI(); renderLeaderboard(); updateMenuStats(); updateContinueButton(); updateTaskBadge();
         
-        // Проверяем ориентацию при загрузке
         setTimeout(checkOrientation, 500);
         
         gameLoop();
-        console.log('🏃 CYBER RUNNER 2077 v5.0 (Гопник + Landscape) загружен.');
+        console.log('🏃 CYBER RUNNER 2077 v6.0 (Landscape Fixed) загружен.');
     </script>
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => { console.log('SW: ', registration.scope); })
-                    .catch(error => { console.log('SW error: ', error); });
-            });
-        }
-    </script>
-
-        <!-- Принудительный поворот для PWA -->
     <script>
         function forceLandscape() {
-            // Проверяем, поддерживается ли API блокировки ориентации
             if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('landscape').catch(function(err) {
-                    console.log('Блокировка ориентации не сработала (нормально для iOS):', err);
+                    console.log('Orientation lock:', err);
                 });
             }
         }
 
-        // Пытаемся заблокировать ориентацию при первом касании экрана
         document.addEventListener('click', forceLandscape, { once: true });
         document.addEventListener('touchstart', forceLandscape, { once: true });
         
-        // Также пробуем при загрузке
         window.addEventListener('load', function() {
             setTimeout(forceLandscape, 1000);
         });
     </script>
 
-    <!-- Регистрация Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=2')
+                navigator.serviceWorker.register('./sw.js?v=6')
                     .then(registration => { console.log('SW OK'); })
                     .catch(error => { console.log('SW Error:', error); });
             });

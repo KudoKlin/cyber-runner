@@ -210,7 +210,15 @@
         .music-start-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .screen-game { justify-content: flex-start; padding-top: 15px; }
-        .game-topbar { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px; gap: 8px; }
+        .game-topbar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            width: 100%; 
+            margin-bottom: 12px; 
+            gap: 8px;
+            flex-wrap: wrap;
+        }
         .game-stats { display: flex; gap: 8px; font-size: 13px; color: #00ffff; flex-wrap: wrap; justify-content: center; flex: 1; font-weight: 700; }
         .game-stats span { background: rgba(0, 0, 0, 0.4); padding: 6px 12px; border-radius: 100px; border: 1px solid rgba(0, 255, 255, 0.15); }
         .game-stats .coins { color: #ffdd00; }
@@ -231,6 +239,7 @@
             border: 1px solid rgba(0, 255, 255, 0.2);
             background: rgba(0, 0, 0, 0.4); color: #00ffff; font-size: 18px;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
         }
         .pause-btn { border-color: rgba(255, 0, 255, 0.3); color: #ff00ff; }
         .upgrades-btn-game { border-color: rgba(255, 221, 0, 0.3); color: #ffdd00; font-size: 20px; }
@@ -392,7 +401,7 @@
             .canvas-wrapper { width: 100%; max-width: 100vw; margin: 0 auto; }
             #gameCanvas { 
                 max-width: 100%; 
-                max-height: 70vh; 
+                max-height: 65vh; 
                 width: auto; 
                 height: auto; 
                 margin: 0 auto; 
@@ -414,7 +423,7 @@
             .menu-content { padding: 10px 15px; }
             .kinetic-title { font-size: 18px; }
             .menu-btn { padding: 8px 12px; font-size: 10px; }
-            #gameCanvas { max-height: 65vh; }
+            #gameCanvas { max-height: 60vh; }
         }
 
         @media (max-width: 600px) {
@@ -465,7 +474,7 @@
     <div class="upgrades-modal" id="upgradesModal">
         <div class="upgrades-content-modal glass">
             <div class="upgrades-modal-title">⚙ АПГРЕЙДЫ</div>
-            <div class="upgrades-modal-coins">💰 <span id="modalCoins">0</span></div>
+            <div class="upgrades-modal-coins"> <span id="modalCoins">0</span></div>
             <div class="upgrade-panel">
                 <div class="upgrade-item">
                     <span class="label">СКОРОСТЬ</span>
@@ -477,11 +486,9 @@
                     <span class="value" id="modalJumpLevel">1</span>
                     <button onclick="buyUpgradeInGame('jump')" id="modalBtnJump">⬆ 30💰</button>
                 </div>
-                <div class="upgrade-item">
-                    <span class="label">ЩИТ</span>
-                    <span class="value" id="modalShieldLevel">0</span>
-                    <button onclick="buyUpgradeInGame('shield')" id="modalBtnShield">⬆ 40💰</button>
-                </div>
+            </div>
+            <div style="margin-top: 15px; color: rgba(0, 255, 255, 0.5); font-size: 11px; font-family: 'Rajdhani', sans-serif;">
+                💡 Щит и рывок покупаются кнопками во время игры
             </div>
             <button class="close-modal-btn" onclick="closeUpgradesModal()">ЗАКРЫТЬ</button>
         </div>
@@ -497,7 +504,7 @@
             <p class="menu-subtitle">НЕОНОВЫЙ РАННЕР БУДУЩЕГО</p>
             <div class="menu-stats">
                 <div class="stat-pill">🏆 Рекорд: <strong id="menuBest">0</strong></div>
-                <div class="stat-pill">💰 Кредиты: <strong id="menuCoins">0</strong></div>
+                <div class="stat-pill"> Кредиты: <strong id="menuCoins">0</strong></div>
             </div>
             <div class="menu-buttons">
                 <button class="menu-btn primary" id="continueBtn" onclick="continueGame()" style="display:none;">▶ ПРОДОЛЖИТЬ</button>
@@ -505,7 +512,7 @@
                 <button class="menu-btn" onclick="showScreen('screenTasks')">🎯 ЗАДАНИЯ <span id="taskBadge" style="color:#ffdd00;"></span></button>
                 <button class="menu-btn" onclick="showScreen('screenSkins')">👕 СКИНЫ</button>
                 <button class="menu-btn" onclick="showScreen('screenRecords')">🏆 РЕКОРДЫ</button>
-                <button class="menu-btn" onclick="showScreen('screenSettings')">⚙️ НАСТРОЙКИ</button>
+                <button class="menu-btn" onclick="showScreen('screenSettings')">️ НАСТРОЙКИ</button>
             </div>
             <div class="menu-hint">
                 <span>ТАП</span> — прыжок | <span>СВАЙП →</span> — рывок | <span>СВАЙП ←</span> — щит
@@ -534,12 +541,13 @@
         <div class="mobile-controls">
             <div class="mobile-right">
                 <button class="mobile-btn shield-btn-m" onpointerdown="useShield()">🛡️</button>
-                <button class="mobile-btn boost-btn" onpointerdown="boost()">⚡</button>
+                <button class="mobile-btn boost-btn" onpointerdown="boost()" id="boostBtnMobile"></button>
             </div>
         </div>
         <div class="game-controls">
             <button onclick="restartGame()" class="btn-restart">🔄 Заново</button>
             <button onclick="useShield()" id="shieldBtn">🛡️ Щит (0)</button>
+            <button onclick="boost()" id="boostBtn">⚡ Рывок</button>
         </div>
     </div>
 
@@ -550,7 +558,7 @@
             <ol class="leaderboard-list" id="leaderboardList">
                 <li class="leaderboard-empty">Пока нет рекордов — сыграй!</li>
             </ol>
-            <button class="clear-btn" onclick="clearRecords()"> Очистить</button>
+            <button class="clear-btn" onclick="clearRecords()">🗑 Очистить</button>
         </div>
     </div>
 
@@ -577,7 +585,7 @@
         <div class="settings-content glass">
             <h2 class="settings-title">⚙️ НАСТРОЙКИ</h2>
             <div class="setting-row" style="background: rgba(255, 0, 255, 0.08); border-color: rgba(255, 0, 255, 0.3);">
-                <span class="setting-label"> Музыка</span>
+                <span class="setting-label">🎵 Музыка</span>
                 <button class="music-start-btn" id="musicStartBtn" onclick="startMusic()">▶ ЗАПУСТИТЬ</button>
             </div>
             <div class="setting-row">
@@ -760,12 +768,35 @@
         animateBg();
 
         // ============================================================
-        //  МУЗЫКА
+        //  CHIPTUNE МУЗЫКА (как в Денди)
         // ============================================================
         let musicCtx = null;
         let musicPlaying = false;
         let musicNodes = [];
         let musicIntervals = [];
+        let currentMelody = 0;
+
+        // Мелодии в стиле Денди (ноты в Hz)
+        const MELODIES = [
+            // Мелодия 1: Быстрая аркадная
+            {
+                notes: [523, 659, 784, 1047, 784, 659, 523, 392, 523, 659, 784, 1047, 1319, 1047, 784, 659],
+                tempo: 150,
+                bass: [131, 165, 196, 262, 196, 165, 131, 98]
+            },
+            // Мелодия 2: Энергичная
+            {
+                notes: [440, 554, 659, 880, 659, 554, 440, 330, 440, 554, 659, 880, 1109, 880, 659, 554],
+                tempo: 180,
+                bass: [110, 139, 165, 220, 165, 139, 110, 82]
+            },
+            // Мелодия 3: Динамичная
+            {
+                notes: [659, 784, 988, 1319, 988, 784, 659, 494, 659, 784, 988, 1319, 1568, 1319, 988, 784],
+                tempo: 160,
+                bass: [165, 196, 247, 330, 247, 196, 165, 123]
+            }
+        ];
 
         function initMusic() {
             if (musicCtx) return;
@@ -781,53 +812,69 @@
             }
             musicPlaying = true;
             applySettingsUI();
+            playChiptuneMelody();
+        }
+
+        function playChiptuneMelody() {
+            if (!musicPlaying) return;
             
+            const melody = MELODIES[currentMelody];
             const masterGain = musicCtx.createGain();
-            masterGain.gain.value = gameSettings.musicVolume * 0.4;
+            masterGain.gain.value = gameSettings.musicVolume * 0.3;
             masterGain.connect(musicCtx.destination);
             musicNodes.push({ type: 'master', gain: masterGain });
             
+            // Мелодия (square wave - как в NES)
+            const melodyOsc = musicCtx.createOscillator();
+            const melodyGain = musicCtx.createGain();
+            melodyOsc.type = 'square';
+            melodyOsc.frequency.value = melody.notes[0];
+            melodyGain.gain.value = 0.15;
+            melodyOsc.connect(melodyGain);
+            melodyGain.connect(masterGain);
+            melodyOsc.start();
+            musicNodes.push({ type: 'melody', osc: melodyOsc, gain: melodyGain });
+            
+            // Бас (triangle wave)
             const bassOsc = musicCtx.createOscillator();
             const bassGain = musicCtx.createGain();
-            bassOsc.type = 'sine'; bassOsc.frequency.value = 55;
-            bassGain.gain.value = 0.3;
-            bassOsc.connect(bassGain); bassGain.connect(masterGain);
+            bassOsc.type = 'triangle';
+            bassOsc.frequency.value = melody.bass[0];
+            bassGain.gain.value = 0.2;
+            bassOsc.connect(bassGain);
+            bassGain.connect(masterGain);
             bassOsc.start();
             musicNodes.push({ type: 'bass', osc: bassOsc, gain: bassGain });
             
-            const padOsc = musicCtx.createOscillator();
-            const padGain = musicCtx.createGain();
-            padOsc.type = 'triangle'; padOsc.frequency.value = 220;
-            padGain.gain.value = 0.08;
-            padOsc.connect(padGain); padGain.connect(masterGain);
-            padOsc.start();
-            musicNodes.push({ type: 'pad', osc: padOsc, gain: padGain });
-            
-            const arpOsc = musicCtx.createOscillator();
-            const arpGain = musicCtx.createGain();
-            arpOsc.type = 'sine'; arpOsc.frequency.value = 440;
-            arpGain.gain.value = 0.05;
-            arpOsc.connect(arpGain); arpGain.connect(masterGain);
-            arpOsc.start();
-            musicNodes.push({ type: 'arp', osc: arpOsc, gain: arpGain });
-            
-            const arpNotes = [220, 330, 440, 550, 660, 550, 440, 330];
-            let arpIndex = 0;
-            const arpInterval = setInterval(() => {
-                if (!musicPlaying) return;
-                arpOsc.frequency.setTargetAtTime(arpNotes[arpIndex], musicCtx.currentTime, 0.1);
-                arpIndex = (arpIndex + 1) % arpNotes.length;
-            }, 400);
-            musicIntervals.push(arpInterval);
-            
-            const bassNotes = [55, 65, 73, 82];
+            let noteIndex = 0;
             let bassIndex = 0;
+            
+            // Переключение нот мелодии
+            const melodyInterval = setInterval(() => {
+                if (!musicPlaying) return;
+                melodyOsc.frequency.setTargetAtTime(melody.notes[noteIndex], musicCtx.currentTime, 0.01);
+                noteIndex = (noteIndex + 1) % melody.notes.length;
+            }, melody.tempo);
+            musicIntervals.push(melodyInterval);
+            
+            // Переключение нот баса
             const bassInterval = setInterval(() => {
                 if (!musicPlaying) return;
-                bassOsc.frequency.setTargetAtTime(bassNotes[bassIndex], musicCtx.currentTime, 0.3);
-                bassIndex = (bassIndex + 1) % bassNotes.length;
-            }, 2000);
+                bassOsc.frequency.setTargetAtTime(melody.bass[bassIndex], musicCtx.currentTime, 0.05);
+                bassIndex = (bassIndex + 1) % melody.bass.length;
+            }, melody.tempo * 2);
             musicIntervals.push(bassInterval);
+            
+            // Смена мелодии каждые 30 секунд
+            const changeInterval = setInterval(() => {
+                if (!musicPlaying) return;
+                stopMusic();
+                currentMelody = (currentMelody + 1) % MELODIES.length;
+                setTimeout(() => {
+                    if (gameSettings.music) startMusic();
+                }, 100);
+            }, 30000);
+            musicIntervals.push(changeInterval);
         }
 
         function stopMusic() {
@@ -843,7 +890,7 @@
         function updateMusicVolume() {
             const master = musicNodes.find(n => n.type === 'master');
             if (master && master.gain && musicCtx) {
-                master.gain.setTargetAtTime(gameSettings.musicVolume * 0.4, musicCtx.currentTime, 0.1);
+                master.gain.setTargetAtTime(gameSettings.musicVolume * 0.3, musicCtx.currentTime, 0.1);
             }
         }
 
@@ -891,10 +938,10 @@
         let currentBiome = 0;
 
         const BIOMES = [
-            { name: 'night', top: '#05050f', mid: '#0a0a1a', bot: '#0a0a0f', ground: '#1a1a3a', accent: '#00ffff', building: '#0d0d20', sign: '#00ffff' },
-            { name: 'lab', top: '#0a0010', mid: '#1a0a2e', bot: '#0a0515', ground: '#3a1a5a', accent: '#ff00ff', building: '#150520', sign: '#ff00ff' },
-            { name: 'space', top: '#000010', mid: '#050520', bot: '#000008', ground: '#2a2a5a', accent: '#00ffaa', building: '#051015', sign: '#00ffaa' },
-            { name: 'acid', top: '#0a1000', mid: '#1a2a0a', bot: '#051000', ground: '#3a5a1a', accent: '#aaff00', building: '#101a05', sign: '#aaff00' }
+            { name: 'night', top: '#05050f', mid: '#0a0a1a', bot: '#0a0a0f', ground: '#1a1a3a', accent: '#00ffff', building: '#080815', sign: '#00ffff' },
+            { name: 'lab', top: '#0a0010', mid: '#1a0a2e', bot: '#0a0515', ground: '#3a1a5a', accent: '#ff00ff', building: '#0a0510', sign: '#ff00ff' },
+            { name: 'space', top: '#000010', mid: '#050520', bot: '#000008', ground: '#2a2a5a', accent: '#00ffaa', building: '#030308', sign: '#00ffaa' },
+            { name: 'acid', top: '#0a1000', mid: '#1a2a0a', bot: '#051000', ground: '#3a5a1a', accent: '#aaff00', building: '#081005', sign: '#aaff00' }
         ];
 
         let activeSkin = localStorage.getItem('cyberRunnerSkin') || 'default';
@@ -915,9 +962,9 @@
         };
 
         const ACHIEVEMENTS = {
-            first_km: { id: 'first_km', icon: '🏃', name: 'Первый километр', desc: 'Набери 1000 очков', reward: 100 },
+            first_km: { id: 'first_km', icon: '', name: 'Первый километр', desc: 'Набери 1000 очков', reward: 100 },
             collector: { id: 'collector', icon: '💰', name: 'Коллекционер', desc: 'Собери 100 монет за забег', reward: 150 },
-            untouchable: { id: 'untouchable', icon: '🛡️', name: 'Неприкасаемый', desc: 'Пройди 300 очков без урона', reward: 200 },
+            untouchable: { id: 'untouchable', icon: '️', name: 'Неприкасаемый', desc: 'Пройди 300 очков без урона', reward: 200 },
             combo_master: { id: 'combo_master', icon: '⚡', name: 'Мастер комбо', desc: 'Достигни комбо x5', reward: 250 }
         };
         let unlockedAchievements = JSON.parse(localStorage.getItem('cyberRunnerAchievements')) || [];
@@ -1105,7 +1152,6 @@
             setTimeout(() => canvas.classList.remove('glitch-active'), 500);
         }
 
-        // Генерация зданий и вывесок
         function generateCity() {
             buildings = [];
             signs = [];
@@ -1117,12 +1163,12 @@
                 const cols = Math.floor(w / 15);
                 for (let r = 0; r < rows; r++) {
                     for (let c = 0; c < cols; c++) {
-                        if (Math.random() < 0.4) {
+                        if (Math.random() < 0.3) {
                             windows.push({
                                 x: 5 + c * 15,
                                 y: 10 + r * 20,
                                 w: 8, h: 12,
-                                lit: Math.random() < 0.7,
+                                lit: Math.random() < 0.5,
                                 color: Math.random() < 0.5 ? '#ffdd00' : '#00ffff'
                             });
                         }
@@ -1130,7 +1176,7 @@
                 }
                 buildings.push({ x: i * 80, w, h, windows });
                 
-                if (Math.random() < 0.3) {
+                if (Math.random() < 0.2) {
                     signs.push({
                         x: i * 80 + Math.random() * 40,
                         y: GROUND_Y - 50 - Math.random() * 100,
@@ -1231,14 +1277,10 @@
             powerupSpawnTimer += timeScale;
             if (powerupSpawnTimer >= 400 + Math.random() * 300) { powerupSpawnTimer = 0; spawnPowerup(); }
 
-            // Дождь
             rainDrops.forEach(drop => {
                 drop.y += drop.speed * timeScale;
                 drop.x -= speed * 0.3 * timeScale;
-                if (drop.y > GROUND_Y) {
-                    drop.y = -20;
-                    drop.x = Math.random() * W;
-                }
+                if (drop.y > GROUND_Y) { drop.y = -20; drop.x = Math.random() * W; }
                 if (drop.x < -20) drop.x = W + 20;
             });
 
@@ -1327,7 +1369,6 @@
             ctx.rotate(-0.15);
             ctx.translate(-(dx + 15), -(dy + 25));
 
-            // Задняя нога
             ctx.fillStyle = skinDark;
             ctx.shadowColor = skinDark; ctx.shadowBlur = 8;
             const backLegAngle = frame === 0 ? 0.4 : -0.3;
@@ -1338,7 +1379,6 @@
             ctx.fillRect(-5, 16, 10, 4);
             ctx.restore();
 
-            // Задняя рука
             ctx.fillStyle = skinDark;
             const backArmAngle = frame === 0 ? -0.5 : 0.4;
             ctx.save();
@@ -1347,14 +1387,12 @@
             ctx.fillRect(-3, 0, 6, 14);
             ctx.restore();
 
-            // Торс с неоновыми линиями
             ctx.fillStyle = skinMain;
             ctx.shadowColor = skinMain; ctx.shadowBlur = 15;
             ctx.beginPath();
             ctx.ellipse(dx + 15, dy + 25, 10, 14, -0.2, 0, Math.PI * 2);
             ctx.fill();
             
-            // Неоновая линия на груди
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 1.5;
             ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 10;
@@ -1363,7 +1401,6 @@
             ctx.lineTo(dx + 20, dy + 30);
             ctx.stroke();
 
-            // Передняя нога
             ctx.fillStyle = skinLeg;
             ctx.shadowColor = skinLeg; ctx.shadowBlur = 10;
             const frontLegAngle = frame === 0 ? -0.3 : 0.4;
@@ -1374,7 +1411,6 @@
             ctx.fillRect(-5, 16, 10, 4);
             ctx.restore();
 
-            // Передняя рука
             ctx.fillStyle = skinMain;
             const frontArmAngle = frame === 0 ? 0.4 : -0.5;
             ctx.save();
@@ -1383,14 +1419,12 @@
             ctx.fillRect(-3, 0, 6, 14);
             ctx.restore();
 
-            // Голова с визором
             ctx.fillStyle = skinMain;
             ctx.shadowColor = skinMain; ctx.shadowBlur = 20;
             ctx.beginPath();
             ctx.arc(dx + 18, dy + 8, 9, 0, Math.PI * 2);
             ctx.fill();
 
-            // Визор (светящийся)
             ctx.fillStyle = '#ffffff';
             ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 15;
             ctx.beginPath();
@@ -1403,7 +1437,6 @@
             ctx.arc(dx + 23, dy + 7, 1.5, 0, Math.PI * 2);
             ctx.fill();
 
-            // Шарф/плащ
             ctx.strokeStyle = skinMain;
             ctx.lineWidth = 3;
             ctx.shadowColor = skinMain; ctx.shadowBlur = 10;
@@ -1425,7 +1458,6 @@
 
             const b = BIOMES[currentBiome];
             
-            // Небо с градиентом
             const grad = ctx.createLinearGradient(0, 0, 0, H);
             grad.addColorStop(0, b.top);
             grad.addColorStop(0.5, b.mid);
@@ -1433,7 +1465,6 @@
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
-            // Звёзды
             ctx.fillStyle = 'rgba(255,255,255,0.3)';
             for (let i = 0; i < 50; i++) {
                 const sx = (i * 37 + 13) % W;
@@ -1443,28 +1474,29 @@
                 ctx.fill();
             }
 
-            // Дальний план зданий (параллакс)
             bgOffset1 = (bgOffset1 - speed * 0.15 * timeScale) % (W + 100);
             ctx.fillStyle = b.building;
+            ctx.globalAlpha = 0.3;
             for (let i = 0; i < W + 200; i += 80) {
                 const h = 100 + Math.sin(i * 0.03) * 50;
                 ctx.fillRect(i + bgOffset1, GROUND_Y - h, 80, h);
             }
+            ctx.globalAlpha = 1;
 
-            // Ближний план зданий с окнами
             bgOffset2 = (bgOffset2 - speed * 0.4 * timeScale) % (W + 100);
             buildings.forEach((bld, idx) => {
                 const x = ((bld.x + bgOffset2) % (W + 200)) - 100;
                 ctx.fillStyle = b.building;
+                ctx.globalAlpha = 0.5;
                 ctx.fillRect(x, GROUND_Y - bld.h, bld.w, bld.h);
+                ctx.globalAlpha = 1;
                 
-                // Окна
                 bld.windows.forEach(win => {
                     if (win.lit) {
                         ctx.fillStyle = win.color;
                         ctx.shadowColor = win.color;
-                        ctx.shadowBlur = 8;
-                        ctx.globalAlpha = 0.6 + Math.sin(frameCount * 0.02 + idx) * 0.2;
+                        ctx.shadowBlur = 5;
+                        ctx.globalAlpha = 0.4 + Math.sin(frameCount * 0.02 + idx) * 0.1;
                         ctx.fillRect(x + win.x, GROUND_Y - bld.h + win.y, win.w, win.h);
                         ctx.globalAlpha = 1;
                         ctx.shadowBlur = 0;
@@ -1472,26 +1504,23 @@
                 });
             });
 
-            // Неоновые вывески
             signs.forEach((sign, idx) => {
                 const x = ((sign.x + bgOffset2 * 1.2) % (W + 200)) - 100;
                 ctx.font = 'bold 14px Orbitron';
                 ctx.fillStyle = sign.color;
                 ctx.shadowColor = sign.color;
-                ctx.shadowBlur = 15;
-                ctx.globalAlpha = 0.7 + Math.sin(frameCount * 0.1 + idx) * 0.3;
+                ctx.shadowBlur = 10;
+                ctx.globalAlpha = 0.5 + Math.sin(frameCount * 0.1 + idx) * 0.2;
                 ctx.fillText(sign.text, x, sign.y);
                 ctx.globalAlpha = 1;
                 ctx.shadowBlur = 0;
             });
 
-            // Земля
             ctx.shadowBlur = 15; ctx.shadowColor = b.accent;
             ctx.fillStyle = b.ground;
             ctx.fillRect(0, GROUND_Y, W, 4);
             ctx.shadowBlur = 0;
 
-            // Сетка на земле
             ctx.strokeStyle = b.accent + '22';
             ctx.lineWidth = 1;
             for (let i = 0; i < W + 40; i += 40) {
@@ -1502,20 +1531,6 @@
                 ctx.stroke();
             }
 
-            // Отражения на мокрой земле
-            ctx.save();
-            ctx.globalAlpha = 0.15;
-            ctx.scale(1, -0.3);
-            ctx.translate(0, -GROUND_Y * 4);
-            
-            // Отражение персонажа
-            const skin = SKINS[activeSkin] || SKINS['default'];
-            drawRealisticRunner(player.x, player.y, skin, legFrame);
-            
-            ctx.restore();
-            ctx.globalAlpha = 1;
-
-            // Трейл
             for (const t of trail) {
                 const alpha = t.life / t.maxLife;
                 ctx.fillStyle = `rgba(0, 255, 255, ${alpha * 0.3})`;
@@ -1524,7 +1539,6 @@
                 ctx.fill();
             }
 
-            // Монеты
             for (const coin of coinsList) {
                 if (coin.collected) continue;
                 ctx.shadowColor = '#ffdd00'; ctx.shadowBlur = 15;
@@ -1540,7 +1554,6 @@
                 ctx.fillText('$', coin.x, coin.y + 1);
             }
 
-            // Бонусы
             for (const pu of powerups) {
                 if (pu.collected) continue;
                 const color = pu.kind === 'magnet' ? '#00aaff' : '#ffdd00';
@@ -1557,7 +1570,6 @@
                 ctx.fillText(pu.kind === 'magnet' ? '🧲' : '×2', pu.x, pu.y + 1);
             }
 
-            // Препятствия
             for (const obs of obstacles) {
                 ctx.shadowColor = obs.color; ctx.shadowBlur = 15;
                 if (obs.type === 'spike') {
@@ -1581,8 +1593,8 @@
                 ctx.shadowBlur = 0;
             }
 
-            // Персонаж
             const dx = player.x, dy = player.y;
+            const skin = SKINS[activeSkin] || SKINS['default'];
             if (shieldActive) {
                 ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 30;
                 ctx.strokeStyle = `rgba(0, 255, 255, 0.5)`;
@@ -1595,7 +1607,6 @@
 
             drawRealisticRunner(dx, dy, skin, legFrame);
 
-            // Частицы
             for (const p of particles) {
                 const alpha = p.life / 35;
                 ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
@@ -1604,8 +1615,7 @@
                 ctx.fill();
             }
 
-            // Дождь
-            ctx.strokeStyle = 'rgba(150, 200, 255, 0.4)';
+            ctx.strokeStyle = 'rgba(150, 200, 255, 0.3)';
             ctx.lineWidth = 1;
             rainDrops.forEach(drop => {
                 ctx.beginPath();
@@ -1614,20 +1624,18 @@
                 ctx.stroke();
             });
 
-            // Дымка/туман вдали
             const fogGrad = ctx.createLinearGradient(0, GROUND_Y - 100, 0, GROUND_Y);
             fogGrad.addColorStop(0, 'rgba(0, 255, 255, 0)');
-            fogGrad.addColorStop(1, 'rgba(0, 255, 255, 0.1)');
+            fogGrad.addColorStop(1, 'rgba(0, 255, 255, 0.05)');
             ctx.fillStyle = fogGrad;
             ctx.fillRect(0, GROUND_Y - 100, W, 100);
 
-            // UI баффы
             let badgeY = 35;
             ctx.textAlign = 'left';
             if (magnetTimer > 0) {
                 ctx.fillStyle = 'rgba(0, 170, 255, 0.9)';
                 ctx.font = 'bold 12px Orbitron';
-                ctx.fillText(` ${Math.ceil(magnetTimer / 60)}с`, 15, badgeY);
+                ctx.fillText(`🧲 ${Math.ceil(magnetTimer / 60)}с`, 15, badgeY);
                 badgeY += 22;
             }
             if (doubleCoinTimer > 0) {
@@ -1645,7 +1653,7 @@
                 ctx.shadowColor = '#ff0055'; ctx.shadowBlur = 40;
                 ctx.fillStyle = '#ff0055';
                 ctx.font = 'bold 40px Orbitron';
-                ctx.fillText(' СИСТЕМА ОТКАЗАЛА', W / 2, H / 2 - 20);
+                ctx.fillText('☠ СИСТЕМА ОТКАЗАЛА', W / 2, H / 2 - 20);
                 ctx.shadowBlur = 0;
                 ctx.fillStyle = '#00ffff';
                 ctx.font = '18px Rajdhani';
@@ -1662,7 +1670,7 @@
                 ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 30;
                 ctx.fillStyle = '#00ffff';
                 ctx.font = 'bold 36px Orbitron';
-                ctx.fillText(' ПАУЗА', W / 2, H / 2);
+                ctx.fillText('⏸ ПАУЗА', W / 2, H / 2);
                 ctx.shadowBlur = 0;
                 ctx.textAlign = 'left';
             }
@@ -1783,7 +1791,7 @@
             const diffMs = now - lastLogin;
             const diffMins = Math.floor(diffMs / 60000);
             if (diffMins > 30) {
-                const earned = Math.min(250, Math.floor(diffMins * 0.25)); // УМЕНЬШЕНО В 2 РАЗА
+                const earned = Math.min(250, Math.floor(diffMins * 0.25));
                 if (earned > 0) { coins += earned; saveProgress(); showOfflineModal(earned, diffMins); }
             }
             localStorage.setItem('cyberRunnerLastLogin', now);
@@ -1805,19 +1813,29 @@
             document.getElementById('coinsDisplay').textContent = coins;
             document.getElementById('livesDisplay').textContent = lives;
             document.getElementById('bestDisplay').textContent = best;
-            document.getElementById('shieldBtn').innerHTML = `🛡️ Щит (${upgrades.shield})`;
+            
+            const shieldBtn = document.getElementById('shieldBtn');
+            if (upgrades.shield > 0) {
+                shieldBtn.innerHTML = `🛡️ Щит (${upgrades.shield})`;
+                shieldBtn.style.opacity = '1';
+            } else if (coins >= 40) {
+                shieldBtn.innerHTML = `🛡️ Купить 40💰`;
+                shieldBtn.style.opacity = '0.8';
+            } else {
+                shieldBtn.innerHTML = `🛡️ Нет 💰`;
+                shieldBtn.style.opacity = '0.4';
+            }
+            
             updateMenuStats();
             updateContinueButton();
         }
 
-        // Апгрейды во время игры
         function openUpgradesModal() {
             if (!gameRunning) return;
             gamePaused = true;
             document.getElementById('modalCoins').textContent = coins;
             document.getElementById('modalSpeedLevel').textContent = upgrades.speed;
             document.getElementById('modalJumpLevel').textContent = upgrades.jump;
-            document.getElementById('modalShieldLevel').textContent = upgrades.shield;
             updateModalButtons();
             document.getElementById('upgradesModal').classList.add('active');
         }
@@ -1828,19 +1846,17 @@
         }
 
         function updateModalButtons() {
-            const costs = { speed: 50, jump: 30, shield: 40 };
-            const maxLevels = { speed: 10, jump: 5, shield: 5 };
+            const costs = { speed: 50, jump: 30 };
+            const maxLevels = { speed: 10, jump: 5 };
             document.getElementById('modalBtnSpeed').disabled = upgrades.speed >= maxLevels.speed || coins < costs.speed;
             document.getElementById('modalBtnJump').disabled = upgrades.jump >= maxLevels.jump || coins < costs.jump;
-            document.getElementById('modalBtnShield').disabled = upgrades.shield >= maxLevels.shield || coins < costs.shield;
             document.getElementById('modalBtnSpeed').textContent = upgrades.speed >= maxLevels.speed ? 'MAX' : `⬆ ${costs.speed}💰`;
             document.getElementById('modalBtnJump').textContent = upgrades.jump >= maxLevels.jump ? 'MAX' : `⬆ ${costs.jump}💰`;
-            document.getElementById('modalBtnShield').textContent = upgrades.shield >= maxLevels.shield ? 'MAX' : `⬆ ${costs.shield}💰`;
         }
 
         function buyUpgradeInGame(type) {
-            const costs = { speed: 50, jump: 30, shield: 40 };
-            const maxLevels = { speed: 10, jump: 5, shield: 5 };
+            const costs = { speed: 50, jump: 30 };
+            const maxLevels = { speed: 10, jump: 5 };
             if (coins < costs[type] || upgrades[type] >= maxLevels[type]) return;
             coins -= costs[type];
             upgrades[type]++;
@@ -1851,12 +1867,10 @@
             document.getElementById('modalCoins').textContent = coins;
             document.getElementById('modalSpeedLevel').textContent = upgrades.speed;
             document.getElementById('modalJumpLevel').textContent = upgrades.jump;
-            document.getElementById('modalShieldLevel').textContent = upgrades.shield;
             updateModalButtons();
             updateUI();
             if (type === 'jump') jumpsLeft = getMaxJumps();
             
-            // Эффект покупки
             for (let i = 0; i < 20; i++) {
                 particles.push({
                     x: W / 2 + (Math.random() - 0.5) * 100,
@@ -1901,22 +1915,11 @@
             }
         }
 
-        function boost() {
-            initAudio();
-            if (!gameRunning || gamePaused) return;
-            if (boostCooldown > 0) return;
-            speed = Math.min(25, speed + 6);
-            boostCooldown = 90;
-            playBeep(800, 0.1, 'sawtooth', 0.1);
-            setTimeout(() => playBeep(1000, 0.1, 'sawtooth', 0.1), 50);
-            haptic(20);
-            for (let i = 0; i < 20; i++) particles.push({ x: player.x, y: player.y + player.h / 2 + (Math.random() - 0.5) * 30, vx: -Math.random() * 10, vy: (Math.random() - 0.5) * 4, life: 25, color: '#ff00ff', size: 3 });
-        }
-
         function useShield() {
             initAudio();
             if (!gameRunning || gamePaused) return;
             if (shieldActive || shieldCooldown > 0) return;
+            
             if (upgrades.shield > 0) {
                 shieldActive = true;
                 shieldTimer = 480;
@@ -1926,7 +1929,77 @@
                 updateUI();
                 saveProgress();
                 saveGameState();
+                return;
             }
+            
+            const SHIELD_COST = 40;
+            if (coins >= SHIELD_COST) {
+                coins -= SHIELD_COST;
+                shieldActive = true;
+                shieldTimer = 480;
+                shieldCooldown = 180;
+                soundShield();
+                haptic(30);
+                updateUI();
+                saveProgress();
+                saveGameState();
+                
+                for (let i = 0; i < 15; i++) {
+                    particles.push({
+                        x: player.x + player.w / 2,
+                        y: player.y + player.h / 2,
+                        vx: (Math.random() - 0.5) * 10,
+                        vy: (Math.random() - 0.5) * 10,
+                        life: 25, color: '#00ffff', size: 3
+                    });
+                }
+                return;
+            }
+            
+            playBeep(200, 0.2, 'sawtooth', 0.1);
+            haptic(50);
+        }
+
+        function boost() {
+            initAudio();
+            if (!gameRunning || gamePaused) return;
+            
+            if (boostCooldown <= 0) {
+                speed = Math.min(25, speed + 6);
+                boostCooldown = 90;
+                playBeep(800, 0.1, 'sawtooth', 0.1);
+                setTimeout(() => playBeep(1000, 0.1, 'sawtooth', 0.1), 50);
+                haptic(20);
+                for (let i = 0; i < 20; i++) particles.push({ x: player.x, y: player.y + player.h / 2 + (Math.random() - 0.5) * 30, vx: -Math.random() * 10, vy: (Math.random() - 0.5) * 4, life: 25, color: '#ff00ff', size: 3 });
+                return;
+            }
+            
+            const BOOST_COST = 20;
+            if (coins >= BOOST_COST) {
+                coins -= BOOST_COST;
+                speed = Math.min(25, speed + 6);
+                boostCooldown = 0;
+                playBeep(1200, 0.1, 'sine', 0.15);
+                setTimeout(() => playBeep(1500, 0.1, 'sine', 0.12), 60);
+                haptic(25);
+                updateUI();
+                saveProgress();
+                saveGameState();
+                
+                for (let i = 0; i < 25; i++) {
+                    particles.push({
+                        x: player.x,
+                        y: player.y + player.h / 2 + (Math.random() - 0.5) * 30,
+                        vx: -Math.random() * 12,
+                        vy: (Math.random() - 0.5) * 5,
+                        life: 30, color: '#ff00ff', size: 3
+                    });
+                }
+                return;
+            }
+            
+            playBeep(200, 0.2, 'sawtooth', 0.1);
+            haptic(50);
         }
 
         function togglePause() {
@@ -1940,7 +2013,7 @@
             initAudio();
             gameRunning = true; gamePaused = false;
             const pauseBtn = document.getElementById('pauseBtn');
-            if (pauseBtn) pauseBtn.textContent = '';
+            if (pauseBtn) pauseBtn.textContent = '⏸';
             score = 0; lives = 3;
             obstacles = []; coinsList = []; powerups = []; particles = []; trail = [];
             spawnTimer = 0; coinSpawnTimer = 0; powerupSpawnTimer = 0; frameCount = 0;
@@ -2157,7 +2230,7 @@
         setTimeout(checkOrientation, 500);
         gameLoop();
         
-        console.log('🏃 CYBER RUNNER 2077 v10.0 (Final Polish) загружен.');
+        console.log('🏃 CYBER RUNNER 2077 v11.0 (Chiptune + Dark City + Fixed UI) загружен.');
     </script>
 
     <script>
@@ -2174,7 +2247,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=10')
+                navigator.serviceWorker.register('./sw.js?v=11')
                     .then(registration => { console.log('SW OK'); })
                     .catch(error => { console.log('SW Error:', error); });
             });

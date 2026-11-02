@@ -504,7 +504,7 @@
             </h1>
             <p class="menu-subtitle">НЕОНОВЫЙ РАННЕР БУДУЩЕГО</p>
             <div class="menu-stats">
-                <div class="stat-pill">🏆 Рекорд: <strong id="menuBest">0</strong></div>
+                <div class="stat-pill">🏆 Рекорд: <strong id="menuBest">0 м</strong></div>
                 <div class="stat-pill"> Кредиты: <strong id="menuCoins">0</strong></div>
             </div>
             <div class="menu-buttons">
@@ -525,7 +525,7 @@
         <div class="game-topbar">
             <button class="back-btn" onclick="goHome()">←</button>
             <div class="game-stats">
-                <span>⚡ <span id="scoreDisplay">0</span></span>
+                <span title="Пройденное расстояние">📏 <span id="distDisplay">0 м</span></span>
                 <span class="coins">💰 <span id="coinsDisplay">0</span></span>
                 <span class="lives">❤️ <span id="livesDisplay">3</span></span>
                 <span>🏆 <span id="bestDisplay">0</span></span>
@@ -910,7 +910,9 @@
 
         let gameRunning = false;
         let gamePaused = false;
-        let score = 0;
+        // Пройденное расстояние в метрах (заменяет очки): ~1 м за 10 px мира
+        const PX_PER_METER = 10;
+        let distanceM = 0;
         let coins = parseInt(localStorage.getItem('cyberRunnerCoins')) || 0;
         let lives = 3;
         let best = parseInt(localStorage.getItem('cyberRunnerBest')) || 0;
@@ -964,9 +966,9 @@
         };
 
         const ACHIEVEMENTS = {
-            first_km: { id: 'first_km', icon: '', name: 'Первый километр', desc: 'Набери 1000 очков', reward: 100 },
+            first_km: { id: 'first_km', icon: '', name: 'Первый километр', desc: 'Пробеги 1000 м', reward: 100 },
             collector: { id: 'collector', icon: '💰', name: 'Коллекционер', desc: 'Собери 100 монет за забег', reward: 150 },
-            untouchable: { id: 'untouchable', icon: '️', name: 'Неприкасаемый', desc: 'Пройди 300 очков без урона', reward: 200 },
+            untouchable: { id: 'untouchable', icon: '️', name: 'Неприкасаемый', desc: 'Пробеги 300 м без урона', reward: 200 },
             combo_master: { id: 'combo_master', icon: '⚡', name: 'Мастер комбо', desc: 'Достигни комбо x5', reward: 250 }
         };
         let unlockedAchievements = JSON.parse(localStorage.getItem('cyberRunnerAchievements')) || [];
@@ -1145,7 +1147,7 @@
         function closeAchievement() { document.getElementById('achievementModal').classList.remove('active'); }
 
         function checkAchievements() {
-            if (score >= 1000 && !unlockedAchievements.includes('first_km')) unlockAchievement('first_km');
+            if (distanceM >= 1000 && !unlockedAchievements.includes('first_km')) unlockAchievement('first_km');
             if (noHitStreak >= 300 && !unlockedAchievements.includes('untouchable')) unlockAchievement('untouchable');
         }
 
@@ -1208,11 +1210,11 @@
             const height = type === 'spike' ? 25 + Math.random() * 20 : 30 + Math.random() * 25;
             const width = type === 'spike' ? 20 : 25 + Math.random() * 15;
             // Воздушная балка (под ней можно только подкатом) — как в Subway Surfers / Jetpack Joyride
-            if (score > 150 && Math.random() < 0.28) {
+            if (distanceM > 150 && Math.random() < 0.28) {
                 obstacles.push({ x: W + 50, y: GROUND_Y - 62, w: 70 + Math.random() * 40, h: 16, type: 'bar', color: BIOMES[currentBiome].sign });
                 return;
             }
-            const isDouble = score > 300 && Math.random() < 0.2;
+            const isDouble = distanceM > 300 && Math.random() < 0.2;
             obstacles.push({ x: W + 50, y: GROUND_Y - height, w: width, h: height, type, color: BIOMES[currentBiome].accent });
             if (isDouble) obstacles.push({ x: W + 50 + width + 15, y: GROUND_Y - (height * 0.7), w: width * 0.8, h: height * 0.7, type: 'box', color: BIOMES[currentBiome].accent });
         }
@@ -1236,8 +1238,11 @@
             if (slowMotionTimer > 0) { slowMotionTimer--; if (slowMotionTimer <= 0) timeScale = 1; }
             if (comboTimer > 0) { comboTimer -= timeScale; if (comboTimer <= 0) { comboCount = 0; comboMultiplier = 1; updateCombo(); } }
             frameCount++;
+            distanceM += speed * timeScale / PX_PER_METER; // накапливаем пройденные метры
+            noHitStreak += speed * timeScale / PX_PER_METER; // серия без урона — тоже в метрах
+            if (frameCount % 30 === 0) { updateNoHitStreak(0); document.getElementById('distDisplay').textContent = Math.floor(distanceM) + ' м'; } // периодическое обновление HUD
 
-            const newBiome = Math.floor(score / 300) % BIOMES.length;
+            const newBiome = Math.floor(distanceM / 300) % BIOMES.length;
             if (newBiome !== currentBiome) {
                 currentBiome = newBiome;
                 generateCity();
@@ -1245,9 +1250,9 @@
             }
 
             const baseSpeed = 7 + (upgrades.speed - 1) * 1.5;
-            const scoreBonus = Math.floor(score / 100) * 0.4;
-            if (boostCooldown > 45) { speed = Math.min(25, baseSpeed + scoreBonus + 6); } 
-            else { speed = Math.min(18, baseSpeed + scoreBonus); }
+            const distBonus = Math.min(8, Math.floor(distanceM / 250) * 0.5); // плавный рост сложности с дистанцией
+            if (boostCooldown > 45) { speed = Math.min(25, baseSpeed + distBonus + 6); } 
+            else { speed = Math.min(18, baseSpeed + distBonus); }
             speed *= gameSettings.speed;
 
             player.vy += gravity * timeScale;
@@ -1285,7 +1290,7 @@
             if (screenShake > 0) screenShake *= 0.9;
 
             spawnTimer += timeScale;
-            let interval = Math.max(35, 75 - Math.floor(score / 30));
+            let interval = Math.max(35, 75 - Math.floor(distanceM / 30));
             if (spawnTimer >= interval) { spawnTimer = 0; if (Math.random() < 0.75) spawnObstacle(); }
 
             coinSpawnTimer += timeScale;
@@ -1313,21 +1318,20 @@
                         continue;
                     }
                     lives--; soundHit(); screenShake = 12; triggerGlitch(); 
-                    score = Math.max(0, score - 15);
                     updateUI(); saveGameState(); resetNoHitStreak();
                     for (let j = 0; j < 25; j++) particles.push({ x: player.x + player.w / 2, y: player.y + player.h / 2, vx: (Math.random() - 0.5) * 15, vy: (Math.random() - 0.5) * 15 - 5, life: 35, color: '#ff0055', size: 3 });
                     obstacles.splice(i, 1);
                     if (lives === 1) triggerSlowMotion(90);
                     if (lives <= 0) {
                         gameRunning = false; soundGameOver();
-                        if (score > best) { best = score; localStorage.setItem('cyberRunnerBest', best); }
-                        saveLeaderboardEntry(score); saveProgress(); clearGameState(); runsThisSession++; trackRuns(); updateUI(); return;
+                        const finalDist = Math.floor(distanceM);
+                        if (finalDist > best) { best = finalDist; localStorage.setItem('cyberRunnerBest', best); }
+                        saveLeaderboardEntry(finalDist); saveProgress(); clearGameState(); runsThisSession++; trackRuns(); updateUI(); return;
                     }
                     continue;
                 }
                 if (obs.x + obs.w < -20) {
-                    obstacles.splice(i, 1); 
-                    score += 5 * comboMultiplier;
+                    obstacles.splice(i, 1);
                     updateUI(); saveGameState(); trackTask('score_total', 0); updateNoHitStreak(5);
                     checkAchievements();
                 }
@@ -1368,7 +1372,6 @@
                 if (p.life <= 0) particles.splice(i, 1);
             }
             if (particles.length > 200) particles.splice(0, particles.length - 200);
-            document.getElementById('scoreDisplay').textContent = score;
         }
 
         function drawRealisticRunner(dx, dy, skin, frame) {
@@ -1741,7 +1744,7 @@
                 ctx.shadowBlur = 0;
                 ctx.fillStyle = '#00ffff';
                 ctx.font = '18px Rajdhani';
-                ctx.fillText(`Финальный счёт: ${score}`, W / 2, H / 2 + 20);
+                ctx.fillText(`Дистанция: ${Math.floor(distanceM)} м`, W / 2, H / 2 + 20);
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
                 ctx.font = '14px Rajdhani';
                 ctx.fillText('Тапни для рестарта', W / 2, H / 2 + 50);
@@ -1785,7 +1788,7 @@
         }
 
         function startNewGame() {
-            coins = 0; score = 0; lives = 3;
+            coins = 0; distanceM = 0; lives = 3;
             clearGameState(); saveProgress();
             restartGame();
             showScreen('screenGame');
@@ -1794,7 +1797,7 @@
         function continueGame() {
             const state = loadGameState();
             if (!state) { startNewGame(); return; }
-            score = state.score || 0;
+            distanceM = state.distance !== undefined ? state.distance : (state.score || 0); // миграция старых сохранений (очки -> метры)
             coins = state.coins || 0;
             lives = state.lives || 3;
             upgrades = JSON.parse(localStorage.getItem('cyberRunnerUpgrades')) || { speed: 1, jump: 1, shield: 0 };
@@ -1819,7 +1822,7 @@
         function updateMenuStats() {
             const menuBest = document.getElementById('menuBest');
             const menuCoins = document.getElementById('menuCoins');
-            if (menuBest) menuBest.textContent = best;
+            if (menuBest) menuBest.textContent = best + ' м';
             if (menuCoins) menuCoins.textContent = coins;
         }
 
@@ -1843,7 +1846,7 @@
         function saveGameState() {
             if (!gameRunning) return;
             try {
-                const state = { score, coins, lives, playerY: player.y, playerVy: player.vy, playerJumping: player.jumping, timestamp: Date.now() };
+                const state = { distance: distanceM, coins, lives, playerY: player.y, playerVy: player.vy, playerJumping: player.jumping, timestamp: Date.now() };
                 localStorage.setItem('cyberRunnerSave', JSON.stringify(state));
             } catch(e) {}
         }
@@ -1853,7 +1856,7 @@
                 const raw = localStorage.getItem('cyberRunnerSave');
                 if (!raw) return null;
                 const state = JSON.parse(raw);
-                if (!state || typeof state.score !== 'number') return null;
+                if (!state || typeof state.distance !== 'number') return null;
                 if (Date.now() - state.timestamp > 86400000) { clearGameState(); return null; }
                 return state;
             } catch (e) { return null; }
@@ -1894,10 +1897,11 @@
         }
 
         function updateUI() {
-            document.getElementById('scoreDisplay').textContent = score;
+            const d = Math.floor(distanceM);
+            document.getElementById('distDisplay').textContent = d + ' м';
             document.getElementById('coinsDisplay').textContent = coins;
             document.getElementById('livesDisplay').textContent = lives;
-            document.getElementById('bestDisplay').textContent = best;
+            document.getElementById('bestDisplay').textContent = best + ' м';
             
             const shieldBtn = document.getElementById('shieldBtn');
             if (upgrades.shield > 0) {
@@ -1967,9 +1971,9 @@
             }
         }
 
-        function saveLeaderboardEntry(finalScore) {
-            if (finalScore <= 0) return;
-            const entry = { score: finalScore, date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }) };
+        function saveLeaderboardEntry(finalDist) {
+            if (finalDist <= 0) return;
+            const entry = { score: finalDist, date: new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }) };
             leaderboard.push(entry);
             leaderboard.sort((a, b) => b.score - a.score);
             leaderboard = leaderboard.slice(0, 5);
@@ -1981,7 +1985,7 @@
             const list = document.getElementById('leaderboardList');
             if (!list) return;
             if (leaderboard.length === 0) { list.innerHTML = '<li class="leaderboard-empty">Пока нет рекордов — сыграй!</li>'; return; }
-            list.innerHTML = leaderboard.map((entry, i) => `<li><span class="rank">#${i + 1}</span><span class="score-val">${entry.score}</span><span class="date-val">${entry.date}</span></li>`).join('');
+            list.innerHTML = leaderboard.map((entry, i) => `<li><span class="rank">#${i + 1}</span><span class="score-val">${entry.score} м</span><span class="date-val">${entry.date}</span></li>`).join('');
         }
 
         function getMaxJumps() { return upgrades.jump >= 3 ? 2 : 1; }
@@ -2113,7 +2117,7 @@
             gameRunning = true; gamePaused = false;
             const pauseBtn = document.getElementById('pauseBtn');
             if (pauseBtn) pauseBtn.textContent = '⏸';
-            score = 0; lives = 3;
+            distanceM = 0; lives = 3;
             obstacles = []; coinsList = []; powerups = []; particles = []; trail = [];
             spawnTimer = 0; coinSpawnTimer = 0; powerupSpawnTimer = 0; frameCount = 0;
             shieldActive = false; shieldTimer = 0; shieldCooldown = 0;
@@ -2133,9 +2137,9 @@
 
         const TASK_TEMPLATES = [
             { id: 'coins', text: 'Собери {n} монет', goal: 50, reward: 60 },
-            { id: 'score', text: 'Набери {n} очков', goal: 200, reward: 80 },
+            { id: 'score', text: 'Пробеги {n} м', goal: 200, reward: 80 },
             { id: 'runs', text: 'Сыграй {n} раз', goal: 3, reward: 50 },
-            { id: 'nohit', text: '{n} очков без урона', goal: 100, reward: 100 },
+            { id: 'nohit', text: '{n} м без урона', goal: 100, reward: 100 },
             { id: 'powerups', text: 'Подбери {n} бонусов', goal: 2, reward: 70 }
         ];
 
@@ -2158,7 +2162,7 @@
             let changed = false;
             if (id === 'coins') { dailyTasks.forEach(t => { if (t.id === 'coins' && !t.done) { t.progress += amount; if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; } } }); }
             else if (id === 'powerups') { dailyTasks.forEach(t => { if (t.id === 'powerups' && !t.done) { t.progress += amount; if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; } } }); }
-            else if (id === 'score_total') { dailyTasks.forEach(t => { if (t.id === 'score' && !t.done) { t.progress = Math.max(t.progress, score); if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; } } }); }
+            else if (id === 'score_total') { dailyTasks.forEach(t => { if (t.id === 'score' && !t.done) { t.progress = Math.max(t.progress, Math.floor(distanceM)); if (t.progress >= t.goal) { t.progress = t.goal; t.done = true; changed = true; } } }); }
             if (changed) { saveDailyTasks(); updateTaskBadge(); }
         }
 

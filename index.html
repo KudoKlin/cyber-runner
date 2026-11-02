@@ -266,6 +266,7 @@
         }
         .mobile-btn:active { transform: scale(0.9); background: rgba(0, 255, 255, 0.25); }
         .mobile-btn.shield-btn-m { width: 56px; height: 56px; font-size: 20px; }
+        .mobile-btn.slide-btn-m { width: 56px; height: 56px; font-size: 20px; border-color: rgba(136, 204, 255, 0.5); color: #88ccff; }
         .mobile-btn.boost-btn { width: 56px; height: 56px; font-size: 20px; border-color: rgba(255, 0, 255, 0.5); color: #ff00ff; }
         @media (hover: none) and (pointer: coarse) { .mobile-controls { display: flex; } }
 
@@ -540,6 +541,7 @@
         </div>
         <div class="mobile-controls">
             <div class="mobile-right">
+                <button class="mobile-btn slide-btn-m" onpointerdown="slide()">⬇️</button>
                 <button class="mobile-btn shield-btn-m" onpointerdown="useShield()">🛡️</button>
                 <button class="mobile-btn boost-btn" onpointerdown="boost()" id="boostBtnMobile"></button>
             </div>
@@ -969,7 +971,8 @@
         };
         let unlockedAchievements = JSON.parse(localStorage.getItem('cyberRunnerAchievements')) || [];
 
-        const player = { x: 80, y: GROUND_Y - 50, w: 30, h: 50, vy: 0, jumping: false };
+        const player = { x: 80, y: GROUND_Y - 50, w: 30, h: 50, vy: 0, jumping: false, sliding: false, slideTimer: 0 };
+        const STAND_H = 50, SLIDE_H = 26, SLIDE_DURATION = 32;
         let obstacles = [];
         let coinsList = [];
         let powerups = [];
@@ -1204,6 +1207,11 @@
             const type = types[Math.floor(Math.random() * types.length)];
             const height = type === 'spike' ? 25 + Math.random() * 20 : 30 + Math.random() * 25;
             const width = type === 'spike' ? 20 : 25 + Math.random() * 15;
+            // Воздушная балка (под ней можно только подкатом) — как в Subway Surfers / Jetpack Joyride
+            if (score > 150 && Math.random() < 0.28) {
+                obstacles.push({ x: W + 50, y: GROUND_Y - 62, w: 70 + Math.random() * 40, h: 16, type: 'bar', color: BIOMES[currentBiome].sign });
+                return;
+            }
             const isDouble = score > 300 && Math.random() < 0.2;
             obstacles.push({ x: W + 50, y: GROUND_Y - height, w: width, h: height, type, color: BIOMES[currentBiome].accent });
             if (isDouble) obstacles.push({ x: W + 50 + width + 15, y: GROUND_Y - (height * 0.7), w: width * 0.8, h: height * 0.7, type: 'box', color: BIOMES[currentBiome].accent });
@@ -1245,10 +1253,19 @@
             player.vy += gravity * timeScale;
             player.y += player.vy * timeScale;
 
+            // Подкат: таймер и динамическая высота (хитбокс + отрисовка)
+            if (player.sliding) {
+                player.slideTimer -= timeScale;
+                if (player.slideTimer <= 0 && !player.jumping) player.sliding = false;
+            }
+            const targetH = player.sliding ? SLIDE_H : STAND_H;
+            player.h = targetH;
+
             if (player.y >= GROUND_Y - player.h) {
                 player.y = GROUND_Y - player.h;
                 player.vy = 0; player.jumping = false;
                 jumpsLeft = getMaxJumps();
+                if (player.sliding && player.slideTimer <= 0) player.sliding = false;
             }
 
             legTimer++;
@@ -1358,6 +1375,57 @@
             const skinMain = skin.colors[0];
             const skinDark = skin.colors[1];
             const skinLeg = skin.colors[2];
+
+            // Поза подката: пригнутый бегун с вытянутой вперёд ногой
+            if (player.sliding) {
+                ctx.save();
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                ctx.beginPath();
+                ctx.ellipse(dx + 17, GROUND_Y + 3, 22, 4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowColor = skinMain; ctx.shadowBlur = 14;
+                ctx.fillStyle = skinMain;
+                ctx.beginPath();
+                ctx.ellipse(dx + 13, dy + 16, 13, 8, -0.25, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = skinLeg;
+                ctx.save();
+                ctx.translate(dx + 20, dy + 18);
+                ctx.rotate(-0.35);
+                ctx.fillRect(0, -3, 18, 6);
+                ctx.fillRect(15, -5, 5, 8);
+                ctx.restore();
+
+                ctx.fillStyle = skinDark;
+                ctx.fillRect(dx + 2, dy + 16, 12, 5);
+
+                ctx.fillStyle = skinMain;
+                ctx.shadowBlur = 18;
+                ctx.beginPath();
+                ctx.arc(dx + 24, dy + 9, 7.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 12;
+                ctx.beginPath();
+                ctx.ellipse(dx + 27, dy + 8, 3, 2, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = skinMain;
+                ctx.lineWidth = 3;
+                ctx.shadowColor = skinMain; ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.moveTo(dx + 4, dy + 14);
+                const scarfWave = Math.sin(frameCount * 0.4) * 4;
+                ctx.quadraticCurveTo(dx - 12 - speed, dy + 10 + scarfWave, dx - 18 - speed * 1.5, dy + 18 + scarfWave);
+                ctx.stroke();
+
+                ctx.restore();
+                ctx.shadowBlur = 0;
+                return;
+            }
             
             ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
             ctx.beginPath();
@@ -1572,7 +1640,18 @@
 
             for (const obs of obstacles) {
                 ctx.shadowColor = obs.color; ctx.shadowBlur = 15;
-                if (obs.type === 'spike') {
+                if (obs.type === 'bar') {
+                    // Воздушная балка с подвесами
+                    ctx.fillStyle = obs.color;
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    ctx.strokeStyle = obs.color; ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(obs.x + 6, obs.y); ctx.lineTo(obs.x + 6, obs.y - 30);
+                    ctx.moveTo(obs.x + obs.w - 6, obs.y); ctx.lineTo(obs.x + obs.w - 6, obs.y - 30);
+                    ctx.stroke();
+                    ctx.fillStyle = '#0a0a0f';
+                    for (let sx = obs.x + 8; sx < obs.x + obs.w - 6; sx += 14) ctx.fillRect(sx, obs.y + 5, 6, 6);
+                } else if (obs.type === 'spike') {
                     ctx.fillStyle = obs.color;
                     ctx.beginPath();
                     ctx.moveTo(obs.x, obs.y + obs.h);
@@ -1606,6 +1685,11 @@
             }
 
             drawRealisticRunner(dx, dy, skin, legFrame);
+
+            // Искры трения во время подката
+            if (player.sliding && frameCount % 2 === 0) {
+                particles.push({ x: player.x + player.w - 4, y: GROUND_Y - 3, vx: -speed * 0.4, vy: -Math.random() * 1.5, life: 12, color: '#ffcc66', size: 2 });
+            }
 
             for (const p of particles) {
                 const alpha = p.life / 35;
@@ -1718,9 +1802,10 @@
             spawnTimer = 0; coinSpawnTimer = 0; powerupSpawnTimer = 0; frameCount = 0;
             shieldActive = false; shieldTimer = 0; shieldCooldown = 0;
             boostCooldown = 0; magnetTimer = 0; doubleCoinTimer = 0; screenShake = 0;
-            player.y = state.playerY !== undefined ? state.playerY : (GROUND_Y - player.h);
+            player.y = state.playerY !== undefined ? state.playerY : (GROUND_Y - STAND_H);
             player.vy = state.playerVy || 0;
             player.jumping = state.playerJumping || false;
+            player.h = STAND_H; player.sliding = false; player.slideTimer = 0;
             jumpsLeft = getMaxJumps();
             gameRunning = true; gamePaused = false;
             const pauseBtn = document.getElementById('pauseBtn');
@@ -1901,6 +1986,20 @@
 
         function getMaxJumps() { return upgrades.jump >= 3 ? 2 : 1; }
 
+        function slide() {
+            initAudio();
+            if (!gameRunning || gamePaused) return;
+            // Подкат можно начать на земле или «срезать» в воздухе (как в Subway Surfers)
+            if (!player.sliding) {
+                player.sliding = true;
+                player.slideTimer = SLIDE_DURATION;
+                if (player.jumping && player.vy < 0) player.vy = 6; // быстрое падение вниз
+                playBeep(220, 0.12, 'sawtooth', 0.12);
+                haptic(20);
+                for (let i = 0; i < 14; i++) particles.push({ x: player.x + player.w / 2, y: GROUND_Y - 4, vx: -Math.random() * 5 - 1, vy: -Math.random() * 2, life: 20, color: '#88ccff', size: 2 });
+            }
+        }
+
         function jump() {
             initAudio();
             if (!gameRunning || gamePaused) return;
@@ -2021,8 +2120,9 @@
             boostCooldown = 0; magnetTimer = 0; doubleCoinTimer = 0; screenShake = 0;
             currentBiome = 0;
             comboCount = 0; comboMultiplier = 1; comboTimer = 0;
-            player.y = GROUND_Y - player.h;
-            player.vy = 0; player.jumping = false;
+            player.y = GROUND_Y - STAND_H;
+            player.h = STAND_H;
+            player.vy = 0; player.jumping = false; player.sliding = false; player.slideTimer = 0;
             jumpsLeft = getMaxJumps();
             currentRunScore = 0; noHitStreak = 0;
             generateCity();
@@ -2173,7 +2273,7 @@
             const dx = touch.clientX - touchStartX, dy = touch.clientY - touchStartY;
             const dt = Date.now() - touchStartTime;
             if (Math.abs(dx) < 30 && Math.abs(dy) < 30 && dt < 300) { jump(); return; }
-            if (Math.abs(dy) > Math.abs(dx)) { if (dy < -40) jump(); }
+            if (Math.abs(dy) > Math.abs(dx)) { if (dy < -40) jump(); if (dy > 40) slide(); }
             else { if (dx > 40) boost(); if (dx < -40) useShield(); }
         }, { passive: true });
 
@@ -2191,6 +2291,8 @@
             const gameActive = document.getElementById('screenGame').classList.contains('active');
             if (!gameActive) return;
             if (e.key === ' ' || e.key === 'Space') { e.preventDefault(); if (!gameRunning) { restartGame(); return; } jump(); }
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === 'ц' || e.key === 'Ц') { e.preventDefault(); if (!gameRunning && gameActive) { restartGame(); return; } jump(); }
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S' || e.key === 'ы' || e.key === 'Ы') { e.preventDefault(); slide(); }
             if (e.key === 'Shift') { e.preventDefault(); boost(); }
             if (e.key === 'e' || e.key === 'E') useShield();
             if (e.key === 'p' || e.key === 'P') togglePause();

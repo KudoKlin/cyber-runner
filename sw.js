@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cyber-runner-v5'; // ← ИЗМЕНИЛ ВЕРСИЮ С v1 НА v5
+const CACHE_NAME = 'cyber-runner-v6'; // ← ИЗМЕНИЛ ВЕРСИЮ С v1 НА v5
 const urlsToCache = [
   './',
   './index.html',

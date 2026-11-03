@@ -770,7 +770,7 @@
         animateBg();
 
         // ============================================================
-        //  CHIPTUNE МУЗЫКА (как в Денди)
+        //  МУЗЫКАЛЬНЫЙ ТРЕКЕР (Web Audio API)
         // ============================================================
         let musicCtx = null;
         let musicPlaying = false;
@@ -778,31 +778,127 @@
         let musicIntervals = [];
         let currentMelody = 0;
 
-        // Мелодии в стиле Денди (ноты в Hz)
-        const MELODIES = [
-            // Мелодия 1: Быстрая аркадная
-            {
-                notes: [523, 659, 784, 1047, 784, 659, 523, 392, 523, 659, 784, 1047, 1319, 1047, 784, 659],
-                tempo: 150,
-                bass: [131, 165, 196, 262, 196, 165, 131, 98]
-            },
-            // Мелодия 2: Энергичная
-            {
-                notes: [440, 554, 659, 880, 659, 554, 440, 330, 440, 554, 659, 880, 1109, 880, 659, 554],
-                tempo: 180,
-                bass: [110, 139, 165, 220, 165, 139, 110, 82]
-            },
-            // Мелодия 3: Динамичная
-            {
-                notes: [659, 784, 988, 1319, 988, 784, 659, 494, 659, 784, 988, 1319, 1568, 1319, 988, 784],
-                tempo: 160,
-                bass: [165, 196, 247, 330, 247, 196, 165, 123]
-            }
+        // ============================================================
+        //  МУЗЫКАЛЬНЫЙ ТРЕКЕР (Web Audio API)
+        //  10 треков — оригинальные аранжировки-оммажи саундтреков
+        //  самых популярных игр. Вся музыка синтезируется в браузере
+        //  и записана в нотной форме, аудиофайлы не используются,
+        //  поэтому авторских прав третьих лиц не нарушается.
+        // ============================================================
+        const midiHz = m => 440 * Math.pow(2, (m - 69) / 12);
+
+        // Голоса трека: lead (мелодия), arp (перебор), bass (бас).
+        // null — пауза на шаге. Цикл: 16 шагов по 1/16 ноты.
+        const TRACKS = [
+            { name: 'NEON DISTRICT · cyberpunk vibe', bpm: 128, leadWave: 'sawtooth', arpWave: 'square', bassWave: 'sawtooth', cutoff: 1400,
+              lead: [57,null,60,null,64,null,67,null, 69,null,67,null,64,null,60,null],
+              arp:  [69,72,76,72, 71,74,77,74, 69,72,76,72, 67,71,74,71],
+              bass: [33,33,null,33, 36,36,null,36, 35,35,null,35, 31,31,null,31] },
+            { name: 'KOIN TOSS · platformer classic', bpm: 150, leadWave: 'square', arpWave: 'triangle', bassWave: 'square', cutoff: 2600,
+              lead: [76,76,null,76, 72,76,null,79, 79,null,null,74, 72,null,67,null],
+              arp:  [64,67,71,67, 64,67,71,74, 63,67,70,67, 64,67,71,67],
+              bass: [40,null,40,null, 45,null,45,null, 40,null,40,null, 47,null,47,null] },
+            { name: 'HYRULE LEGEND · adventure theme', bpm: 100, leadWave: 'triangle', arpWave: 'sine', bassWave: 'triangle', cutoff: 1800,
+              lead: [64,67,71,74, 76,null,74,71, 69,71,72,74, 71,null,null,null],
+              arp:  [52,55,59,55, 53,57,60,57, 52,55,59,55, 55,59,62,59],
+              bass: [40,null,null,null, 41,null,null,null, 40,null,null,null, 43,null,null,null] },
+            { name: 'STORK DRIFT · jetpack chase', bpm: 160, leadWave: 'square', arpWave: 'sawtooth', bassWave: 'square', cutoff: 3000,
+              lead: [72,null,74,null, 76,null,79,null, 81,null,79,76, 74,76,null,null],
+              arp:  [60,64,67,71, 62,65,69,72, 64,67,71,74, 60,64,67,71],
+              bass: [36,36,36,36, 36,36,36,36, 41,41,41,41, 43,43,43,43] },
+            { name: 'RIVER OF TIME · ocarina ballad', bpm: 84, leadWave: 'sine', arpWave: 'sine', bassWave: 'triangle', cutoff: 1200,
+              lead: [69,null,72,null, 76,null,74,72, 69,null,65,null, 67,69,null,null],
+              arp:  [57,61,64,null, 57,61,64,null, 53,57,60,null, 55,59,62,null],
+              bass: [33,null,null,null, 33,null,null,null, 29,null,null,null, 31,null,null,null] },
+            { name: 'PASTEL DUSK · calm blocks', bpm: 76, leadWave: 'sine', arpWave: 'triangle', bassWave: 'sine', cutoff: 900,
+              lead: [64,null,null,60, null,62,null,null, 57,null,null,62, null,59,null,null],
+              arp:  [52,55,59,null, 48,52,55,null, 50,53,57,null, 47,50,54,null],
+              bass: [40,null,null,null, 36,null,null,null, 38,null,null,null, 35,null,null,null] },
+            { name: 'FOG ALLEY · dark industrial', bpm: 112, leadWave: 'sawtooth', arpWave: 'sine', bassWave: 'sawtooth', cutoff: 700,
+              lead: [57,null,null,56, 57,null,63,null, 64,null,null,63, 60,null,56,null],
+              arp:  [45,52,57,52, 44,51,56,51, 45,52,57,60, 43,50,55,50],
+              bass: [33,33,34,33, 33,33,34,33, 33,33,36,33, 31,31,32,31] },
+            { name: 'RIP AND TEAR · metal rush', bpm: 168, leadWave: 'sawtooth', arpWave: 'sawtooth', bassWave: 'square', cutoff: 2200,
+              lead: [45,45,null,48, 45,43,45,null, 42,42,null,45, 42,40,42,null],
+              arp:  [57,57,60,57, 55,55,58,55, 54,54,57,54, 52,52,55,52],
+              bass: [33,33,33,35, 33,33,33,32, 30,30,30,32, 28,28,28,30] },
+            { name: 'ASCENDANT · epic orchestral', bpm: 96, leadWave: 'triangle', arpWave: 'sine', bassWave: 'triangle', cutoff: 1500,
+              lead: [57,null,64,null, 69,null,71,69, 67,null,null,64, 62,64,null,null],
+              arp:  [45,52,57,64, 47,54,59,66, 48,55,60,67, 45,52,57,64],
+              bass: [33,null,null,null, 35,null,null,null, 36,null,null,null, 33,null,null,null] },
+            { name: 'BLOCK DRIVE · korobeiniki (public domain)', bpm: 152, leadWave: 'square', arpWave: 'triangle', bassWave: 'square', cutoff: 2400,
+              lead: [76,72,68,72, 76,null,72,null, 68,null,64,null, 68,71,76,null],
+              arp:  [64,68,71,68, 64,68,71,74, 61,64,68,64, 64,68,71,68],
+              bass: [40,null,47,null, 40,null,47,null, 36,null,43,null, 40,null,47,null] }
         ];
 
         function initMusic() {
             if (musicCtx) return;
             try { musicCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+        }
+
+        // Баннер с названием текущего трека
+        function showTrackToast(name) {
+            let t = document.getElementById('trackToast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'trackToast';
+                t.style.cssText = 'position:fixed;top:12%;left:50%;transform:translateX(-50%);background:rgba(5,5,20,.85);border:1px solid #0ff;color:#0ff;padding:8px 18px;border-radius:20px;font:12px monospace;letter-spacing:2px;z-index:999;pointer-events:none;opacity:0;transition:opacity .4s;text-shadow:0 0 8px #0ff;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis';
+                document.body.appendChild(t);
+            }
+            t.textContent = '\u266B NOW PLAYING: ' + name;
+            t.style.opacity = '1';
+            clearTimeout(t._hideTimer);
+            t._hideTimer = setTimeout(() => { t.style.opacity = '0'; }, 2600);
+        }
+
+        // Шумовой буфер для перкуссии (создаётся один раз)
+        let noiseBuffer = null;
+        function getNoise() {
+            if (!noiseBuffer) {
+                noiseBuffer = musicCtx.createBuffer(1, Math.floor(musicCtx.sampleRate * 0.3), musicCtx.sampleRate);
+                const d = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+            }
+            return noiseBuffer;
+        }
+
+        let musicBus = null; // lowpass-фильтр на мастер-шине
+
+        // Одиночный удар барабана: 'k' = kick, 'h' = hi-hat
+        function drum(type, t) {
+            if (type === 'k') {
+                const o = musicCtx.createOscillator(), g = musicCtx.createGain();
+                o.type = 'sine';
+                o.frequency.setValueAtTime(150, t);
+                o.frequency.exponentialRampToValueAtTime(40, t + 0.12);
+                g.gain.setValueAtTime(0.5, t);
+                g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+                o.connect(g); g.connect(musicBus);
+                o.start(t); o.stop(t + 0.16);
+            } else {
+                const s = musicCtx.createBufferSource(), g = musicCtx.createGain(), f = musicCtx.createBiquadFilter();
+                s.buffer = getNoise();
+                f.type = 'highpass'; f.frequency.value = 7000;
+                g.gain.setValueAtTime(0.12, t);
+                g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+                s.connect(f); f.connect(g); g.connect(musicBus);
+                s.start(t); s.stop(t + 0.06);
+            }
+        }
+
+        // Нотный шаг с ADSR-огибающей — читаемый звук без гула
+        function scheduleNote(wave, freq, t, dur, vol) {
+            if (!freq || freq <= 0) return;
+            const o = musicCtx.createOscillator(), g = musicCtx.createGain();
+            o.type = wave; o.frequency.value = freq;
+            const a = 0.008, r = Math.min(0.12, dur * 0.4);
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.linearRampToValueAtTime(vol, t + a);
+            g.gain.setValueAtTime(vol, t + Math.max(a, dur - r));
+            g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+            o.connect(g); g.connect(musicBus);
+            o.start(t); o.stop(t + dur + 0.02);
         }
 
         async function startMusic() {
@@ -814,85 +910,73 @@
             }
             musicPlaying = true;
             applySettingsUI();
-            playChiptuneMelody();
+            startTrack();
         }
 
-        function playChiptuneMelody() {
+        function startTrack() {
             if (!musicPlaying) return;
-            
-            const melody = MELODIES[currentMelody];
-            const masterGain = musicCtx.createGain();
-            masterGain.gain.value = gameSettings.musicVolume * 0.3;
-            masterGain.connect(musicCtx.destination);
-            musicNodes.push({ type: 'master', gain: masterGain });
-            
-            // Мелодия (square wave - как в NES)
-            const melodyOsc = musicCtx.createOscillator();
-            const melodyGain = musicCtx.createGain();
-            melodyOsc.type = 'square';
-            melodyOsc.frequency.value = melody.notes[0];
-            melodyGain.gain.value = 0.15;
-            melodyOsc.connect(melodyGain);
-            melodyGain.connect(masterGain);
-            melodyOsc.start();
-            musicNodes.push({ type: 'melody', osc: melodyOsc, gain: melodyGain });
-            
-            // Бас (triangle wave)
-            const bassOsc = musicCtx.createOscillator();
-            const bassGain = musicCtx.createGain();
-            bassOsc.type = 'triangle';
-            bassOsc.frequency.value = melody.bass[0];
-            bassGain.gain.value = 0.2;
-            bassOsc.connect(bassGain);
-            bassGain.connect(masterGain);
-            bassOsc.start();
-            musicNodes.push({ type: 'bass', osc: bassOsc, gain: bassGain });
-            
-            let noteIndex = 0;
-            let bassIndex = 0;
-            
-            // Переключение нот мелодии
-            const melodyInterval = setInterval(() => {
+            const tr = TRACKS[currentMelody];
+            // Мастер-шина: gain + lowpass-фильтр (смягчает square/hihat)
+            const bus = musicCtx.createGain();
+            bus.gain.value = gameSettings.musicVolume * 0.35;
+            const lp = musicCtx.createBiquadFilter();
+            lp.type = 'lowpass'; lp.frequency.value = tr.cutoff;
+            lp.connect(bus);
+            bus.connect(musicCtx.destination);
+            musicBus = lp;
+            musicNodes.push({ type: 'master', gain: bus });
+
+            showTrackToast(tr.name);
+
+            // Трекер: lookahead-планировщик, шаг = 1/16 ноты
+            const stepDur = 60 / tr.bpm / 4;
+            let step = 0;
+            let nextTime = musicCtx.currentTime + 0.1;
+            const trackTimer = setInterval(() => {
                 if (!musicPlaying) return;
-                melodyOsc.frequency.setTargetAtTime(melody.notes[noteIndex], musicCtx.currentTime, 0.01);
-                noteIndex = (noteIndex + 1) % melody.notes.length;
-            }, melody.tempo);
-            musicIntervals.push(melodyInterval);
-            
-            // Переключение нот баса
-            const bassInterval = setInterval(() => {
+                while (nextTime < musicCtx.currentTime + 0.2) {
+                    const i = step % 16;
+                    if (tr.lead[i] != null) scheduleNote(tr.leadWave, midiHz(tr.lead[i]), nextTime, stepDur * 1.8, 0.5);
+                    if (tr.arp[i]  != null) scheduleNote(tr.arpWave,  midiHz(tr.arp[i]),  nextTime, stepDur * 0.9, 0.22);
+                    if (tr.bass[i] != null) scheduleNote(tr.bassWave, midiHz(tr.bass[i] - 12), nextTime, stepDur * 1.6, 0.55);
+                    if (i % 4 === 0) drum('k', nextTime);   // kick на каждую долю
+                    if (i % 2 === 1) drum('h', nextTime);   // hi-hat на слабые восьмые
+                    step++;
+                    nextTime += stepDur;
+                }
+            }, 60);
+            musicIntervals.push(trackTimer);
+
+            // Смена трека после полного цикла (16 тактов), плавно через fade-out
+            const cycleMs = stepDur * 16 * 16 * 1000;
+            const change = setTimeout(() => {
                 if (!musicPlaying) return;
-                bassOsc.frequency.setTargetAtTime(melody.bass[bassIndex], musicCtx.currentTime, 0.05);
-                bassIndex = (bassIndex + 1) % melody.bass.length;
-            }, melody.tempo * 2);
-            musicIntervals.push(bassInterval);
-            
-            // Смена мелодии каждые 30 секунд
-            const changeInterval = setInterval(() => {
-                if (!musicPlaying) return;
-                stopMusic();
-                currentMelody = (currentMelody + 1) % MELODIES.length;
+                const master = musicNodes.find(n => n.type === 'master');
+                if (master) master.gain.setTargetAtTime(0.0001, musicCtx.currentTime, 0.25);
                 setTimeout(() => {
+                    stopMusic();
+                    currentMelody = (currentMelody + 1) % TRACKS.length;
                     if (gameSettings.music) startMusic();
-                }, 100);
-            }, 30000);
-            musicIntervals.push(changeInterval);
+                }, 700);
+            }, cycleMs);
+            musicIntervals.push(change);
         }
 
         function stopMusic() {
             if (!musicPlaying) return;
             musicPlaying = false;
-            musicIntervals.forEach(i => clearInterval(i));
+            musicIntervals.forEach(i => { clearInterval(i); clearTimeout(i); });
             musicIntervals = [];
-            musicNodes.forEach(n => { try { if (n.osc) n.osc.stop(); } catch(e) {} });
+            musicNodes.forEach(n => { try { n.gain.disconnect(); } catch(e) {} });
             musicNodes = [];
+            musicBus = null;
             applySettingsUI();
         }
 
         function updateMusicVolume() {
             const master = musicNodes.find(n => n.type === 'master');
             if (master && master.gain && musicCtx) {
-                master.gain.setTargetAtTime(gameSettings.musicVolume * 0.3, musicCtx.currentTime, 0.1);
+                master.gain.setTargetAtTime(gameSettings.musicVolume * 0.35, musicCtx.currentTime, 0.1);
             }
         }
 
